@@ -1,0 +1,98 @@
+#DIRECTIONS
+
+{codeDirection: "DCR",              nomAgence: "Direction Commerciale et Réseau"} 
+{codeDirection: "DAI",	            nomAgence: "Direction de l'Audit Interne"}
+{codeDirection: "DID",	            nomAgence: "Direction de l'Innovation et du Developpement"} 
+{codeDirection: "DMG",	            nomAgence: "Direction des Moyens Généraux"} 
+{codeDirection: "DOC",	            nomAgence: "Direction des Opérations de Credit"} 
+{codeDirection: "DRH",	            nomAgence: "Direction des Ressources Humaines"} 
+{codeDirection: "DSITN",	        nomAgence: "Direction des Systèmes d'Information et de la Transformation Numérique"} 
+{codeDirection: "DFC",	            nomAgence: "Direction Financière et Comptable"} 
+{codeDirection: "DG",               nomAgence: "Direction Générale"} 
+{codeDirection: "DGAFP",	        nomAgence: "Direction Générale Adjointe Chargée de Finance et du Patrimoine"} 
+{codeDirection: "DGARC",	        nomAgence: "Direction Générale Adjointe Chargée des Risques et Conformité"} 
+ 
+
+#AGENCE
+
+{codeAgence : "WU 67",	            nomAgence: "AD WU 67ha"},
+{codeAgence : "WU 006 I",	        nomAgence: "AD WU Diégo I"},
+{codeAgence : "WU 006 II",	        nomAgence: "AD WU Diégo II"},
+{codeAgence : "WU 004",	            nomAgence: "AD WU Majunga"},
+{codeAgence : "WU 012",	            nomAgence: "AD WU Nosy Be"},
+{codeAgence : "CEM 001",	        nomAgence: "CEM - WU 001 TSARALALANA"},
+{codeAgence : "CEM 002",	        nomAgence: "CEM - WU 002 FIANARANTSOA"},
+{codeAgence : "CEM 003",	        nomAgence: "CEM - WU 003 TAMATAVE"},
+{codeAgence : "CEM 004",	        nomAgence: "CEM - WU 004 MAJUNGA"},
+{codeAgence : "CEM 005",	        nomAgence: "CEM - WU 005 AMBOSITRA"},
+{codeAgence : "CEM 006",	        nomAgence: "CEM - WU 006 DIEGO"},
+{codeAgence : "CEM 008",	        nomAgence: "CEM - WU 008 TULEAR"},
+{codeAgence : "CEM 009",	        nomAgence: "CEM - WU 009 ANTSIRABE"},
+{codeAgence : "CEM 010",	        nomAgence: "CEM - WU 010 FORT - DAUPHIN"},
+{codeAgence : "CEM 011",	        nomAgence: "CEM - WU 011 MORONDAVA"},
+{codeAgence : "CEM 016",	        nomAgence: "CEM - WU 016 SAINTE MARIE"},
+{codeAgence : "CEM 017",	        nomAgence: "CEM - WU 017 AMBATONDRAZAKA"},
+{codeAgence : "CEM 018",	        nomAgence: "CEM - WU 018 MANAKARA"},
+{codeAgence : "CEM 019",	        nomAgence: "CEM - WU 019 MORAMANGA"},
+{codeAgence : "CEM 020",	        nomAgence: "CEM - WU 020 TSIROANOMANDIDY"},
+{codeAgence : "CEM 021",	        nomAgence: "CEM - WU 021 ANALAVORY"},
+{codeAgence : "CEM 024",	        nomAgence: "CEM - WU 024 AMBATOLAMPY"},
+{codeAgence : "CEM 028",	        nomAgence: "CEM - WU 028 AMBALAVAO"},
+{codeAgence : "CEM 029",	        nomAgence: "CEM - WU 029 FANDRIANA"},
+{codeAgence : "CEM 030",	        nomAgence: "CEM - WU 030 IHOSY"},
+{codeAgence : "CEM 043",	        nomAgence: "CEM - WU 043 AMBANJA"},
+{codeAgence : "CEM 044",	        nomAgence: "CEM - WU 044 AMBILOBE"},
+{codeAgence : "CEM 046",	        nomAgence: "CEM - WU 046 SAMBAVA"},
+{codeAgence : "CEM 048",	        nomAgence: "CEM - WU 048 ANDRAVOAHANGY"},
+{codeAgence : "CEM 049",	        nomAgence: "CEM - WU 049 ANTSAKAVIRO"},
+{codeAgence : "CEM 051",	        nomAgence: "CEM - WU 051 ANALAMAHITSY"},
+{codeAgence : "CEM 086",	        nomAgence: "CEM - WU 086 TAMATAVE"}
+
+
+#SERVICE
+
+DCR SAR	            Service Animation du Réseau
+DCR SAC	            Service de l’Appui et de la Coordination
+DCR SEF	            Service de l’Education Financière
+
+DAI AJ	            Auditeurs Juniors
+DAI AS	            Auditeurs Seniors
+	
+DID SDO	            Service Recherche et Développement des Offres
+
+DMG SAD	            Service Archive et Documentation
+DMG SIA	            Service Immobilisation et Chaîne d'Approvisionnement
+DMG SLM	            Service Logistique et Maintenance
+DMG SVP	            Service Valorisation du Patrimoine
+	
+SENG	        Service Engagements
+SSR	            Service Suivi et Recouvrement
+	
+SAP	            Service de l'Administration du Personnel
+SASCI	        Service des Affaires Sociales et Communication Interne
+SDRH	        Service du Développement des Ressources Humaines
+
+SDD	            Service Data et Décisionnel
+SIE	            Service Infrastructure et Exploitation
+SSI	            Service Sécurité Informatique
+STN	            Service Transformation Numérique
+
+
+SAUT	        Service Authentification
+SCTB	        Service Comptabilité
+STRES	        Service Trésorerie
+	
+BSDG	        Bureau du Secrétariat du DG
+CCRP	        Cellule Communication et Relations Publiques
+SCGP	        Service Contrôle de Gestion et Performance
+UGPM	        Unité de Gestion de Passation des Marchés
+
+
+SGT	            Service des Grands Travaux
+	
+
+SCTRL	        Service Contrôle
+SFISC	        Service Fiscalité
+SJC	            Service Juridique et Contentieux
+SRC	            Service Risques et Conformité
+
