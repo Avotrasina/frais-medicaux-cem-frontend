@@ -1,51 +1,41 @@
 import type { StructureOrganisationnelle } from "../types/organisation";
+import { directions } from "./direction";
+import { agents } from "./agent";
 export const structures: StructureOrganisationnelle[] = [
   {
     id: "STR-001",
-    statutPEC: "DIRECTEUR",
-    direction: {
-      codeDirection: "DSITN",
-      nom: "Direction des Systèmes d'Information et de la Transformation Numérique",
-      services: [],
-    },
-    agents: [],
+    statutPEC: "CHEF_SERVICE",
+    direction: directions.find((d) => d.codeDirection === "DCR"),
+    agents: agents.filter((a) => a.structureID === "STR-001"),
   },
   {
     id: "STR-002",
-    statutPEC: "CHEF_SERVICE",
-    direction: {
-      codeDirection: "DRH",
-      nom: "Direction des Ressources Humaines",
-      services: [],
-    },
-    agents: [],
+    statutPEC: "AGENT",
+    direction: directions.find((d) => d.codeDirection === "DCR"),
+    agents: agents.filter((a) => a.structureID === "STR-002"),
   },
   {
     id: "STR-003",
-    statutPEC: "CHEF_AGENCE",
-    agence: {
-      codeAgence: "CEM 001",
-      nomAgence: "CEM - WU 001 TSARALALANA",
-    },
-    agents: [],
+    statutPEC: "AGENT",
+    direction: directions.find((d) => d.codeDirection === "DID"),
+    agents: agents.filter((a) => a.structureID === "STR-003"),
   },
   {
     id: "STR-004",
     statutPEC: "AGENT",
-    direction: {
-      codeDirection: "DFC",
-      nom: "Direction Financière et Comptable",
-      services: [],
-    },
-    agents: [],
+    direction: directions.find((d) => d.codeDirection === "DAI"),
+    agents: agents.filter((a) => a.structureID === "STR-004"),
   },
   {
     id: "STR-005",
     statutPEC: "AGENT",
-    agence: {
-      codeAgence: "CEM 002",
-      nomAgence: "CEM - WU 002 FIANARANTSOA",
-    },
-    agents: [],
+    direction: directions.find((d) => d.codeDirection === "DAI"),
+    agents: agents.filter((a) => a.structureID === "STR-005"),
+  },
+  {
+    id: "STR-006",
+    statutPEC: "DIRECTEUR",
+    direction: directions.find((d) => d.codeDirection === "DRH"),
+    agents: agents.filter((a) => a.structureID === "STR-006"),
   },
 ];

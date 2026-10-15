@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge, statusTone } from "../components/Badge";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { DataTable, type Column } from "../components/DataTable";
 import { InlineCell } from "../components/InlineCell";
 import { PageHeader } from "../components/PageHeader";
 import { ResourceToolbar } from "../components/ResourceToolbar";
-
+import { Modal } from "../components/Modal";
+import { ToastViewport, notify } from "../components/Toast";
 
 import { directions } from "../data/direction";
 import { agents as initialAgents } from "../data/agent";
@@ -13,7 +15,7 @@ import { personnes } from "../data/personne";
 import { structures } from "../data/structure";
 import { agences } from "../data/agence";
 import { fonctions } from "../data/fonction";
-
+import { services } from "../data/service";
 
 // View model matching the columns in the Excel sheet.
 interface AgentRow {
@@ -48,30 +50,22 @@ const formatDate = (value?: string | null): string => {
 const buildAgentRows = (): AgentRow[] => {
   return initialAgents.map((agent) => {
     const personne = personnes.find(
-      (p) => p.agent?.matricule === agent.matricule
+      (p) => p.agent?.matricule === agent.matricule,
     );
 
-    const structure = structures.find(
-      (s) => s.id === agent.structureID
-    );
+    const structure = structures.find((s) => s.id === agent.structureID);
 
     const directionCode = structure?.direction?.codeDirection;
-    const direction = directions.find(
-      (d) => d.codeDirection === directionCode
-    );
+    const direction = directions.find((d) => d.codeDirection === directionCode);
 
     const agenceCode = structure?.agence?.codeAgence;
-    const agence = agences.find(
-      (a) => a.codeAgence === agenceCode
+    const agence = agences.find((a) => a.codeAgence === agenceCode);
+
+    const service = services.find(
+      (s) => s.codeService === agent.serviceID,
     );
 
-    const service = direction?.services.find(
-      (s) => s.codeService === String(agent.serviceID)
-    );
-
-    const fonction = fonctions.find(
-      (f) => f.id === agent.fonctionID
-    );
+    const fonction = fonctions.find((f) => f.id === agent.fonctionID);
 
     const isRetired = agent.agentType === "AGENT_RETRAITE";
     const organisation = isRetired
@@ -82,7 +76,7 @@ const buildAgentRows = (): AgentRow[] => {
 
     const statutPEC = isRetired
       ? "RETRAITE"
-      : structure?.statutPEC ?? "AGENT";
+      : (structure?.statutPEC ?? "AGENT");
 
     return {
       id: agent.id,
@@ -92,29 +86,30 @@ const buildAgentRows = (): AgentRow[] => {
         : "—",
       fonction: fonction?.nom ?? "—",
       statutPEC,
-      sexe: personne?.sexe === "FEMININ"
-        ? "Femme"
-        : personne?.sexe === "MASCULIN"
-          ? "Homme"
-          : "—",
+      sexe:
+        personne?.sexe === "FEMININ"
+          ? "Femme"
+          : personne?.sexe === "MASCULIN"
+            ? "Homme"
+            : "—",
       categorie: agent.categorieID || "—",
       organisation,
       codeDirection: isRetired
         ? "RET"
         : agence
           ? "AGENCE"
-          : direction?.codeDirection ?? "—",
+          : (direction?.codeDirection ?? "—"),
       direction: isRetired
         ? "RETRAITE"
         : agence
           ? "Agence"
-          : direction?.nom ?? "—",
+          : (direction?.nom ?? "—"),
       codeServiceAgence: isRetired
         ? "RET"
-        : agence?.codeAgence ?? service?.codeService ?? "—",
+        : (agence?.codeAgence ?? service?.codeService ?? "—"),
       serviceAgence: isRetired
         ? "RETRAITE"
-        : agence?.nomAgence ?? service?.nom ?? "—",
+        : (agence?.nomAgence ?? service?.nom ?? "—"),
       dateNaissance: formatDate(personne?.dateNaissance),
       dateEntree: formatDate(agent.dateEntree),
       observation: agent.observationMatricule ?? "—",
@@ -128,6 +123,38 @@ export default function AgentPage() {
   const [rows, setRows] = useState<AgentRow[]>(buildAgentRows);
   const [q, setQ] = useState("");
   const [deleteRow, setDeleteRow] = useState<AgentRow | null>(null);
+  const [editing, setEditing] = useState<AgentRow | null>(null);
+  const emptyRow = (): Omit<AgentRow, "id"> => ({
+    im: "",
+    name: "",
+    fonction: "",
+    statutPEC: "AGENT",
+    sexe: "—",
+    categorie: "",
+    organisation: "DIRECTION",
+    codeDirection: "",
+    direction: "",
+    codeServiceAgence: "",
+    serviceAgence: "",
+    dateNaissance: "",
+    dateEntree: "",
+    observation: "",
+    carte: "",
+    parQui: "Utilisateur connecté",
+  });
+  const [form, setForm] = useState<Omit<AgentRow, "id">>(emptyRow());
+  const editField = (label: string, key: keyof typeof form, type = "text") => (
+    <div key={key}>
+      <label className="label">{label}</label>
+      <input
+        className="field"
+        type={type}
+        value={form[key]}
+        required={["im", "name"].includes(key)}
+        onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+      />
+    </div>
+  );
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -155,19 +182,13 @@ export default function AgentPage() {
       ]
         .join(" ")
         .toLowerCase()
-        .includes(query)
+        .includes(query),
     );
   }, [rows, q]);
 
-  const save = (
-    id: number,
-    key: keyof AgentRow,
-    value: string
-  ) => {
+  const save = (id: number, key: keyof AgentRow, value: string) => {
     setRows((current) =>
-      current.map((row) =>
-        row.id === id ? { ...row, [key]: value } : row
-      )
+      current.map((row) => (row.id === id ? { ...row, [key]: value } : row)),
     );
   };
 
@@ -206,9 +227,7 @@ export default function AgentPage() {
       key: "statutPEC",
       label: "Statut PEC",
       render: (row) => (
-        <Badge tone={statusTone(row.statutPEC)}>
-          {row.statutPEC}
-        </Badge>
+        <Badge tone={statusTone(row.statutPEC)}>{row.statutPEC}</Badge>
       ),
     },
     {
@@ -334,18 +353,70 @@ export default function AgentPage() {
       key: "parQui",
       label: "ParQui",
       render: (row) => (
-        <span className="text-xs text-slate-500">
-          {row.parQui}
-        </span>
+        <span className="text-xs text-slate-500">{row.parQui}</span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (row) => (
+        <div className="flex gap-1">
+          <button
+            title="Modifier"
+            className="btn-ghost"
+            onClick={() => {
+              setEditing(row);
+              setForm({
+                im: row.im,
+                name: row.name,
+                fonction: row.fonction,
+                statutPEC: row.statutPEC,
+                sexe: row.sexe,
+                categorie: row.categorie,
+                organisation: row.organisation,
+                codeDirection: row.codeDirection,
+                direction: row.direction,
+                codeServiceAgence: row.codeServiceAgence,
+                serviceAgence: row.serviceAgence,
+                dateNaissance: row.dateNaissance,
+                dateEntree: row.dateEntree,
+                observation: row.observation,
+                carte: row.carte,
+                parQui: row.parQui,
+              });
+            }}
+          >
+            <Pencil size={14} />
+          </button>
+          <button
+            title="Supprimer"
+            className="btn-ghost text-red-600"
+            onClick={() => setDeleteRow(row)}
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
     <>
+      <ToastViewport />
       <PageHeader
         title="Agents"
         description="Liste des agents actifs et retraités, informations personnelles et rattachement organisationnel."
+        actions={
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setEditing({ id: -1, ...emptyRow() });
+              setForm(emptyRow());
+            }}
+          >
+            <Plus size={16} /> Ajouter un agent
+          </button>
+        }
       />
 
       <ResourceToolbar
@@ -358,23 +429,10 @@ export default function AgentPage() {
         <span>
           {filtered.length} agent(s) affiché(s) sur {rows.length}
         </span>
-        <span>
-          Cliquez sur une cellule modifiable pour changer sa valeur.
-        </span>
+        <span>Cliquez sur une cellule modifiable pour changer sa valeur.</span>
       </div>
 
       <DataTable rows={filtered} columns={columns} />
-
-      <div className="mt-3 flex justify-end">
-        <button
-          type="button"
-          className="btn-ghost text-red-600"
-          disabled={!deleteRow && rows.length === 0}
-          onClick={() => setDeleteRow(filtered[0] ?? null)}
-        >
-          Supprimer le premier résultat
-        </button>
-      </div>
 
       <ConfirmDialog
         open={!!deleteRow}
@@ -387,12 +445,67 @@ export default function AgentPage() {
         onConfirm={() => {
           if (deleteRow) {
             setRows((current) =>
-              current.filter((row) => row.id !== deleteRow.id)
+              current.filter((row) => row.id !== deleteRow.id),
             );
+            notify("Agent supprimé");
           }
           setDeleteRow(null);
         }}
       />
+      <Modal
+        open={!!editing}
+        title={editing?.id === -1 ? "Nouvel agent" : "Modifier l'agent"}
+        description="Données mockées : les changements restent en mémoire pendant la session."
+        onClose={() => setEditing(null)}
+      >
+        <form
+          className="grid gap-4 md:grid-cols-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (editing?.id === -1) {
+              setRows((current) => [
+                { ...form, id: Math.max(0, ...current.map((r) => r.id)) + 1 },
+                ...current,
+              ]);
+              notify("Agent créé");
+            } else if (editing) {
+              setRows((current) =>
+                current.map((r) =>
+                  r.id === editing.id ? { ...form, id: r.id } : r,
+                ),
+              );
+              notify("Agent modifié");
+            }
+            setEditing(null);
+          }}
+        >
+          {editField("Matricule IM", "im")}
+          {editField("Nom et prénom", "name")}
+          {editField("Fonction", "fonction")}
+          {editField("Statut PEC", "statutPEC")}
+          {editField("Sexe", "sexe")}
+          {editField("Catégorie", "categorie")}
+          {editField("Organisation", "organisation")}
+          {editField("Code direction", "codeDirection")}
+          {editField("Direction", "direction")}
+          {editField("Code service / agence", "codeServiceAgence")}
+          {editField("Service / agence", "serviceAgence")}
+          {editField("Date de naissance", "dateNaissance")}
+          {editField("Date d'entrée", "dateEntree")}
+          {editField("Observation", "observation")}
+          {editField("Carte", "carte")}
+          <div className="flex justify-end gap-2 md:col-span-2">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setEditing(null)}
+            >
+              Annuler
+            </button>
+            <button className="btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </Modal>
     </>
   );
 }

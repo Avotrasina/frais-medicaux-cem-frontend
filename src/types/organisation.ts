@@ -1,4 +1,5 @@
 import type { Agent } from "./agent"
+import type { Service } from "./service"
 
 export interface StructureOrganisationnelle {
   id: string
@@ -14,20 +15,14 @@ export interface Fonction {
   agents: Agent[]
 }
 
-export interface Direction {
-  codeDirection: string
-  nom: string
-  services: Service[]
-}
+  export interface Direction {
+    codeDirection: string
+    nom: string
+    services: Service[]
+  }
 
 export interface Agence {
   codeAgence: string
   nomAgence: string
 }
 
-export interface Service {
-  codeService: string
-  nom: string
-  codeDirection: string
-  agents: Agent[]
-}

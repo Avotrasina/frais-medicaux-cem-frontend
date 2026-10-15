@@ -8,7 +8,7 @@ export interface Agent {
   familleAgent: FamilleAgent[]
 
   structureID: string
-  serviceID: number
+  serviceID: string
   fonctionID: number
   categorieID: string
 }
