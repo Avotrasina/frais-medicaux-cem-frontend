@@ -77,32 +77,32 @@ export const personnes: Personne[] = [
 export const famillesAgents: FamilleAgent[] = [
   {
     id: 1,
-    agentMatricule: "CEM-2020-001",
-    carteSocialePath: "/mock/cartes-sociales/famille-001.jpg",
+    agentMatricule: "256",
+    carteSocialePath: "images/cartes-sociales/44444444-4444-4444-8444-444444444444.png",
     conjoint: { id: 1, numConjoint: 1 },
   },
   {
     id: 2,
-    agentMatricule: "CEM-2020-001",
-    carteSocialePath: "/mock/cartes-sociales/famille-002.jpg",
+    agentMatricule: "256",
+    carteSocialePath: "images/cartes-sociales/55555555-5555-4555-8555-555555555555.jpg",
     enfant: { id: 2, numEnfant: 1 },
   },
   {
     id: 3,
-    agentMatricule: "CEM-2021-014",
-    carteSocialePath: "/mock/cartes-sociales/famille-003.jpg",
+    agentMatricule: "412",
+    carteSocialePath: "images/cartes-sociales/66666666-6666-4666-8666-666666666666.png",
     conjoint: { id: 3, numConjoint: 1 },
   },
   {
     id: 4,
-    agentMatricule: "CEM-2021-014",
-    carteSocialePath: "/mock/cartes-sociales/famille-004.jpg",
+    agentMatricule: "412",
+    carteSocialePath: "images/cartes-sociales/77777777-7777-4777-8777-777777777777.jpg",
     enfant: { id: 4, numEnfant: 1 },
   },
   {
     id: 5,
-    agentMatricule: "CEM-2019-032",
-    carteSocialePath: "/mock/cartes-sociales/famille-005.jpg",
+    agentMatricule: "303",
+    carteSocialePath: "images/cartes-sociales/88888888-8888-4888-8888-888888888888.png",
     enfant: { id: 5, numEnfant: 1 },
   },
 ];

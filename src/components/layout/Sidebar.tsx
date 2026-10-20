@@ -3,11 +3,6 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   Bell,
   ChevronDown,
-  FileCheck2,
-  FileText,
-  Gauge,
-  HeartPulse,
-  LayoutDashboard,
   LogOut,
   Menu,
   PanelLeftClose,
@@ -17,25 +12,25 @@ import {
   Stethoscope,
   UserRound,
   Users,
-  WalletCards,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { Modal } from "../Modal";
 import logo from "../../assets/logo.jpg";
 
-const nav = [
-  { to: "/", label: "Tableau de bord", icon: LayoutDashboard },
+type NavLinkEntry = { to: string; label: string; icon: LucideIcon };
+type NavSectionEntry = { section: string };
+type NavEntry = NavLinkEntry | NavSectionEntry;
+
+/** Only routes that actually exist are listed: no dead navigation entry. */
+const nav: NavEntry[] = [
   { section: "Gestion" },
   { to: "/agents", label: "Agents", icon: Users },
   { to: "/beneficiaires", label: "Bénéficiaires", icon: UserRound },
   { to: "/prestataires", label: "Prestataires", icon: Stethoscope },
-  { to: "/pec", label: "Prises en charge", icon: ShieldCheck, badge: "12" },
-  { to: "/factures", label: "Factures", icon: FileText, badge: "8" },
-  { to: "/retenues", label: "Retenues salaire", icon: WalletCards },
-  { section: "Pilotage" },
-  { to: "/rapports", label: "États & suivi", icon: Gauge },
-  { to: "/utilisateurs", label: "Utilisateurs", icon: Users },
-  { to: "/parametres", label: "Paramètres", icon: Settings },
+  { to: "/pec", label: "Prises en charge", icon: ShieldCheck },
+  { section: "Paramétrage" },
+  { to: "/referentiels", label: "Référentiels", icon: Settings },
 ];
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
@@ -44,8 +39,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const current =
-    nav.find((n: any) => n.to === location.pathname && n.label)?.label ??
-    "Tableau de bord";
+    nav
+      .filter((entry): entry is NavLinkEntry => "to" in entry)
+      .find((entry) => entry.to === location.pathname)?.label ?? "Accueil";
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${isActive ? "bg-red-50 text-red-700" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"}`;
@@ -81,10 +77,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             Navigation
           </div>
           <nav className="space-y-1">
-            {nav.map((item: any, idx) =>
-              item.section ? (
+            {nav.map((item, idx) =>
+              "section" in item ? (
                 <div
-                  key={idx}
+                  key={`section-${idx}`}
                   className={`px-3 pb-2 pt-5 text-[10px] font-extrabold uppercase tracking-[.18em] text-slate-400 ${collapsed ? "lg:hidden" : ""}`}
                 >
                   {item.section}
@@ -101,13 +97,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                   <span className={`${collapsed ? "lg:hidden" : ""}`}>
                     {item.label}
                   </span>
-                  {item.badge && (
-                    <span
-                      className={`ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 ${collapsed ? "lg:hidden" : ""}`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
                 </NavLink>
               ),
             )}

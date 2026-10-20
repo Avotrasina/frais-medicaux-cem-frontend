@@ -1,255 +1,448 @@
-import { Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { ConfirmDialog } from "../components/ConfirmDialog";
+import { MessageSquare, Plus, RefreshCw, Search } from "lucide-react";
+import { useCallback, useState, type FormEvent } from "react";
+import {
+	BeneficiaryEditForm,
+	BeneficiaryObservationForm,
+	FamilyMemberCreateForm,
+} from "../components/beneficiaries/BeneficiaryForm";
+import { Badge } from "../components/Badge";
 import { DataTable, type Column } from "../components/DataTable";
-import { InlineCell } from "../components/InlineCell";
+import { ErrorBlock, LoadingBlock } from "../components/Feedback";
+import { ImageThumb } from "../components/ImageThumb";
 import { Modal } from "../components/Modal";
 import { PageHeader } from "../components/PageHeader";
-import { ResourceToolbar } from "../components/ResourceToolbar";
-import { ToastViewport, notify } from "../components/Toast";
-import { beneficiaires as mockBeneficiaires } from "../data/beneficiaire";
-import type { Beneficiaire } from "../types/personne";
+import { ToastViewport } from "../components/Toast";
+import { useAsyncLoader } from "../hooks/useAsyncLoader";
+import { listAgents, updateAgentInformation } from "../services/agents";
+import {
+	getBeneficiaryByIdp,
+	listAllBeneficiaries,
+	listBeneficiariesByMatricule,
+	updateBeneficiaryObservation,
+} from "../services/beneficiaries";
+import {
+	createFamilyMember,
+	listFamilyMembers,
+	resolveFamilyMember,
+	updateFamilyMemberInformation,
+} from "../services/family";
+import type {
+	AgentItem,
+	Beneficiary,
+	CreateFamilyMemberInput,
+	FamilyKind,
+	UpdateFamilyMemberInput,
+} from "../types/api";
+import { errorMessage, explainKnownBackendDefect } from "../utils/errors";
+import { notify } from "../utils/notify";
+import {
+	formatDate,
+	calculateAge,
+	labelCodeFamille,
+	labelSexe,
+	orDash,
+} from "../utils/format";
 
-type Row = {
-  id: number;
-  idp: string;
-  nom: string;
-  prenom: string;
-  sexe: string;
-  naissance: string;
-  matricule: string;
-  observation: string;
+type BeneficiaryRow = Beneficiary & { id: string };
+
+type SearchMode = "matricule" | "idp";
+
+const FAMILLE_TONES: Record<string, "blue" | "green" | "amber"> = {
+	AGENT: "blue",
+	CONJOINT: "green",
+	ENFANT: "amber",
 };
-const initialRows = (): Row[] =>
-  mockBeneficiaires.map((b) => ({
-    id: b.id,
-    idp: b.idp,
-    nom: b.personne.nom,
-    prenom: b.personne.prenom,
-    sexe: b.personne.sexe,
-    naissance: b.personne.dateNaissance,
-    matricule: b.personne.agent?.matricule ?? "—",
-    observation: b.observationIDP ?? "",
-  }));
-const blank = (): Omit<Row, "id"> => ({
-  idp: "",
-  nom: "",
-  prenom: "",
-  sexe: "FEMININ",
-  naissance: "",
-  matricule: "",
-  observation: "",
-});
 
 export default function BeneficiairePage() {
-  const [rows, setRows] = useState<Row[]>(initialRows);
-  const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState<Row | null>(null);
-  const [form, setForm] = useState<Omit<Row, "id">>(blank());
-  const [deleting, setDeleting] = useState<Row | null>(null);
-  const filtered = useMemo(
-    () =>
-      rows.filter((r) =>
-        Object.values(r).join(" ").toLowerCase().includes(query.toLowerCase()),
-      ),
-    [rows, query],
-  );
-  const update = (id: number, key: keyof Row, value: string) => {
-    setRows((old) =>
-      old.map((r) => (r.id === id ? { ...r, [key]: value } : r)),
-    );
-    notify("Bénéficiaire mis à jour");
-  };
-  const columns: Column<Row>[] = [
-    {
-      key: "idp",
-      label: "IDP",
-      render: (r) => (
-        <InlineCell value={r.idp} onSave={(v) => update(r.id, "idp", v)} />
-      ),
-    },
-    {
-      key: "nom",
-      label: "Nom",
-      render: (r) => (
-        <InlineCell value={r.nom} onSave={(v) => update(r.id, "nom", v)} />
-      ),
-    },
-    {
-      key: "prenom",
-      label: "Prénom",
-      render: (r) => (
-        <InlineCell
-          value={r.prenom}
-          onSave={(v) => update(r.id, "prenom", v)}
-        />
-      ),
-    },
-    {
-      key: "sexe",
-      label: "Sexe",
-      render: (r) => (
-        <InlineCell value={r.sexe} onSave={(v) => update(r.id, "sexe", v)} />
-      ),
-    },
-    {
-      key: "naissance",
-      label: "Date de naissance",
-      render: (r) => (
-        <InlineCell
-          value={r.naissance}
-          onSave={(v) => update(r.id, "naissance", v)}
-        />
-      ),
-    },
-    {
-      key: "matricule",
-      label: "Matricule agent",
-      render: (r) => (
-        <InlineCell
-          value={r.matricule}
-          onSave={(v) => update(r.id, "matricule", v)}
-        />
-      ),
-    },
-    {
-      key: "observation",
-      label: "Observation",
-      render: (r) => (
-        <InlineCell
-          value={r.observation}
-          onSave={(v) => update(r.id, "observation", v)}
-        />
-      ),
-    },
-    {
-      key: "actions",
-      label: "Actions",
-      render: (r) => (
-        <button
-          className="btn-ghost text-red-600"
-          title="Supprimer"
-          onClick={() => setDeleting(r)}
-        >
-          <Trash2 size={15} />
-        </button>
-      ),
-    },
-  ];
-  const openNew = () => {
-    setEditing({ id: -1, ...blank() });
-    setForm(blank());
-  };
-  const input = (label: string, key: keyof typeof form, type = "text") => (
-    <div key={key}>
-      <label className="label">{label}</label>
-      <input
-        className="field"
-        type={type}
-        required={["idp", "nom", "prenom"].includes(key)}
-        value={form[key]}
-        onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-      />
-    </div>
-  );
-  return (
-    <>
-      <ToastViewport />
-      <PageHeader
-        title="Bénéficiaires"
-        description="Gestion des bénéficiaires rattachés aux agents et suivi de leurs identifiants."
-        actions={
-          <button className="btn-primary" onClick={openNew}>
-            <Plus size={16} /> Ajouter un bénéficiaire
-          </button>
-        }
-      />
-      <ResourceToolbar
-        value={query}
-        onChange={setQuery}
-        placeholder="Rechercher par IDP, nom, matricule…"
-      />
-      <p className="mb-3 text-xs text-slate-400">
-        {filtered.length} bénéficiaire(s) affiché(s) sur {rows.length}. Cliquez
-        sur une cellule pour la modifier.
-      </p>
-      <DataTable rows={filtered} columns={columns} />
-      <Modal
-        open={!!editing}
-        title={
-          editing?.id === -1
-            ? "Nouveau bénéficiaire"
-            : "Modifier le bénéficiaire"
-        }
-        onClose={() => setEditing(null)}
-        description="Les données sont simulées et restent en mémoire pendant la session."
-      >
-        <form
-          className="grid gap-4 md:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (editing?.id === -1) {
-              setRows((old) => [
-                { ...form, id: Math.max(0, ...old.map((r) => r.id)) + 1 },
-                ...old,
-              ]);
-              notify("Bénéficiaire créé");
-            } else if (editing) {
-              setRows((old) =>
-                old.map((r) =>
-                  r.id === editing.id ? { ...form, id: r.id } : r,
-                ),
-              );
-              notify("Bénéficiaire modifié");
-            }
-            setEditing(null);
-          }}
-        >
-          {input("Identifiant IDP", "idp")}
-          {input("Nom", "nom")}
-          {input("Prénom", "prenom")}
-          <div>
-            <label className="label">Sexe</label>
-            <select
-              className="field"
-              value={form.sexe}
-              onChange={(e) => setForm((f) => ({ ...f, sexe: e.target.value }))}
-            >
-              <option value="FEMININ">Féminin</option>
-              <option value="MASCULIN">Masculin</option>
-            </select>
-          </div>
-          {input("Date de naissance", "naissance", "date")}
-          {input("Matricule de l'agent", "matricule")}
-          {input("Observation", "observation")}
-          <div className="flex justify-end gap-2 md:col-span-2">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => setEditing(null)}
-            >
-              Annuler
-            </button>
-            <button className="btn-primary">Enregistrer</button>
-          </div>
-        </form>
-      </Modal>
-      <ConfirmDialog
-        open={!!deleting}
-        message={
-          deleting
-            ? `Supprimer le bénéficiaire ${deleting.nom} ${deleting.prenom} ?`
-            : ""
-        }
-        onCancel={() => setDeleting(null)}
-        onConfirm={() => {
-          setRows((old) =>
-            deleting ? old.filter((r) => r.id !== deleting.id) : old,
-          );
-          setDeleting(null);
-          notify("Bénéficiaire supprimé");
-        }}
-      />
-    </>
-  );
+	const [rows, setRows] = useState<BeneficiaryRow[]>([]);
+	const [agents, setAgents] = useState<AgentItem[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [progress, setProgress] = useState<{
+		loaded: number;
+		total: number;
+	} | null>(null);
+
+	const [searchMode, setSearchMode] = useState<SearchMode>("matricule");
+	const [searchDraft, setSearchDraft] = useState("");
+	const [appliedSearch, setAppliedSearch] = useState("");
+
+	const [createOpen, setCreateOpen] = useState(false);
+	const [editTarget, setEditTarget] = useState<BeneficiaryRow | null>(null);
+	const [observationTarget, setObservationTarget] =
+		useState<BeneficiaryRow | null>(null);
+	const [submitting, setSubmitting] = useState(false);
+
+	/**
+	 * Loads the beneficiaries of the current view.
+	 * No state is written before the first `await`, which keeps the effect
+	 * below free of synchronous renders. Every write is guarded by `isStale()`,
+	 * so a slow aggregation cannot overwrite a newer search.
+	 */
+	const fetchBeneficiaries = useCallback(
+		async (isStale: () => boolean) => {
+			try {
+				if (appliedSearch) {
+					if (searchMode === "idp") {
+						const found = await getBeneficiaryByIdp(appliedSearch);
+						if (isStale()) return;
+						setRows([{ ...found, id: found.idp }]);
+					} else {
+						const found = await listBeneficiariesByMatricule(appliedSearch);
+						if (isStale()) return;
+						setRows(found.map((item) => ({ ...item, id: item.idp })));
+					}
+					setError(null);
+					return;
+				}
+
+				// No "list all beneficiaries" route exists: aggregate from agents.
+				const agentList = await listAgents();
+				if (isStale()) return;
+				setAgents(agentList);
+				setProgress({ loaded: 0, total: agentList.length });
+				const { beneficiaries } = await listAllBeneficiaries(
+					agentList.map((agent) => agent.matricule),
+					{
+						onProgress: (loaded, total) => {
+							if (!isStale()) setProgress({ loaded, total });
+						},
+					},
+				);
+				if (isStale()) return;
+				setRows(beneficiaries.map((item) => ({ ...item, id: item.idp })));
+				setError(null);
+			} catch (caught) {
+				if (isStale()) return;
+				setRows([]);
+				setError(
+					errorMessage(caught, "Impossible de charger les bénéficiaires."),
+				);
+			} finally {
+				if (!isStale()) {
+					setProgress(null);
+					setLoading(false);
+				}
+			}
+		},
+		[appliedSearch, searchMode],
+	);
+
+	/** Manual refresh: re-displays the spinner before loading again. */
+	const refresh = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+		await fetchBeneficiaries(() => false);
+	}, [fetchBeneficiaries]);
+
+	useAsyncLoader(fetchBeneficiaries);
+
+	async function handleCreate(
+		kind: FamilyKind,
+		input: CreateFamilyMemberInput,
+		image: File,
+	): Promise<void> {
+		setSubmitting(true);
+		try {
+			await createFamilyMember(kind, input, image);
+			notify("Bénéficiaire créé avec succès.");
+			setCreateOpen(false);
+			await fetchBeneficiaries(() => false);
+		} catch (caught) {
+			notify(
+				explainKnownBackendDefect(
+					caught,
+					kind === "enfant" ? "enfant" : "generic",
+				) ?? errorMessage(caught, "Création impossible."),
+				"error",
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	async function handleEdit(input: UpdateFamilyMemberInput): Promise<void> {
+		if (!editTarget) return;
+		setSubmitting(true);
+		try {
+			if (editTarget.codeFamille === "AGENT") {
+				await updateAgentInformation(editTarget.matricule, input);
+			} else {
+				// `/agent-family/*/informations/:id` needs the person id, which is
+				// only exposed by the family listing of the agent.
+				const members = await listFamilyMembers(editTarget.matricule);
+				const member = resolveFamilyMember(members, editTarget);
+				if (!member) {
+					throw new Error(
+						"Identifiant de la personne introuvable : le membre n'apparaît pas dans la famille de l'agent.",
+					);
+				}
+				await updateFamilyMemberInformation(
+					editTarget.codeFamille === "CONJOINT" ? "conjoint" : "enfant",
+					member.id,
+					input,
+				);
+			}
+			notify("Bénéficiaire mis à jour.");
+			setEditTarget(null);
+			await fetchBeneficiaries(() => false);
+		} catch (caught) {
+			notify(errorMessage(caught, "Mise à jour impossible."), "error");
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	async function handleObservation(observation: string | null): Promise<void> {
+		if (!observationTarget) return;
+		setSubmitting(true);
+		try {
+			await updateBeneficiaryObservation(observationTarget.idp, observation);
+			notify("Observation enregistrée.");
+			setObservationTarget(null);
+			await fetchBeneficiaries(() => false);
+		} catch (caught) {
+			notify(errorMessage(caught, "Enregistrement impossible."), "error");
+		} finally {
+			setSubmitting(false);
+		}
+	}
+
+	const columns: Column<BeneficiaryRow>[] = [
+		{
+			key: "idp",
+			label: "IDP",
+			render: (row) => (
+				<span className="font-mono text-xs font-bold">{row.idp}</span>
+			),
+		},
+		{
+			key: "nom",
+			label: "NOM et PRENOM BENEFICIAIRE",
+			render: (row) => `${row.nom} ${row.prenom}`,
+		},
+		{
+			key: "codeFamille",
+			label: "Code_Fam",
+			render: (row) => (
+				<Badge tone={FAMILLE_TONES[row.codeFamille] ?? "slate"}>
+					{labelCodeFamille(row.codeFamille)}
+				</Badge>
+			),
+		},
+		{
+			key: "dateNaissance",
+			label: "Né(e) le",
+			render: (row) => formatDate(row.dateNaissance),
+		},
+		{ key: "sexe", label: "Sexe", render: (row) => labelSexe(row.sexe) },
+		{
+			key: "observationIDP",
+			label: "Obs IDP",
+			className: "max-w-[280px] whitespace-normal",
+			render: (row) => (
+				<span className="text-xs text-slate-600">
+					{orDash(row.observationIDP)}
+				</span>
+			),
+		},
+		{
+			key: "age",
+			label: "Age",
+			render: (row) => orDash(calculateAge(row.dateNaissance)),
+		},
+		{
+			key: "matricule",
+			label: "IM",
+			render: (row) => (
+				<span className="font-mono text-xs">{row.matricule}</span>
+			),
+		},
+		{
+			key: "carte",
+			label: "Carte",
+			render: (row) => (
+				<ImageThumb
+					path={row.carteSocialePath ?? row.carteProfessionnellePath}
+					name={`${row.nom} ${row.prenom}`}
+					agentMatricule={
+						row.codeFamille === "AGENT" ? row.matricule : undefined
+					}
+					familyMember={row.codeFamille === "AGENT" ? undefined : row}
+					size={40}
+				/>
+			),
+		},
+	];
+
+	return (
+		<>
+			<ToastViewport />
+			<PageHeader
+				title="Gestion des Bénéficiaires"
+				description="Bénéficiaires (IDP) rattachés aux agents : consultation, mise à jour de l'état civil et de l'observation."
+				actions={
+					<>
+						<button className="btn-secondary" onClick={() => void refresh()}>
+							<RefreshCw size={16} /> Actualiser
+						</button>
+						<button
+							className="btn-primary"
+							onClick={() => setCreateOpen(true)}
+							disabled={agents.length === 0}
+							title={
+								agents.length === 0
+									? "Chargez d'abord la liste des agents"
+									: undefined
+							}
+						>
+							<Plus size={16} /> Nouveau bénéficiaire
+						</button>
+					</>
+				}
+			/>
+
+			<div className="panel mb-4 space-y-3 p-4">
+				<form
+					className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]"
+					onSubmit={(event: FormEvent) => {
+						event.preventDefault();
+						const next = searchDraft.trim();
+						if (next === appliedSearch) return;
+						setLoading(true);
+						setAppliedSearch(next);
+					}}
+				>
+					<div className="grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
+						<select
+							className="field"
+							value={searchMode}
+							onChange={(event) => {
+								const next = event.target.value as SearchMode;
+								if (next === searchMode) return;
+								setLoading(true);
+								setSearchMode(next);
+							}}
+						>
+							<option value="matricule">Par matricule agent</option>
+							<option value="idp">Par IDP</option>
+						</select>
+						<input
+							className="field"
+							value={searchDraft}
+							placeholder={searchMode === "idp" ? "Ex. 012AGT001" : "Ex. M1234"}
+							onChange={(event) => setSearchDraft(event.target.value)}
+						/>
+					</div>
+					<div className="flex gap-2">
+						<button className="btn-secondary" type="submit">
+							<Search size={16} /> Rechercher
+						</button>
+						{appliedSearch && (
+							<button
+								type="button"
+								className="btn-secondary"
+								onClick={() => {
+									setSearchDraft("");
+									setLoading(true);
+									setAppliedSearch("");
+								}}
+							>
+								Effacer
+							</button>
+						)}
+					</div>
+				</form>
+				<p className="text-xs text-slate-400">
+					{appliedSearch
+						? `Recherche ${searchMode === "idp" ? "par IDP" : "par matricule"} : ${appliedSearch}`
+						: `${rows.length} bénéficiaire(s) chargé(s) à partir de ${agents.length} agent(s).`}
+				</p>
+			</div>
+
+			<div className="mt-4 space-y-4">
+				{loading && (
+					<LoadingBlock
+						label={
+							progress
+								? `Chargement des bénéficiaires… ${progress.loaded}/${progress.total} agent(s)`
+								: "Chargement des bénéficiaires…"
+						}
+					/>
+				)}
+				{error && <ErrorBlock message={error} onRetry={() => void refresh()} />}
+
+				{!loading && !error && (
+					<DataTable
+						rows={rows}
+						columns={columns}
+						empty="Aucun bénéficiaire pour cette recherche."
+						onEdit={(row) => setEditTarget(row)}
+						rowActions={(row) => (
+							<button
+								className="btn-ghost"
+								title="Modifier l'observation"
+								onClick={() => setObservationTarget(row)}
+							>
+								<MessageSquare size={15} />
+							</button>
+						)}
+					/>
+				)}
+			</div>
+
+			<Modal
+				open={createOpen}
+				title="Nouveau bénéficiaire"
+				description="Un bénéficiaire est créé en tant que conjoint ou enfant d'un agent."
+				onClose={() => setCreateOpen(false)}
+			>
+				<FamilyMemberCreateForm
+					agents={agents}
+					submitting={submitting}
+					onSubmit={handleCreate}
+					onCancel={() => setCreateOpen(false)}
+				/>
+			</Modal>
+
+			<Modal
+				open={Boolean(editTarget)}
+				title={`Modifier ${editTarget?.nom ?? ""} ${editTarget?.prenom ?? ""}`}
+				description="État civil du bénéficiaire. Seuls les champs modifiés sont envoyés."
+				onClose={() => setEditTarget(null)}
+			>
+				{editTarget && (
+					<BeneficiaryEditForm
+						key={editTarget.idp}
+						beneficiary={editTarget}
+						isAgent={editTarget.codeFamille === "AGENT"}
+						submitting={submitting}
+						onSubmit={handleEdit}
+						onCancel={() => setEditTarget(null)}
+					/>
+				)}
+			</Modal>
+
+			<Modal
+				open={Boolean(observationTarget)}
+				title="Observation IDP"
+				description={
+					observationTarget
+						? `${observationTarget.nom} ${observationTarget.prenom} — ${observationTarget.idp}`
+						: ""
+				}
+				onClose={() => setObservationTarget(null)}
+				width="max-w-lg"
+			>
+				{observationTarget && (
+					<BeneficiaryObservationForm
+						beneficiary={observationTarget}
+						submitting={submitting}
+						onSubmit={handleObservation}
+						onCancel={() => setObservationTarget(null)}
+					/>
+				)}
+			</Modal>
+		</>
+	);
 }

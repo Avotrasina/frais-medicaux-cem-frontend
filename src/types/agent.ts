@@ -1,33 +1,32 @@
 export interface Agent {
-  id: number
-  matricule: string
-  observationMatricule?: string
-  carteProfessionnellePath: string
-  dateEntree: string
-  agentType: 'AGENT_ACTIF' | 'AGENT_RETRAITE'
-  familleAgent: FamilleAgent[]
+	id: number;
+	matricule: string;
+	observationMatricule?: string;
+	carteProfessionnellePath: string;
+	dateEntree: string;
+	agentType: "AGENT_ACTIF" | "AGENT_RETRAITE";
+	familleAgent: FamilleAgent[];
 
-  structureID: string
-  serviceID: string
-  fonctionID: number
-  categorieID: string
+	structureID: string;
+	serviceID: string;
+	fonction: string | null;
+	categorieID: string;
 }
 
 export interface FamilleAgent {
-  id: number
-  agentMatricule: string
-  carteSocialePath: string
-  conjoint?: Conjoint
-  enfant?: Enfant
-
+	id: number;
+	agentMatricule: string;
+	carteSocialePath: string;
+	conjoint?: Conjoint;
+	enfant?: Enfant;
 }
 
 export interface Enfant {
-  id: number
-  numEnfant: number
+	id: number;
+	numEnfant: number;
 }
 
 export interface Conjoint {
-  id: number
-  numConjoint: number
-}   
+	id: number;
+	numConjoint: number;
+}

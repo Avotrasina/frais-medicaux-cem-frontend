@@ -1,39 +1,43 @@
-import type { Attestation } from "../types/attestation";
-export const attestations: Attestation[] = [
+import type { MockAttestation } from "../types/attestation";
+export const attestations: MockAttestation[] = [
   {
     id: 1,
-    attestationPath: 1,
+    attestationPath: "mock/attestations/attestation-001.pdf",
     dateValidation: "2026-09-15",
     naturePrestation: "Consultation médicale",
     servicePrestataire: "Médecine générale",
     prestataireID: 1,
-    idpBeneficiaire: "IDP-2026-001",
+    idpBeneficiaire: "001AGT001",
+    statut: "EN_ATTENTE",
   },
   {
     id: 2,
-    attestationPath: 2,
+    attestationPath: "mock/attestations/attestation-002.pdf",
     dateValidation: "2026-09-20",
     naturePrestation: "Analyses biologiques",
     servicePrestataire: "Laboratoire",
     prestataireID: 4,
-    idpBeneficiaire: "IDP-2026-002",
+    idpBeneficiaire: "002AGT001",
+    statut: "VALIDEE",
   },
   {
     id: 3,
-    attestationPath: 3,
+    attestationPath: "mock/attestations/attestation-003.pdf",
     dateValidation: "2026-10-02",
     naturePrestation: "Hospitalisation",
     servicePrestataire: "Médecine interne",
     prestataireID: 2,
-    idpBeneficiaire: "IDP-2026-003",
+    idpBeneficiaire: "003AGT001",
+    statut: "REFUSEE",
   },
   {
     id: 4,
-    attestationPath: 4,
+    attestationPath: "mock/attestations/attestation-004.pdf",
     dateValidation: "2026-10-05",
     naturePrestation: "Consultation pédiatrique",
     servicePrestataire: "Pédiatrie",
     prestataireID: 3,
-    idpBeneficiaire: "IDP-2026-004",
+    idpBeneficiaire: "007CJT001",
+    statut: "EN_ATTENTE",
   },
 ];
