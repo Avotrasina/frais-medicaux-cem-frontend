@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 /**
  * Base URL of the FM-CEM backend (NestJS).
- * The reference API listens on `http://localhost:3000` by default (env var `PORT`).
+ * The API listens on `http://localhost:3000` by default (env var `PORT`).
  * Configure it in `.env`:
  *
  *   VITE_API_BASE_URL=http://localhost:3000
@@ -176,76 +176,127 @@ api.interceptors.response.use(
  */
 export const apiRoutes = {
 	// --- Agents -------------------------------------------------------------
-	agents: "/agent/all",
-	agentsFiltered: "/agent/all/filtered",
-	agentSearchLastName: "/agent/search/last-name",
-	agentSearchFirstName: "/agent/search/first-name",
-	/** Trailing slash is part of the documented route. */
-	agentCreate: "/agent/create/",
+	agents: "/agents",
+	agentsFiltered: "/agents/search",
+	agentSearchLastName: "/agents/search/last-name",
+	agentSearchFirstName: "/agents/search/first-name",
+	agentCreate: "/agents",
 	agentInformation: (matricule: string) =>
-		`/agent/information/${encodeURIComponent(matricule)}`,
+		`/agents/${encodeURIComponent(matricule)}`,
 	agentCard: (matricule: string) =>
-		`/agent/card/${encodeURIComponent(matricule)}`,
+		`/agents/${encodeURIComponent(matricule)}/card`,
 	agentCardImage: (matricule: string) =>
-		`/agent/${encodeURIComponent(matricule)}/card`,
-	agent: (matricule: string) => `/agent/${encodeURIComponent(matricule)}`,
+		`/agents/${encodeURIComponent(matricule)}/card`,
+	agent: (matricule: string) => `/agents/${encodeURIComponent(matricule)}`,
+	agentDeletionRequests: "/agents/deletion-requests",
+	agentDeletionValidation: (matricule: string) =>
+		`/agents/${encodeURIComponent(matricule)}/deletion-validation`,
+	agentDeletionRejection: (matricule: string) =>
+		`/agents/${encodeURIComponent(matricule)}/deletion-rejection`,
 
 	// --- Agent family (spouse / child) --------------------------------------
 	family: (matricule: string) =>
-		`/agent-family/${encodeURIComponent(matricule)}`,
-	conjointCreate: "/agent-family/conjoint",
-	conjointInformations: (id: number) =>
-		`/agent-family/conjoint/informations/${id}`,
-	conjointCard: (id: number) => `/agent-family/conjoint/card/${id}`,
-	enfantCreate: "/agent-family/enfant",
-	enfantInformations: (id: number) => `/agent-family/enfant/informations/${id}`,
-	enfantCard: (id: number) => `/agent-family/enfant/card/${id}`,
-	agentFamilyCard: (id: number) => `/agent-family/card/${id}`,
+		`/agent-families/agents/${encodeURIComponent(matricule)}`,
+	conjointCreate: "/agent-families/spouses",
+	conjointInformations: (id: number) => `/agent-families/spouses/${id}`,
+	conjointCard: (id: number) => `/agent-families/spouses/${id}/card`,
+	enfantCreate: "/agent-families/children",
+	enfantInformations: (id: number) => `/agent-families/children/${id}`,
+	enfantCard: (id: number) => `/agent-families/children/${id}/card`,
+	agentFamilyCard: (id: number) => `/agent-families/family-members/${id}/card`,
+	familyDeletion: (type: "spouses" | "children", id: number) =>
+		`/agent-families/${type}/${id}`,
+	spouseDeletionRequests: "/agent-families/spouses/deletion-requests",
+	childDeletionRequests: "/agent-families/children/deletion-requests",
+	familyDeletionValidation: (type: "spouses" | "children", id: number) =>
+		`/agent-families/${type}/${id}/deletion-validation`,
+	familyDeletionRejection: (type: "spouses" | "children", id: number) =>
+		`/agent-families/${type}/${id}/deletion-rejection`,
 
 	// --- Beneficiaries (IDP) ------------------------------------------------
 	beneficiariesByMatricule: (matricule: string) =>
-		`/beneficiaries/matricule/${encodeURIComponent(matricule)}`,
+		`/beneficiaries/by-matricule/${encodeURIComponent(matricule)}`,
 	beneficiaryByIdp: (idp: string) =>
-		`/beneficiaries/idp/${encodeURIComponent(idp)}`,
+		`/beneficiaries/${encodeURIComponent(idp)}`,
 	beneficiaryObservation: (idp: string) =>
-		`/beneficiaries/idp/${encodeURIComponent(idp)}/observation`,
+		`/beneficiaries/${encodeURIComponent(idp)}/observation`,
 
 	// --- Organisational structure -------------------------------------------
-	agences: "/structure-organisationnelle/agences",
+	agences: "/organizational-structures/agencies",
 	agence: (codeAgence: string) =>
-		`/structure-organisationnelle/agences/${encodeURIComponent(codeAgence)}`,
-	directions: "/structure-organisationnelle/directions",
+		`/organizational-structures/agencies/${encodeURIComponent(codeAgence)}`,
+	agenceDeletionRequests:
+		"/organizational-structures/agencies/deletion-requests",
+	agenceDeletionValidation: (code: string) =>
+		`/organizational-structures/agencies/${encodeURIComponent(code)}/deletion-validation`,
+	agenceDeletionRejection: (code: string) =>
+		`/organizational-structures/agencies/${encodeURIComponent(code)}/deletion-rejection`,
+	directions: "/organizational-structures/directions",
 	direction: (codeDirection: string) =>
-		`/structure-organisationnelle/directions/${encodeURIComponent(codeDirection)}`,
+		`/organizational-structures/directions/${encodeURIComponent(codeDirection)}`,
+	directionDeletionRequests:
+		"/organizational-structures/directions/deletion-requests",
+	directionDeletionValidation: (code: string) =>
+		`/organizational-structures/directions/${encodeURIComponent(code)}/deletion-validation`,
+	directionDeletionRejection: (code: string) =>
+		`/organizational-structures/directions/${encodeURIComponent(code)}/deletion-rejection`,
 	directionServices: (codeDirection: string) =>
-		`/structure-organisationnelle/directions/${encodeURIComponent(codeDirection)}/services`,
-	services: "/structure-organisationnelle/services",
+		`/organizational-structures/directions/${encodeURIComponent(codeDirection)}/services`,
+	services: "/organizational-structures/services",
+	serviceDeletionRequests:
+		"/organizational-structures/services/deletion-requests",
+	serviceDeletionValidation: (code: string) =>
+		`/organizational-structures/services/${encodeURIComponent(code)}/deletion-validation`,
+	serviceDeletionRejection: (code: string) =>
+		`/organizational-structures/services/${encodeURIComponent(code)}/deletion-rejection`,
+	service: (codeService: string) =>
+		`/organizational-structures/services/${encodeURIComponent(codeService)}`,
 	serviceNom: (codeService: string) =>
-		`/structure-organisationnelle/services/${encodeURIComponent(codeService)}/nom`,
+		`/organizational-structures/services/${encodeURIComponent(codeService)}/name`,
 	serviceDirection: (codeService: string) =>
-		`/structure-organisationnelle/services/${encodeURIComponent(codeService)}/direction`,
+		`/organizational-structures/services/${encodeURIComponent(codeService)}/direction`,
 
 	// --- Locations ----------------------------------------------------------
-	lieux: "/lieux",
-	lieu: (id: number) => `/lieux/${id}`,
+	lieux: "/locations",
+	lieu: (id: number) => `/locations/${id}`,
+	lieuDeletionRequests: "/locations/deletion-requests",
+	lieuDeletionValidation: (id: number) =>
+		`/locations/${id}/deletion-validation`,
+	lieuDeletionRejection: (id: number) => `/locations/${id}/deletion-rejection`,
 
 	// --- Providers ----------------------------------------------------------
 	providers: "/providers",
-	providersFilter: "/providers/filter",
-	provider: (id: number) => `/providers/${id}`,
+	providersFilter: "/providers/search",
+	provider: (id: number) => `/providers/${id}-provider`,
+	providerConvention: (id: number) => `/providers/${id}-provider/convention`,
+	providerDeletionRequests: "/providers/deletion-requests",
+	providerDeletionValidation: (id: number) =>
+		`/providers/${id}-provider/deletion-validation`,
+	providerDeletionRejection: (id: number) =>
+		`/providers/${id}-provider/deletion-rejection`,
 	providerCategories: "/provider-categories",
 	providerCategory: (id: number) => `/provider-categories/${id}`,
+	providerCategoryDeletionRequests: "/provider-categories/deletion-requests",
+	providerCategoryDeletionValidation: (id: number) =>
+		`/provider-categories/${id}/deletion-validation`,
+	providerCategoryDeletionRejection: (id: number) =>
+		`/provider-categories/${id}/deletion-rejection`,
 
 	// --- Agent categories ---------------------------------------------------
 	agentCategories: "/agent-categories",
 	agentCategory: (id: number) => `/agent-categories/${id}`,
+	agentCategoryDeletionRequests: "/agent-categories/deletion-requests",
+	agentCategoryDeletionValidation: (id: number) =>
+		`/agent-categories/${id}/deletion-validation`,
+	agentCategoryDeletionRejection: (id: number) =>
+		`/agent-categories/${id}/deletion-rejection`,
 
 	// --- Attestations -------------------------------------------------------
-	attestationCreate: "/attestation/create/",
-	pendingAttestations: "/attestation/pending/",
-	approveAttestation: (id: number) => `/attestation/approve/${id}`,
-	rejectAttestation: (id: number) => `/attestation/reject/${id}`,
-	attestationPreview: (id: number) => `/attestation/preview/${id}`,
+	attestationCreate: "/attestations",
+	pendingAttestations: "/attestations/pending",
+	approveAttestation: (id: number) => `/attestations/${id}/approval`,
+	rejectAttestation: (id: number) => `/attestations/${id}/rejection`,
+	attestationPreview: (id: number) => `/attestations/${id}/preview`,
 };
 
 /** Thin helpers that resolve directly to the response body. */
@@ -309,4 +360,8 @@ export function resolveAgentCardUrl(matricule: string): string {
 
 export function resolveFamilyCardUrl(id: number): string {
 	return `${API_BASE_URL.replace(/\/+$/, "")}${apiRoutes.agentFamilyCard(id)}`;
+}
+
+export function resolveProviderConventionUrl(id: number): string {
+	return `${API_BASE_URL.replace(/\/+$/, "")}${apiRoutes.providerConvention(id)}`;
 }

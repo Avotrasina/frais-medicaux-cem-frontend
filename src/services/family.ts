@@ -11,7 +11,7 @@ import { resolveFamilyCardUrl } from "./api";
 const familyCardMembersByMatricule = new Map<string, Promise<FamilyMember[]>>();
 
 /**
- * `GET /agent-family/:matricule` — spouses and children of an agent.
+ * `GET /agent-families/agents/:matricule` — spouses and children of an agent.
  * `:id` used by the update routes is the **person id**, not the matricule, so
  * this listing is also the way to resolve that id from an IDP.
  */
@@ -36,7 +36,7 @@ function cardRoute(kind: FamilyKind, id: number): string {
 }
 
 /**
- * `POST /agent-family/conjoint|enfant` — creates the person and its beneficiary
+ * `POST /agent-families/spouses|children` — creates the person and its beneficiary
  * row. The social card (`image`) is mandatory.
  *
  * Known backend defect: `SaveEnfantUseCase` passes `numConjoint: numEnfant`,
@@ -55,7 +55,7 @@ export async function createFamilyMember(
 	familyCardMembersByMatricule.delete(input.agentMatricule);
 }
 
-/** `PATCH /agent-family/conjoint|enfant/informations/:id` — `204`. */
+/** `PATCH /agent-families/spouses|children/:id` — `204`. */
 export async function updateFamilyMemberInformation(
 	kind: FamilyKind,
 	id: number,
@@ -65,7 +65,7 @@ export async function updateFamilyMemberInformation(
 	familyCardMembersByMatricule.clear();
 }
 
-/** `PATCH /agent-family/conjoint|enfant/card/:id` — `204`. */
+/** `PATCH /agent-families/spouses|children/:id/card` — `204`. */
 export function updateFamilyMemberCard(
 	kind: FamilyKind,
 	id: number,
@@ -99,7 +99,7 @@ export function resolveFamilyMember(
 	);
 }
 
-/** Resolves the family-member ID required by `GET /agent-family/card/:id`. */
+/** Resolves the family-member ID required by `GET /agent-families/family-members/:id/card`. */
 export async function resolveFamilyMemberCardUrl(
 	beneficiary: Pick<
 		Beneficiary,

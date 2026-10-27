@@ -149,39 +149,65 @@ export function TextAreaField({
 	);
 }
 
+
 export function FileField({
-	label,
-	file,
-	onFile,
-	required = false,
-	disabled = false,
-	hint,
-	className = "",
+  label,
+  file,
+  onFile,
+  required = false,
+  disabled = false,
+  hint,
+  className = "",
+  accept = IMAGE_ACCEPT,
 }: BaseProps & {
-	file: File | null;
-	onFile: (file: File | null) => void;
+  file: File | null;
+  onFile: (file: File | null) => void;
+  accept?: string;
 }) {
-	const id = useId();
-	return (
-		<div className={className}>
-			<label className="label" htmlFor={id}>
-				{label}
-				{required && <span className="text-red-600"> *</span>}
-			</label>
-			<input
-				id={id}
-				className="field"
-				type="file"
-				accept={IMAGE_ACCEPT}
-				required={required && !file}
-				disabled={disabled}
-				onChange={(event: ChangeEvent<HTMLInputElement>) =>
-					onFile(event.target.files?.[0] ?? null)
-				}
-			/>
-			<p className="mt-1 text-xs text-slate-400">
-				{hint ?? "JPEG, PNG ou WEBP — 2 Mo maximum."}
-			</p>
-		</div>
-	);
+  const id = useId();
+
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const selectedFile = event.target.files?.[0] ?? null;
+
+    // Vérifier le type MIME et l'extension du fichier.
+    if (
+      selectedFile &&
+      accept === "application/pdf" &&
+      selectedFile.type !== "application/pdf" &&
+      !selectedFile.name.toLowerCase().endsWith(".pdf")
+    ) {
+      onFile(null);
+      event.target.value = "";
+      return;
+    }
+
+    onFile(selectedFile);
+  }
+
+  return (
+    <div className={className}>
+      <label className="label" htmlFor={id}>
+        {label}
+        {required && <span className="text-red-600"> *</span>}
+      </label>
+
+      <input
+        id={id}
+        className="field"
+        type="file"
+        accept={accept}
+        required={required && !file}
+        disabled={disabled}
+        onChange={handleFileChange}
+      />
+
+      <p className="mt-1 text-xs text-slate-400">
+        {hint ??
+          (accept === "application/pdf"
+            ? "Fichier PDF uniquement."
+            : "JPEG, PNG ou WEBP — 2 Mo maximum.")}
+      </p>
+    </div>
+  );
 }
+

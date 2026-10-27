@@ -1,7 +1,7 @@
 import { AlertTriangle } from 'lucide-react'
 import { Modal } from './Modal'
 
-export function ConfirmDialog({ open, title = 'Confirmer la suppression', message, onCancel, onConfirm }: { open: boolean; title?: string; message: string; onCancel: () => void; onConfirm: () => void }) {
+export function ConfirmDialog({ open, title = 'Confirmer la suppression', confirmLabel = 'Supprimer', confirmDisabled = false, message, onCancel, onConfirm }: { open: boolean; title?: string; confirmLabel?: string; confirmDisabled?: boolean; message: string; onCancel: () => void; onConfirm: () => void }) {
   return (
     <Modal open={open} title={title} onClose={onCancel} width="max-w-md">
       <div className="flex gap-4 rounded-2xl bg-red-50 p-4 ring-1 ring-red-100">
@@ -10,7 +10,7 @@ export function ConfirmDialog({ open, title = 'Confirmer la suppression', messag
       </div>
       <div className="mt-6 flex justify-end gap-2">
         <button className="btn-secondary" onClick={onCancel}>Annuler</button>
-        <button className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700" onClick={onConfirm}>Supprimer</button>
+        <button className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50" onClick={onConfirm} disabled={confirmDisabled}>{confirmLabel}</button>
       </div>
     </Modal>
   )

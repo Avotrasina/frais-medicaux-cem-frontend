@@ -6,13 +6,13 @@ import type {
 	UpdateAgentInput,
 } from "../types/api";
 
-/** `GET /agent/all` — every agent, sorted by `nom`, `prenom`. */
+/** `GET /agents` — every active agent, sorted by `nom`, `prenom`. */
 export function listAgents(): Promise<AgentItem[]> {
 	return apiService.get<AgentItem[]>(apiRoutes.agents);
 }
 
 /**
- * `GET /agent/all/filtered`.
+ * `GET /agents/search?filter=...`.
  *
  * The backend destructures `query.filter` without a guard, so calling it
  * without a filter throws. When no criterion is provided we therefore fall back
@@ -32,14 +32,14 @@ export function listAgentsFiltered(
 	});
 }
 
-/** `GET /agent/search/last-name?value=` — case-insensitive "contains" match. */
+/** `GET /agents/search/last-name?value=` — case-insensitive "contains" match. */
 export function searchAgentsByLastName(value: string): Promise<AgentItem[]> {
 	return apiService.get<AgentItem[]>(apiRoutes.agentSearchLastName, {
 		params: { value },
 	});
 }
 
-/** `GET /agent/search/first-name?value=` — case-insensitive "contains" match. */
+/** `GET /agents/search/first-name?value=` — case-insensitive "contains" match. */
 export function searchAgentsByFirstName(value: string): Promise<AgentItem[]> {
 	return apiService.get<AgentItem[]>(apiRoutes.agentSearchFirstName, {
 		params: { value },
@@ -47,39 +47,46 @@ export function searchAgentsByFirstName(value: string): Promise<AgentItem[]> {
 }
 
 /**
- * `POST /agent/create/` — creates person + agent + beneficiary in one
+ * `POST /agents` — creates person + agent + beneficiary in one
  * transaction. The professional card (`image`) is mandatory.
  */
 export function createAgent(
 	input: CreateAgentInput,
 	image: File,
 ): Promise<void> {
+	const { codeAgence, codeDirection, ...fields } = input;
+	const structureID = codeAgence || codeDirection;
 	return apiService.post<void>(
 		apiRoutes.agentCreate,
-		imageFormData(input as unknown as Record<string, unknown>, image),
+		imageFormData(
+			{ ...fields, ...(structureID ? { structureID } : {}) },
+			image,
+		),
 	);
 }
 
-/** `PATCH /agent/information/:matricule` — partial update, `204`. */
+/** `PATCH /agents/:matricule` — partial update, `204`. */
 export function updateAgentInformation(
 	matricule: string,
 	input: UpdateAgentInput,
 ): Promise<void> {
-	return apiService.patch<void>(apiRoutes.agentInformation(matricule), input);
+	const { codeAgence, codeDirection, ...fields } = input;
+	const structureID = codeAgence || codeDirection;
+	return apiService.patch<void>(apiRoutes.agentInformation(matricule), {
+		...fields,
+		...(structureID ? { structureID } : {}),
+	});
 }
 
-/** `PATCH /agent/card/:matricule` — replaces the professional card, `204`. */
-export function updateAgentCard(
-	matricule: string,
-	image: File,
-): Promise<void> {
+/** `PATCH /agents/:matricule/card` — replaces the professional card, `204`. */
+export function updateAgentCard(matricule: string, image: File): Promise<void> {
 	return apiService.patch<void>(
 		apiRoutes.agentCard(matricule),
 		imageFormData({}, image),
 	);
 }
 
-/** `DELETE /agent/:matricule` — cascades to family and beneficiary rows. */
-export function deleteAgent(matricule: string): Promise<void> {
+/** `DELETE /agents/:matricule` — submits a deletion request. */
+export function requestAgentDeletion(matricule: string): Promise<void> {
 	return apiService.delete<void>(apiRoutes.agent(matricule));
 }

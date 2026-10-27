@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   Bell,
   ChevronDown,
+  ClipboardCheck,
   LogOut,
   Menu,
   PanelLeftClose,
@@ -31,6 +32,7 @@ const nav: NavEntry[] = [
   { to: "/pec", label: "Prises en charge", icon: ShieldCheck },
   { section: "Paramétrage" },
   { to: "/referentiels", label: "Référentiels", icon: Settings },
+  { to: "/demandes-suppression", label: "Demandes de suppression", icon: ClipboardCheck },
 ];
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {

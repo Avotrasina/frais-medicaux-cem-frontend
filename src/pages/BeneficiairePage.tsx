@@ -1,4 +1,4 @@
-import { MessageSquare, Plus, RefreshCw, Search } from "lucide-react";
+import { MessageSquare, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useCallback, useState, type FormEvent } from "react";
 import {
 	BeneficiaryEditForm,
@@ -26,6 +26,7 @@ import {
 	resolveFamilyMember,
 	updateFamilyMemberInformation,
 } from "../services/family";
+import { requestDeletion } from "../services/deletions";
 import type {
 	AgentItem,
 	Beneficiary,
@@ -168,7 +169,7 @@ export default function BeneficiairePage() {
 			if (editTarget.codeFamille === "AGENT") {
 				await updateAgentInformation(editTarget.matricule, input);
 			} else {
-				// `/agent-family/*/informations/:id` needs the person id, which is
+				// `/agent-families/<kind>/:id` needs the person id, which is
 				// only exposed by the family listing of the agent.
 				const members = await listFamilyMembers(editTarget.matricule);
 				const member = resolveFamilyMember(members, editTarget);
@@ -205,6 +206,23 @@ export default function BeneficiairePage() {
 			notify(errorMessage(caught, "Enregistrement impossible."), "error");
 		} finally {
 			setSubmitting(false);
+		}
+	}
+
+	async function handleFamilyDeletionRequest(row: BeneficiaryRow): Promise<void> {
+		if (row.codeFamille === "AGENT") return;
+		try {
+			const familyMembers = await listFamilyMembers(row.matricule);
+			const member = resolveFamilyMember(familyMembers, row);
+			if (!member) {
+				throw new Error("Identifiant du membre de la famille introuvable.");
+			}
+			const resource = row.codeFamille === "CONJOINT" ? "spouse" : "child";
+			await requestDeletion(resource, member.id);
+			notify("Demande de suppression envoyée.");
+			await fetchBeneficiaries(() => false);
+		} catch (caught) {
+			notify(errorMessage(caught, "Demande de suppression impossible."), "error");
 		}
 	}
 
@@ -379,13 +397,26 @@ export default function BeneficiairePage() {
 						empty="Aucun bénéficiaire pour cette recherche."
 						onEdit={(row) => setEditTarget(row)}
 						rowActions={(row) => (
-							<button
-								className="btn-ghost"
-								title="Modifier l'observation"
-								onClick={() => setObservationTarget(row)}
-							>
-								<MessageSquare size={15} />
-							</button>
+							<>
+								<button
+									className="btn-ghost"
+									title="Modifier l'observation"
+									aria-label={`Modifier l'observation de ${row.nom} ${row.prenom}`}
+									onClick={() => setObservationTarget(row)}
+								>
+									<MessageSquare size={15} />
+								</button>
+								{row.codeFamille !== "AGENT" && (
+									<button
+										className="btn-ghost text-red-600"
+										title="Demander la suppression"
+										aria-label={`Demander la suppression de ${row.nom} ${row.prenom}`}
+										onClick={() => void handleFamilyDeletionRequest(row)}
+									>
+										<Trash2 size={15} />
+									</button>
+								)}
+							</>
 						)}
 					/>
 				)}

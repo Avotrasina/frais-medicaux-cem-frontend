@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import AgentPage from "./pages/AgentPage";
 import BeneficiairePage from "./pages/BeneficiairePage";
+import DeletionRequestsPage from "./pages/DeletionRequestsPage";
 import PrestatairePage from "./pages/PrestatairePage";
 import PriseEnChargePage from "./pages/PriseEnChargePage";
 import ReferentielsPage from "./pages/ReferentielsPage";
@@ -52,6 +53,14 @@ export default function App() {
 				element={
 					<ShellRoute>
 						<ReferentielsPage />
+					</ShellRoute>
+				}
+			/>
+			<Route
+				path="/demandes-suppression"
+				element={
+					<ShellRoute>
+						<DeletionRequestsPage />
 					</ShellRoute>
 				}
 			/>

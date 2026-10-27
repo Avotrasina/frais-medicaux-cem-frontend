@@ -13,11 +13,11 @@ import { useReferentials } from "../hooks/useReferentials";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
 import {
 	createAgent,
-	deleteAgent,
 	listAgents,
 	listAgentsFiltered,
 	searchAgentsByFirstName,
 	searchAgentsByLastName,
+	requestAgentDeletion,
 	updateAgentCard,
 	updateAgentInformation,
 } from "../services/agents";
@@ -212,13 +212,18 @@ export default function AgentPage() {
 			direction,
 		]),
 	);
+	const agenceByCode = new Map(
+		referentials.agences.map((agence) => [agence.codeAgence, agence]),
+	);
 
 	const columns: Column<AgentRow>[] = [
 		{
 			key: "matricule",
 			label: "IM",
 			render: (row) => (
-				<span className="font-mono text-xs font-bold">{row.matricule}</span>
+				<span className="font-mono text-xs font-bold">
+					{String(row.matricule).padStart(3, "0")}
+				</span>
 			),
 		},
 		{
@@ -256,28 +261,52 @@ export default function AgentPage() {
 		{
 			key: "codeDirection",
 			label: "Cod_Dir",
-			render: (row) =>
-				serviceByCode.get(row.codeService ?? "")?.codeDirection ?? "—",
+			render: (row) => {
+				if (row.backOfficeFrontOffice === "AGENCE") return "AGENCE";
+				if (row.backOfficeFrontOffice === "RETRAITE") return "RET";
+				return row.structureID ?? "—";
+			},
 		},
 		{
 			key: "direction",
 			label: "Direction",
 			render: (row) => {
+				if (row.backOfficeFrontOffice === "RETRAITE") return "RETRAITE";
+				if (row.backOfficeFrontOffice === "AGENCE") return "AGENCE";
 				const codeDirection = serviceByCode.get(
 					row.codeService ?? "",
 				)?.codeDirection;
-				return directionByCode.get(codeDirection ?? "")?.nom ?? "—";
+				return (
+					directionByCode.get(row.structureID ?? codeDirection ?? "")?.nom ??
+					"—"
+				);
 			},
 		},
 		{
 			key: "codeService",
 			label: "Cod_Serv / Cod_Agc",
-			render: (row) => orDash(row.codeService),
+			render: (row) => {
+				if (row.statutPEC === "DIRECTEUR") return "DIRECTEUR";
+				if (row.backOfficeFrontOffice === "RETRAITE") return "RET";
+				return row.backOfficeFrontOffice === "DIRECTION"
+					? orDash(row.codeService)
+					: orDash(row.structureID);
+			},
 		},
 		{
 			key: "serviceAgence",
 			label: "SERVICE / Agence",
-			render: (row) => serviceByCode.get(row.codeService ?? "")?.nom ?? "—",
+			render: (row) => {
+				if (row.backOfficeFrontOffice === "RETRAITE") return "RETRAITE";
+				if (row.statutPEC === "DIRECTEUR") return "-";
+				if (row.backOfficeFrontOffice === "DIRECTION") {
+					return serviceByCode.get(row.codeService ?? "")?.nom ?? "—";
+				}
+				const codeAgence = row.structureID;
+				if (!codeAgence) return "—";
+				const nomAgence = agenceByCode.get(codeAgence)?.nomAgence;
+				return nomAgence ? `${codeAgence} ${nomAgence}` : codeAgence;
+			},
 		},
 		{
 			key: "dateNaissance",
@@ -391,12 +420,15 @@ export default function AgentPage() {
 		if (!deleteTarget) return;
 		setSubmitting(true);
 		try {
-			await deleteAgent(deleteTarget.matricule);
-			notify("Agent supprimé.");
+			await requestAgentDeletion(deleteTarget.matricule);
+			notify("Demande de suppression envoyée.");
 			setDeleteTarget(null);
 			await fetchAgents(() => false);
 		} catch (caught) {
-			notify(errorMessage(caught, "Suppression impossible."), "error");
+			notify(
+				errorMessage(caught, "Demande de suppression impossible."),
+				"error",
+			);
 		} finally {
 			setSubmitting(false);
 		}
@@ -407,7 +439,7 @@ export default function AgentPage() {
 			<ToastViewport />
 			<PageHeader
 				title="Gestion des Agents"
-				description="Créez, consultez, modifiez et supprimez les agents ; la carte professionnelle est gérée séparément."
+				description="Créez, consultez et modifiez les agents. Les suppressions sont soumises à validation ; la carte professionnelle est gérée séparément."
 				actions={
 					<>
 						<button className="btn-secondary" onClick={() => void refresh()}>
@@ -715,9 +747,11 @@ export default function AgentPage() {
 
 			<ConfirmDialog
 				open={Boolean(deleteTarget)}
+				title="Confirmer la demande de suppression"
+				confirmLabel="Envoyer la demande"
 				message={
 					deleteTarget
-						? `Supprimer l'agent ${deleteTarget.nom} ${deleteTarget.prenom} (${deleteTarget.matricule}) ? Sa famille et ses bénéficiaires seront également supprimés.`
+						? `Envoyer une demande de suppression pour l'agent ${deleteTarget.nom} ${deleteTarget.prenom} (${deleteTarget.matricule}) ?`
 						: ""
 				}
 				onCancel={() => setDeleteTarget(null)}

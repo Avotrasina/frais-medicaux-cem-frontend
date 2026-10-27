@@ -1,4 +1,4 @@
-import { apiRoutes, apiService } from "./api";
+import { apiRoutes, apiService, imageFormData } from "./api";
 import type {
 	CreateProviderInput,
 	Provider,
@@ -13,7 +13,7 @@ export function listProviders(): Promise<Provider[]> {
 }
 
 /**
- * `GET /providers/filter?lieuID=&categorieID=`.
+ * `GET /providers/search?lieuID=&categorieID=`.
  * Both criteria are optional and combined with AND. Invalid integers give a 400,
  * so the caller must send numbers or nothing.
  */
@@ -28,11 +28,21 @@ export function filterProviders(filter: ProviderFilter): Promise<Provider[]> {
 }
 
 /** `POST /providers` — all fields required; returns the created provider. */
-export function createProvider(input: CreateProviderInput): Promise<Provider> {
-	return apiService.post<Provider>(apiRoutes.providers, input);
+export function createProvider(
+	input: CreateProviderInput,
+	convention: File,
+): Promise<Provider> {
+	return apiService.post<Provider>(
+		apiRoutes.providers,
+		imageFormData(
+			input as unknown as Record<string, unknown>,
+			convention,
+			"convention",
+		),
+	);
 }
 
-/** `PATCH /providers/:id` — partial update; `null`/missing values are ignored. */
+/** `PATCH /providers/:id-provider` — partial update; `null`/missing values are ignored. */
 export function updateProvider(
 	id: number,
 	input: UpdateProviderInput,
@@ -40,10 +50,16 @@ export function updateProvider(
 	return apiService.patch<Provider>(apiRoutes.provider(id), input);
 }
 
-/**
- * No delete route is exposed for providers in the documented branch: a provider
- * is referenced by attestations, and the deletion use case is not published.
- */
+/** `PATCH /providers/:id-provider/convention` — replaces the agreement PDF. */
+export function updateProviderConvention(
+	id: number,
+	convention: File,
+): Promise<Provider> {
+	return apiService.patch<Provider>(
+		apiRoutes.providerConvention(id),
+		imageFormData({}, convention, "convention"),
+	);
+}
 
 // --- Provider categories ----------------------------------------------------
 
@@ -52,7 +68,9 @@ export function listProviderCategories(): Promise<ProviderCategory[]> {
 }
 
 export function createProviderCategory(nom: string): Promise<ProviderCategory> {
-	return apiService.post<ProviderCategory>(apiRoutes.providerCategories, { nom });
+	return apiService.post<ProviderCategory>(apiRoutes.providerCategories, {
+		nom,
+	});
 }
 
 export function updateProviderCategory(

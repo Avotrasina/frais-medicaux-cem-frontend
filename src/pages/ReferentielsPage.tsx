@@ -10,6 +10,7 @@ import {
 	createProviderCategory,
 	updateProviderCategory,
 } from "../services/providers";
+import { requestDeletion, type DeletionResource } from "../services/deletions";
 import {
 	createAgence,
 	createAgentCategory,
@@ -46,7 +47,7 @@ interface SimpleRow {
 }
 
 /**
- * Generic panel for the flat referentials (`/lieux`,
+ * Generic panel for the flat referentials (`/locations`,
  * `/provider-categories`, `/agent-categories`).
  * Names are edited inline, which mirrors the behaviour of the other tables.
  */
@@ -58,6 +59,7 @@ function SimpleReferentialPanel({
 	createPlaceholder,
 	onCreate,
 	onUpdate,
+	onDelete,
 	empty,
 }: {
 	label: string;
@@ -67,10 +69,23 @@ function SimpleReferentialPanel({
 	createPlaceholder: string;
 	onCreate: (value: string) => Promise<void>;
 	onUpdate: (id: number, value: string) => Promise<void>;
+	onDelete: (row: SimpleRow) => Promise<void>;
 	empty: string;
 }) {
 	const [draft, setDraft] = useState("");
 	const [busy, setBusy] = useState(false);
+
+	async function handleDelete(row: SimpleRow): Promise<void> {
+		setBusy(true);
+		try {
+			await onDelete(row);
+			notify(`Demande de suppression envoyée pour ${label.toLowerCase()}.`);
+		} catch (caught) {
+			notify(errorMessage(caught, "Demande de suppression impossible."), "error");
+		} finally {
+			setBusy(false);
+		}
+	}
 
 	const columns: Column<SimpleRow>[] = [
 		{
@@ -138,7 +153,12 @@ function SimpleReferentialPanel({
 					<Plus size={16} /> Ajouter
 				</button>
 			</form>
-			<DataTable rows={rows} columns={columns} empty={empty} />
+			<DataTable
+				rows={rows}
+				columns={columns}
+				empty={empty}
+				onDelete={(row) => void handleDelete(row)}
+			/>
 			<p className="text-xs text-slate-400">
 				Cliquez sur une valeur pour la modifier (clé d'édition :{" "}
 				<span className="font-mono">{valuePlaceholder}</span>).
@@ -150,6 +170,27 @@ function SimpleReferentialPanel({
 export default function ReferentielsPage() {
 	const referentials = useReferentials();
 	const [tab, setTab] = useState<TabKey>("lieux");
+
+	async function submitDeletion(
+		resource: DeletionResource,
+		id: string | number,
+	): Promise<void> {
+		await requestDeletion(resource, id);
+		await referentials.reload();
+	}
+
+	async function handleStructureDeletion(
+		resource: "agency" | "direction" | "service",
+		id: string,
+		label: string,
+	): Promise<void> {
+		try {
+			await submitDeletion(resource, id);
+			notify(`Demande de suppression envoyée pour ${label}.`);
+		} catch (caught) {
+			notify(errorMessage(caught, "Demande de suppression impossible."), "error");
+		}
+	}
 
 	const lieuRows = useMemo<SimpleRow[]>(
 		() =>
@@ -419,7 +460,7 @@ export default function ReferentielsPage() {
 							label="Lieu"
 							valeurLabel="Nom du lieu"
 							rows={lieuRows}
-							valuePlaceholder="/lieux/:id"
+							valuePlaceholder="/locations/:id"
 							createPlaceholder="Nom du nouveau lieu"
 							empty="Aucun lieu enregistré."
 							onCreate={async (value) => {
@@ -430,6 +471,7 @@ export default function ReferentielsPage() {
 								await updateLieu(id, value);
 								await referentials.reload();
 							}}
+							onDelete={(row) => submitDeletion("location", row.id)}
 						/>
 					)}
 
@@ -449,6 +491,7 @@ export default function ReferentielsPage() {
 								await updateProviderCategory(id, value);
 								await referentials.reload();
 							}}
+							onDelete={(row) => submitDeletion("providerCategory", row.id)}
 						/>
 					)}
 
@@ -470,6 +513,7 @@ export default function ReferentielsPage() {
 										await updateAgentCategory(id, value);
 										await referentials.reload();
 									}}
+									onDelete={(row) => submitDeletion("agentCategory", row.id)}
 								/>
 							</div>
 						</>
@@ -503,6 +547,13 @@ export default function ReferentielsPage() {
 									rows={agenceRows}
 									columns={agenceColumns}
 									empty="Aucune agence enregistrée."
+									onDelete={(row) =>
+										void handleStructureDeletion(
+											"agency",
+											row.codeAgence,
+											"l’agence",
+										)
+									}
 								/>
 							</StructureSection>
 
@@ -532,6 +583,13 @@ export default function ReferentielsPage() {
 									rows={directionRows}
 									columns={directionColumns}
 									empty="Aucune direction enregistrée."
+									onDelete={(row) =>
+										void handleStructureDeletion(
+											"direction",
+											row.codeDirection,
+											"la direction",
+										)
+									}
 								/>
 							</StructureSection>
 
@@ -574,6 +632,13 @@ export default function ReferentielsPage() {
 									rows={serviceRows}
 									columns={serviceColumns}
 									empty="Aucun service enregistré."
+									onDelete={(row) =>
+										void handleStructureDeletion(
+											"service",
+											row.codeService,
+											"le service",
+										)
+									}
 								/>
 							</StructureSection>
 						</div>

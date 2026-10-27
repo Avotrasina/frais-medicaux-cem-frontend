@@ -1,7 +1,7 @@
 import { apiRoutes, apiService } from "./api";
 import type { Beneficiary } from "../types/api";
 
-/** `GET /beneficiaries/matricule/:matricule` — agent + spouse + children. */
+/** `GET /beneficiaries/by-matricule/:matricule` — agent + spouse + children. */
 export function listBeneficiariesByMatricule(
 	matricule: string,
 ): Promise<Beneficiary[]> {
@@ -10,13 +10,13 @@ export function listBeneficiariesByMatricule(
 	);
 }
 
-/** `GET /beneficiaries/idp/:idp` — throws `Beneficiaire introuvable` if unknown. */
+/** `GET /beneficiaries/:idp` — throws `Beneficiaire introuvable` if unknown. */
 export function getBeneficiaryByIdp(idp: string): Promise<Beneficiary> {
 	return apiService.get<Beneficiary>(apiRoutes.beneficiaryByIdp(idp));
 }
 
 /**
- * `PATCH /beneficiaries/idp/:idp/observation`.
+ * `PATCH /beneficiaries/:idp/observation`.
  * A missing or `null` value clears the observation.
  */
 export function updateBeneficiaryObservation(

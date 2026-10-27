@@ -23,7 +23,7 @@ const EMPTY_OPTION = "";
 /**
  * Beneficiaries are never created directly: the API creates the person and its
  * beneficiary row together. A brand-new beneficiary therefore goes through the
- * spouse (`conjoint`) or child (`enfant`) route of `/agent-family`.
+ * spouse or child route of `/agent-families`.
  */
 export function FamilyMemberCreateForm({
 	agents,
@@ -169,8 +169,8 @@ export function FamilyMemberCreateForm({
  * Civil-information update.
  *
  * The route depends on the family code: the agent is updated through
- * `/agent/information/:matricule`, a spouse or a child through
- * `/agent-family/<kind>/informations/:id` (the `:id` being the person id).
+ * `/agents/:matricule`, a spouse or a child through
+ * `/agent-families/<kind>/:id` (the `:id` being the person id).
  */
 export function BeneficiaryEditForm({
 	beneficiary,
@@ -257,8 +257,8 @@ export function BeneficiaryEditForm({
 					</dt>
 					<dd className="font-mono text-xs text-slate-600">
 						{isAgent
-							? `/agent/information/${beneficiary.matricule}`
-							: `/agent-family/${beneficiary.codeFamille === "CONJOINT" ? "conjoint" : "enfant"}/informations/:id`}
+							? `/agents/${beneficiary.matricule}`
+							: `/agent-families/${beneficiary.codeFamille === "CONJOINT" ? "spouses" : "children"}/:id`}
 					</dd>
 				</div>
 			</dl>

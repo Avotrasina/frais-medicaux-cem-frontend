@@ -26,9 +26,10 @@ export interface Attestation {
 	idpBeneficiaire: string;
 	prestataireID: number;
 	createdAt: string;
+	datePEC: string;
 }
 
-/** Body of `POST /attestation/create/`; the endpoint returns no body. */
+/** Body of `POST /attestations`; the endpoint returns no body. */
 export interface CreateAttestationInput {
 	idpBeneficiaire: string;
 	providerID: number;

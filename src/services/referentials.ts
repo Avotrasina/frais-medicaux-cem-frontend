@@ -17,7 +17,7 @@ import type {
 
 // --- Locations --------------------------------------------------------------
 
-/** There is no `GET /lieux/:id`: only the full listing is available. */
+/** There is no `GET /locations/:id`: only the full listing is available. */
 export function listLieux(): Promise<Lieu[]> {
 	return apiService.get<Lieu[]>(apiRoutes.lieux);
 }

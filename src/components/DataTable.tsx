@@ -132,8 +132,8 @@ export function DataTable<T extends { id: string | number }>({
 											{onDelete && (
 												<button
 													className="btn-ghost text-red-600"
-													title="Supprimer"
-													aria-label="Supprimer"
+													title="Demander la suppression"
+													aria-label="Demander la suppression"
 													onClick={() => onDelete(row)}
 												>
 													<Trash2 size={15} />

@@ -55,7 +55,10 @@ import {
 import { notify } from "../utils/notify";
 
 function referenceFor(attestation: Attestation): string {
-	return `${attestation.createdAt.slice(0, 4)} - ${attestation.id}`;
+	const date = attestation.createdAt || attestation.datePEC;
+	const year = date?.slice(0, 4);
+	const id = String(attestation.id).padStart(3, "0");
+	return year ? `${year} - ${id}` : id;
 }
 
 export default function PriseEnChargePage() {

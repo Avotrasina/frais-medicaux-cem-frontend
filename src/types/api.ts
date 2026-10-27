@@ -29,11 +29,10 @@ export type CodeFamille = (typeof CODES_FAMILLE)[number];
 // --- Agents -----------------------------------------------------------------
 
 /**
- * Item returned by `/agent/all`, `/agent/all/filtered` and the two search routes.
+ * Item returned by `/agents`, `/agents/search` and the two search routes.
  *
- * The structure codes (`codeAgence`, `codeDirection`) are **not** part of the
- * response: `AgentRepository.toReadAgent` drops them, so an active agent always
- * resolves to `AGENCE`.
+ * `structureID` is the organizational structure code: an agency code for
+ * `AGENCE` agents and a direction code for `DIRECTION` agents.
  */
 export interface AgentItem {
 	matricule: string;
@@ -47,13 +46,14 @@ export interface AgentItem {
 	observationMatricule: string | null;
 	fonction: string | null;
 	categorieID: string | null;
+	structureID: string | null;
 	codeService: string | null;
 	carteProfessionnellePath: string | null;
 	createdAt: string;
 	updatedAt: string;
 }
 
-/** Body of `POST /agent/create/` (multipart, `image` is required). */
+/** Body of `POST /agents` (multipart, `image` is required). */
 export interface CreateAgentInput {
 	matricule: string;
 	nom: string;
@@ -66,19 +66,20 @@ export interface CreateAgentInput {
 	observationMatricule?: string | null;
 	fonction?: string | null;
 	categorieID?: string | null;
+	structureID?: string | null;
 	codeDirection?: string | null;
 	codeAgence?: string | null;
 	codeService?: string | null;
 }
 
 /**
- * Body of `PATCH /agent/information/:matricule`.
+ * Body of `PATCH /agents/:matricule`.
  * `matricule` and `image` are not updatable. `null`/missing values are ignored
  * by the backend, so a field can never be cleared through this route.
  */
 export type UpdateAgentInput = Partial<Omit<CreateAgentInput, "matricule">>;
 
-/** Nested `filter` object accepted by `GET /agent/all/filtered`. */
+/** Nested `filter` object accepted by `GET /agents/search`. */
 export interface AgentStructureFilter {
 	backOfficeFrontOffice?: BackOfficeFrontOffice;
 	codeAgence?: string;
@@ -101,7 +102,7 @@ export interface FamilyMember {
 	agentMatricule: string;
 }
 
-/** Body of `POST /agent-family/conjoint|enfant` (multipart, `image` required). */
+/** Body of `POST /agent-families/spouses|children` (multipart, `image` required). */
 export interface CreateFamilyMemberInput {
 	agentMatricule: string;
 	nom: string;
@@ -110,7 +111,7 @@ export interface CreateFamilyMemberInput {
 	sexe: Sexe;
 }
 
-/** Body of `PATCH /agent-family/<kind>/informations/:id`. */
+/** Body of `PATCH /agent-families/<kind>/:id`. */
 export interface UpdateFamilyMemberInput {
 	nom?: string;
 	prenom?: string;
@@ -207,7 +208,7 @@ export interface CreateProviderInput {
 
 export type UpdateProviderInput = Partial<CreateProviderInput>;
 
-/** Query of `GET /providers/filter`. */
+/** Query of `GET /providers/search`. */
 export interface ProviderFilter {
 	lieuID?: number;
 	categorieID?: number;

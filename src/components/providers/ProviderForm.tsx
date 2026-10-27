@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { SelectField, TextAreaField, TextField } from "../form";
+import { FileField, SelectField, TextAreaField, TextField } from "../form";
 import { ErrorBlock } from "../Feedback";
 import type { Referentials } from "../../hooks/useReferentials";
 import {
@@ -27,6 +27,7 @@ interface ProviderFormState {
 	listePrestation: string;
 	lieuID: string;
 	categorieID: string;
+	convention: File | null;
 }
 
 function blankState(): ProviderFormState {
@@ -41,6 +42,7 @@ function blankState(): ProviderFormState {
 		listePrestation: "",
 		lieuID: "",
 		categorieID: "",
+		convention: null,
 	};
 }
 
@@ -56,6 +58,7 @@ function fromProvider(provider: Provider): ProviderFormState {
 		listePrestation: provider.listePrestation,
 		lieuID: String(provider.lieuID),
 		categorieID: String(provider.categorieID),
+		convention: null,
 	};
 }
 
@@ -79,8 +82,12 @@ export function ProviderForm({
 	provider?: Provider | null;
 	referentials: Referentials;
 	submitting: boolean;
-	onCreate: (input: CreateProviderInput) => Promise<void>;
-	onUpdate: (id: number, input: Partial<CreateProviderInput>) => Promise<void>;
+	onCreate: (input: CreateProviderInput, convention: File) => Promise<void>;
+	onUpdate: (
+		id: number,
+		input: Partial<CreateProviderInput>,
+		convention?: File,
+	) => Promise<void>;
 	onCancel: () => void;
 }) {
 	const isEdit = mode === "edit";
@@ -126,6 +133,8 @@ export function ProviderForm({
 		}
 		if (!state.lieuID) found.push("Le lieu est obligatoire.");
 		if (!state.categorieID) found.push("La catégorie est obligatoire.");
+		if (!isEdit && !state.convention)
+			found.push("Le PDF de la convention est obligatoire.");
 		return found;
 	}
 
@@ -158,15 +167,15 @@ export function ProviderForm({
 					Object.assign(changed, { [key]: payload[key] });
 				}
 			});
-			if (Object.keys(changed).length === 0) {
+			if (Object.keys(changed).length === 0 && !state.convention) {
 				setErrors(["Aucune modification à enregistrer."]);
 				return;
 			}
-			await onUpdate(provider.id, changed);
+			await onUpdate(provider.id, changed, state.convention ?? undefined);
 			return;
 		}
 
-		await onCreate(payload);
+		await onCreate(payload, state.convention as File);
 	}
 
 	return (
@@ -263,6 +272,19 @@ export function ProviderForm({
 					onChange={(value) => update("listePrestation", value)}
 					required
 					className="md:col-span-2"
+				/>
+				<FileField
+					label="Convention (PDF)"
+					file={state.convention}
+					onFile={(file) => update("convention", file)}
+					required={!isEdit}
+					accept="application/pdf"
+					className="md:col-span-2"
+					hint={
+						isEdit
+							? "Sélectionnez un PDF uniquement pour remplacer la convention actuelle."
+							: "Un fichier PDF est requis."
+					}
 				/>
 			</div>
 
