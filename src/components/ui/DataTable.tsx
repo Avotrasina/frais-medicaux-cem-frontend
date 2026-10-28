@@ -39,7 +39,7 @@ export function DataTable<T extends { id: string | number }>({
 	onToggleAll,
 	onToggleRow,
 	allSelected,
-	empty = "Aucun résultat.",
+	empty = "Aucun rÃƒÂ©sultat.",
 	pageSize = 10,
 	rowActions,
 }: DataTableProps<T>) {
@@ -71,7 +71,7 @@ export function DataTable<T extends { id: string | number }>({
 										type="checkbox"
 										checked={Boolean(allSelected)}
 										onChange={onToggleAll}
-										aria-label="Tout sélectionner"
+										aria-label="Tout sÃƒÂ©lectionner"
 									/>
 								</th>
 							)}
@@ -97,7 +97,7 @@ export function DataTable<T extends { id: string | number }>({
 											type="checkbox"
 											checked={selected.has(row.id)}
 											onChange={() => onToggleRow?.(row.id)}
-											aria-label="Sélectionner la ligne"
+											aria-label="SÃƒÂ©lectionner la ligne"
 										/>
 									</td>
 								)}
@@ -111,7 +111,7 @@ export function DataTable<T extends { id: string | number }>({
 											: String(
 													(row as Record<string, unknown>)[
 														column.key as string
-													] ?? "—",
+													] ?? "Ã¢â‚¬â€",
 												)}
 									</td>
 								))}
@@ -152,7 +152,7 @@ export function DataTable<T extends { id: string | number }>({
 			</div>
 			<div className="flex flex-col gap-3 border-t border-slate-100 px-4 py-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
 				<span>
-					Affichage de {firstShown} �??  {lastShown} sur {rows.length} résultat(s)
+				Affichage de {firstShown} à {lastShown} sur {rows.length} résultat(s)
 				</span>
 				<div className="flex items-center gap-1">
 					<button
@@ -161,14 +161,14 @@ export function DataTable<T extends { id: string | number }>({
 							setRequestedPage((current) => Math.max(1, current - 1))
 						}
 						disabled={page <= 1}
-						aria-label="Page précédente"
+						aria-label="Page prÃƒÂ©cÃƒÂ©dente"
 					>
 						<ChevronLeft size={15} />
 					</button>
 					{pageNumbers(page, pageCount).map((entry, index) =>
-						entry === "…" ? (
+						entry === "Ã¢â‚¬Â¦" ? (
 							<span key={`gap-${index}`} className="px-1.5 text-slate-400">
-								…
+								Ã¢â‚¬Â¦
 							</span>
 						) : (
 							<button
@@ -200,8 +200,8 @@ export function DataTable<T extends { id: string | number }>({
 	);
 }
 
-/** Compact pager: first, last, current ± 1, with ellipsis gaps. */
-function pageNumbers(page: number, pageCount: number): (number | "…")[] {
+/** Compact pager: first, last, current Ã‚Â± 1, with ellipsis gaps. */
+function pageNumbers(page: number, pageCount: number): (number | "Ã¢â‚¬Â¦")[] {
 	if (pageCount <= 7) {
 		return Array.from({ length: pageCount }, (_, index) => index + 1);
 	}
@@ -210,10 +210,10 @@ function pageNumbers(page: number, pageCount: number): (number | "…")[] {
 		.filter((value) => value >= 1 && value <= pageCount)
 		.sort((left, right) => left - right);
 
-	const result: (number | "…")[] = [];
+	const result: (number | "Ã¢â‚¬Â¦")[] = [];
 	sorted.forEach((value, index) => {
 		if (index > 0 && value - sorted[index - 1] > 1) {
-			result.push("…");
+			result.push("Ã¢â‚¬Â¦");
 		}
 		result.push(value);
 	});
