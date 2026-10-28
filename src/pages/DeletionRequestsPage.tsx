@@ -1,10 +1,10 @@
 import { Check, RefreshCw, X } from "lucide-react";
 import { useCallback, useState } from "react";
-import { ConfirmDialog } from "../components/ConfirmDialog";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { PageHeader } from "../components/PageHeader";
-import { ToastViewport } from "../components/Toast";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ToastViewport } from "../components/ui/Toast";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
 import {
 	listDeletionRequests,
@@ -12,7 +12,7 @@ import {
 	validateDeletion,
 	type DeletionRequest,
 	type DeletionResource,
-} from "../services/deletions";
+} from "../features/deletions/services/deletions";
 import { errorMessage } from "../utils/errors";
 import { notify } from "../utils/notify";
 

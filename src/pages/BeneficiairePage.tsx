@@ -4,29 +4,29 @@ import {
 	BeneficiaryEditForm,
 	BeneficiaryObservationForm,
 	FamilyMemberCreateForm,
-} from "../components/beneficiaries/BeneficiaryForm";
-import { Badge } from "../components/Badge";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { ImageThumb } from "../components/ImageThumb";
-import { Modal } from "../components/Modal";
-import { PageHeader } from "../components/PageHeader";
-import { ToastViewport } from "../components/Toast";
+} from "../features/beneficiaries/components/BeneficiaryForm";
+import { Badge } from "../components/ui/Badge";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { ImageThumb } from "../components/ui/ImageThumb";
+import { Modal } from "../components/ui/Modal";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ToastViewport } from "../components/ui/Toast";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
-import { listAgents, updateAgentInformation } from "../services/agents";
+import { listAgents, updateAgentInformation } from "../features/agents/services/agents";
 import {
 	getBeneficiaryByIdp,
 	listAllBeneficiaries,
 	listBeneficiariesByMatricule,
 	updateBeneficiaryObservation,
-} from "../services/beneficiaries";
+} from "../features/beneficiaries/services/beneficiaries";
 import {
 	createFamilyMember,
 	listFamilyMembers,
 	resolveFamilyMember,
 	updateFamilyMemberInformation,
-} from "../services/family";
-import { requestDeletion } from "../services/deletions";
+} from "../features/beneficiaries/services/family";
+import { requestDeletion } from "../features/deletions/services/deletions";
 import type {
 	AgentItem,
 	Beneficiary,
@@ -184,11 +184,11 @@ export default function BeneficiairePage() {
 					input,
 				);
 			}
-			notify("Bénéficiaire mis à jour.");
+			notify("Bénéficiaire mis �???  jour.");
 			setEditTarget(null);
 			await fetchBeneficiaries(() => false);
 		} catch (caught) {
-			notify(errorMessage(caught, "Mise à jour impossible."), "error");
+			notify(errorMessage(caught, "Mise �???  jour impossible."), "error");
 		} finally {
 			setSubmitting(false);
 		}
@@ -298,7 +298,7 @@ export default function BeneficiairePage() {
 			<ToastViewport />
 			<PageHeader
 				title="Gestion des Bénéficiaires"
-				description="Bénéficiaires (IDP) rattachés aux agents : consultation, mise à jour de l'état civil et de l'observation."
+				description="Bénéficiaires (IDP) rattachés aux agents : consultation, mise �???  jour de l'état civil et de l'observation."
 				actions={
 					<>
 						<button className="btn-secondary" onClick={() => void refresh()}>
@@ -374,7 +374,7 @@ export default function BeneficiairePage() {
 				<p className="text-xs text-slate-400">
 					{appliedSearch
 						? `Recherche ${searchMode === "idp" ? "par IDP" : "par matricule"} : ${appliedSearch}`
-						: `${rows.length} bénéficiaire(s) chargé(s) à partir de ${agents.length} agent(s).`}
+						: `${rows.length} bénéficiaire(s) chargé(s) �???  partir de ${agents.length} agent(s).`}
 				</p>
 			</div>
 

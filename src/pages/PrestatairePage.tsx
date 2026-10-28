@@ -1,13 +1,13 @@
 import { ChevronDown, FileText, Plus, RefreshCw, Search } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { Badge } from "../components/Badge";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { Modal } from "../components/Modal";
-import { PageHeader } from "../components/PageHeader";
-import { ProviderForm } from "../components/providers/ProviderForm";
-import { ToastViewport } from "../components/Toast";
-import { useReferentials } from "../hooks/useReferentials";
+import { Badge } from "../components/ui/Badge";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { Modal } from "../components/ui/Modal";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ProviderForm } from "../features/providers/components/ProviderForm";
+import { ToastViewport } from "../components/ui/Toast";
+import { useReferentials } from "../features/referentials/hooks/useReferentials";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
 import {
 	createProvider,
@@ -15,9 +15,9 @@ import {
 	listProviders,
 	updateProvider,
 	updateProviderConvention,
-} from "../services/providers";
+} from "../features/providers/services/providers";
 import { resolveProviderConventionUrl } from "../services/api";
-import { requestDeletion } from "../services/deletions";
+import { requestDeletion } from "../features/deletions/services/deletions";
 import type { CreateProviderInput, Provider } from "../types/api";
 import { errorMessage } from "../utils/errors";
 import { formatDate, labelProviderStatus, orDash } from "../utils/format";

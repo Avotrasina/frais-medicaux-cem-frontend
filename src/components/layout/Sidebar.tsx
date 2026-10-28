@@ -16,7 +16,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { Modal } from "../Modal";
+import { Modal } from "../ui/Modal";
 import logo from "../../assets/logo.jpg";
 
 type NavLinkEntry = { to: string; label: string; icon: LucideIcon };

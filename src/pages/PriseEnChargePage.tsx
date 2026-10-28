@@ -7,30 +7,30 @@ import {
 	useState,
 	type FormEvent,
 } from "react";
-import { AttestationForm } from "../components/pec/AttestationForm";
-import { Badge } from "../components/Badge";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { ImageThumb } from "../components/ImageThumb";
-import { Modal } from "../components/Modal";
-import { PageHeader } from "../components/PageHeader";
-import { ToastViewport } from "../components/Toast";
+import { AttestationForm } from "../features/pec/components/AttestationForm";
+import { Badge } from "../components/ui/Badge";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { ImageThumb } from "../components/ui/ImageThumb";
+import { Modal } from "../components/ui/Modal";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ToastViewport } from "../components/ui/Toast";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
-import { listAgents } from "../services/agents";
+import { listAgents } from "../features/agents/services/agents";
 import {
 	approveAttestation,
 	createAttestation,
 	getAttestationPreview,
 	listAttestations,
 	rejectAttestation,
-} from "../services/attestations";
-import { getBeneficiaryByIdp } from "../services/beneficiaries";
-import { listProviders } from "../services/providers";
+} from "../features/pec/services/attestations";
+import { getBeneficiaryByIdp } from "../features/beneficiaries/services/beneficiaries";
+import { listProviders } from "../features/providers/services/providers";
 import {
 	listDirections,
 	listLieux,
 	listServices,
-} from "../services/referentials";
+} from "../features/referentials/services/referentials";
 import type {
 	AgentItem,
 	Beneficiary,

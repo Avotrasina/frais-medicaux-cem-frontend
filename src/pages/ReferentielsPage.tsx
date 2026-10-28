@@ -1,16 +1,16 @@
 import { Plus, RefreshCw } from "lucide-react";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { InlineCell } from "../components/InlineCell";
-import { PageHeader } from "../components/PageHeader";
-import { ToastViewport } from "../components/Toast";
-import { useReferentials } from "../hooks/useReferentials";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { InlineCell } from "../components/ui/InlineCell";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ToastViewport } from "../components/ui/Toast";
+import { useReferentials } from "../features/referentials/hooks/useReferentials";
 import {
 	createProviderCategory,
 	updateProviderCategory,
-} from "../services/providers";
-import { requestDeletion, type DeletionResource } from "../services/deletions";
+} from "../features/providers/services/providers";
+import { requestDeletion, type DeletionResource } from "../features/deletions/services/deletions";
 import {
 	createAgence,
 	createAgentCategory,
@@ -23,7 +23,7 @@ import {
 	updateDirection,
 	updateLieu,
 	updateServiceName,
-} from "../services/referentials";
+} from "../features/referentials/services/referentials";
 import { errorMessage } from "../utils/errors";
 import { notify } from "../utils/notify";
 
@@ -107,10 +107,10 @@ function SimpleReferentialPanel({
 						void (async () => {
 							try {
 								await onUpdate(row.id, trimmed);
-								notify(`${label} mis à jour.`);
+								notify(`${label} mis �???  jour.`);
 							} catch (caught) {
 								notify(
-									errorMessage(caught, "Mise à jour impossible."),
+									errorMessage(caught, "Mise �???  jour impossible."),
 									"error",
 								);
 							}
@@ -247,10 +247,10 @@ export default function ReferentielsPage() {
 							try {
 								await updateAgence(row.codeAgence, trimmed);
 								await referentials.reload();
-								notify("Agence mise à jour.");
+								notify("Agence mise �???  jour.");
 							} catch (caught) {
 								notify(
-									errorMessage(caught, "Mise à jour impossible."),
+									errorMessage(caught, "Mise �???  jour impossible."),
 									"error",
 								);
 							}
@@ -287,10 +287,10 @@ export default function ReferentielsPage() {
 							try {
 								await updateDirection(row.codeDirection, trimmed);
 								await referentials.reload();
-								notify("Direction mise à jour.");
+								notify("Direction mise �???  jour.");
 							} catch (caught) {
 								notify(
-									errorMessage(caught, "Mise à jour impossible."),
+									errorMessage(caught, "Mise �???  jour impossible."),
 									"error",
 								);
 							}
@@ -332,10 +332,10 @@ export default function ReferentielsPage() {
 							try {
 								await updateServiceName(row.codeService, trimmed);
 								await referentials.reload();
-								notify("Service mis à jour.");
+								notify("Service mis �???  jour.");
 							} catch (caught) {
 								notify(
-									errorMessage(caught, "Mise à jour impossible."),
+									errorMessage(caught, "Mise �???  jour impossible."),
 									"error",
 								);
 							}
@@ -359,7 +359,7 @@ export default function ReferentielsPage() {
 								await moveService(row.codeService, next);
 								await referentials.reload();
 								notify(
-									"Service déplacé ; le rattachement des agents a été mis à jour par le serveur.",
+									"Service déplacé ; le rattachement des agents a été mis �???  jour par le serveur.",
 								);
 							} catch (caught) {
 								notify(

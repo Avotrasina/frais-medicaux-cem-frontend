@@ -1,15 +1,15 @@
 import { IdCard, Plus, RefreshCw, Search } from "lucide-react";
 import { useCallback, useMemo, useRef, useState, type FormEvent } from "react";
-import { AgentForm } from "../components/agents/AgentForm";
-import { ConfirmDialog } from "../components/ConfirmDialog";
-import { DataTable, type Column } from "../components/DataTable";
-import { ErrorBlock, LoadingBlock } from "../components/Feedback";
-import { FileField } from "../components/form";
-import { ImageThumb } from "../components/ImageThumb";
-import { Modal } from "../components/Modal";
-import { PageHeader } from "../components/PageHeader";
-import { ToastViewport } from "../components/Toast";
-import { useReferentials } from "../hooks/useReferentials";
+import { AgentForm } from "../features/agents/components/AgentForm";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { DataTable, type Column } from "../components/ui/DataTable";
+import { ErrorBlock, LoadingBlock } from "../components/ui/Feedback";
+import { FileField } from "../components/ui/form";
+import { ImageThumb } from "../components/ui/ImageThumb";
+import { Modal } from "../components/ui/Modal";
+import { PageHeader } from "../components/ui/PageHeader";
+import { ToastViewport } from "../components/ui/Toast";
+import { useReferentials } from "../features/referentials/hooks/useReferentials";
 import { useAsyncLoader } from "../hooks/useAsyncLoader";
 import {
 	createAgent,
@@ -20,7 +20,7 @@ import {
 	requestAgentDeletion,
 	updateAgentCard,
 	updateAgentInformation,
-} from "../services/agents";
+} from "../features/agents/services/agents";
 import { resolveAgentCardUrl } from "../services/api";
 import type {
 	AgentItem,
