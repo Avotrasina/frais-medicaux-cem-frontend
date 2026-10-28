@@ -268,7 +268,7 @@ export const apiRoutes = {
 	providers: "/providers",
 	providersFilter: "/providers/search",
 	provider: (id: number) => `/providers/${id}-provider`,
-	providerConvention: (id: number) => `/providers/${id}-provider/convention`,
+	providerConvention: (id: number) => `/providers/${id}/convention`,
 	providerDeletionRequests: "/providers/deletion-requests",
 	providerDeletionValidation: (id: number) =>
 		`/providers/${id}-provider/deletion-validation`,
