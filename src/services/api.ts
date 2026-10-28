@@ -293,7 +293,7 @@ export const apiRoutes = {
 
 	// --- Attestations -------------------------------------------------------
 	attestationCreate: "/attestations",
-	pendingAttestations: "/attestations/pending",
+	attestations: "/attestations",
 	approveAttestation: (id: number) => `/attestations/${id}/approval`,
 	rejectAttestation: (id: number) => `/attestations/${id}/rejection`,
 	attestationPreview: (id: number) => `/attestations/${id}/preview`,

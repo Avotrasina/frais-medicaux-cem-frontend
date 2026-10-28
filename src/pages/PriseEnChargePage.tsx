@@ -21,7 +21,7 @@ import {
 	approveAttestation,
 	createAttestation,
 	getAttestationPreview,
-	listPendingAttestations,
+	listAttestations,
 	rejectAttestation,
 } from "../services/attestations";
 import { getBeneficiaryByIdp } from "../services/beneficiaries";
@@ -42,6 +42,7 @@ import type {
 import type {
 	Attestation,
 	AttestationFormValues,
+	AttestationStatut,
 	AttestationTableRow,
 } from "../types/attestation";
 import { errorMessage } from "../utils/errors";
@@ -74,6 +75,8 @@ export default function PriseEnChargePage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [query, setQuery] = useState("");
+	const [statusFilter, setStatusFilter] =
+		useState<AttestationStatut>("EN_ATTENTE");
 
 	const [idpDraft, setIdpDraft] = useState("");
 	const [searchedBeneficiary, setSearchedBeneficiary] =
@@ -103,14 +106,14 @@ export default function PriseEnChargePage() {
 	const fetchPageData = useCallback(async (isStale: () => boolean) => {
 		try {
 			const [
-				pending,
+				attestationList,
 				agentList,
 				providerList,
 				serviceList,
 				directionList,
 				locationList,
 			] = await Promise.all([
-				listPendingAttestations(),
+				listAttestations(),
 				listAgents(),
 				listProviders(),
 				listServices(),
@@ -119,7 +122,9 @@ export default function PriseEnChargePage() {
 			]);
 			if (isStale()) return;
 
-			const idps = [...new Set(pending.map((item) => item.idpBeneficiaire))];
+			const idps = [
+				...new Set(attestationList.map((item) => item.idpBeneficiaire)),
+			];
 			const beneficiaryResults = await Promise.all(
 				idps.map(async (idp) => {
 					try {
@@ -135,7 +140,7 @@ export default function PriseEnChargePage() {
 			for (const [idp, beneficiary] of beneficiaryResults) {
 				if (beneficiary) nextBeneficiaries.set(idp, beneficiary);
 			}
-			setAttestations(pending);
+			setAttestations(attestationList);
 			setAgents(agentList);
 			setProviders(providerList);
 			setServices(serviceList);
@@ -233,9 +238,10 @@ export default function PriseEnChargePage() {
 
 	const visible = useMemo(() => {
 		const needle = query.trim().toLowerCase();
-		if (!needle) return rows;
-		return rows.filter((row) =>
-			[
+		return rows.filter((row) => {
+			if (row.statut !== statusFilter) return false;
+			if (!needle) return true;
+			return [
 				referenceFor(row),
 				row.idpBeneficiaire,
 				row.beneficiary
@@ -248,9 +254,9 @@ export default function PriseEnChargePage() {
 			]
 				.join(" ")
 				.toLowerCase()
-				.includes(needle),
-		);
-	}, [rows, query]);
+				.includes(needle);
+		});
+	}, [rows, query, statusFilter]);
 
 	async function handleIdpSearch(event: FormEvent): Promise<void> {
 		event.preventDefault();
@@ -484,17 +490,35 @@ export default function PriseEnChargePage() {
 					className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]"
 					onSubmit={(event) => void handleIdpSearch(event)}
 				>
-					<input
-						className="field"
-						value={idpDraft}
-						placeholder="Saisir l'IDP du concerné"
-						disabled={searching}
-						onChange={(event) => {
-							setIdpDraft(event.target.value);
-							setSearchedBeneficiary(null);
-							setSearchError(null);
-						}}
-					/>
+					<div className="relative min-w-0">
+						<input
+							className="field pr-11"
+							value={idpDraft}
+							placeholder="Saisir l'IDP du concerné"
+							disabled={searching}
+							onChange={(event) => {
+								setIdpDraft(event.target.value);
+								setSearchedBeneficiary(null);
+								setSearchError(null);
+							}}
+						/>
+						{idpDraft && (
+							<button
+								type="button"
+								className="btn-ghost absolute right-2 top-1/2 -translate-y-1/2"
+								aria-label="Effacer la recherche IDP"
+								title="Effacer"
+								disabled={searching}
+								onClick={() => {
+									setIdpDraft("");
+									setSearchedBeneficiary(null);
+									setSearchError(null);
+								}}
+							>
+								<X size={17} />
+							</button>
+						)}
+					</div>
 					<button className="btn-primary" disabled={searching}>
 						<Search size={16} /> {searching ? "Recherche…" : "Rechercher"}
 					</button>
@@ -658,16 +682,27 @@ export default function PriseEnChargePage() {
 					</div>
 				)}
 			</div>
-			<div className="panel mb-4 mt-4 grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+			<div className="panel mb-4 mt-4 grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_14rem]">
 				<input
 					className="field"
 					value={query}
 					placeholder="Rechercher une référence, un IDP, un prestataire…"
 					onChange={(event) => setQuery(event.target.value)}
 				/>
-				<p className="self-center text-xs text-slate-400">
-					{visible.length} prise(s) en charge affichée(s) parmi les demandes en
-					attente
+				<select
+					className="field"
+					aria-label="Filtrer les attestations par statut"
+					value={statusFilter}
+					onChange={(event) =>
+						setStatusFilter(event.target.value as AttestationStatut)
+					}
+				>
+					<option value="EN_ATTENTE">En attente</option>
+					<option value="VALIDEE">Validées</option>
+					<option value="REFUSEE">Refusées</option>
+				</select>
+				<p className="text-sm text-slate-500 sm:col-span-2">
+					{visible.length} attestation(s) affichée(s)
 				</p>
 			</div>
 
@@ -678,39 +713,49 @@ export default function PriseEnChargePage() {
 					<DataTable
 						rows={visible}
 						columns={columns}
-						empty="Aucune prise en charge en attente."
-						rowActions={(row) => (
-							<>
-								<button
-									className="btn-ghost"
-									title="Afficher l'aperçu"
-									aria-label="Afficher l'aperçu"
-									onClick={() => void handlePreview(row)}
-								>
-									<Eye size={15} />
-								</button>
-								<button
-									className="btn-ghost text-emerald-700"
-									title="Valider l'attestation"
-									aria-label="Valider l'attestation"
-									onClick={() =>
-										setReviewTarget({ attestation: row, action: "approve" })
-									}
-								>
-									<Check size={15} />
-								</button>
-								<button
-									className="btn-ghost text-red-600"
-									title="Rejeter l'attestation"
-									aria-label="Rejeter l'attestation"
-									onClick={() =>
-										setReviewTarget({ attestation: row, action: "reject" })
-									}
-								>
-									<X size={15} />
-								</button>
-							</>
-						)}
+						empty={`Aucune attestation ${statusFilter === "EN_ATTENTE" ? "en attente" : statusFilter === "VALIDEE" ? "validée" : "refusée"}.`}
+						rowActions={
+							statusFilter === "EN_ATTENTE"
+								? (row) => (
+										<>
+											<button
+												className="btn-ghost"
+												title="Afficher l'aperçu"
+												aria-label="Afficher l'aperçu"
+												onClick={() => void handlePreview(row)}
+											>
+												<Eye size={15} />
+											</button>
+											<button
+												className="btn-ghost text-emerald-700"
+												title="Valider l'attestation"
+												aria-label="Valider l'attestation"
+												onClick={() =>
+													setReviewTarget({
+														attestation: row,
+														action: "approve",
+													})
+												}
+											>
+												<Check size={15} />
+											</button>
+											<button
+												className="btn-ghost text-red-600"
+												title="Rejeter l'attestation"
+												aria-label="Rejeter l'attestation"
+												onClick={() =>
+													setReviewTarget({
+														attestation: row,
+														action: "reject",
+													})
+												}
+											>
+												<X size={15} />
+											</button>
+										</>
+									)
+								: undefined
+						}
 					/>
 				)}
 			</div>

@@ -62,7 +62,7 @@ export function DataTable<T extends { id: string | number }>({
 	return (
 		<div className="table-shell">
 			<div className="overflow-x-auto">
-				<table className="min-w-full border-collapse text-sm">
+				<table className="min-w-full border-collapse text-[15px]">
 					<thead className="bg-slate-50 text-left">
 						<tr>
 							{selected && (
@@ -78,7 +78,7 @@ export function DataTable<T extends { id: string | number }>({
 							{columns.map((column) => (
 								<th
 									key={String(column.key)}
-									className={`whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 ${column.className ?? ""}`}
+									className={`whitespace-nowrap border-b border-slate-200 px-4 py-3 text-xs font-bold uppercase text-slate-600 ${column.className ?? ""}`}
 								>
 									{column.label}
 								</th>
@@ -150,7 +150,7 @@ export function DataTable<T extends { id: string | number }>({
 					<div className="p-10 text-center text-sm text-slate-400">{empty}</div>
 				)}
 			</div>
-			<div className="flex flex-col gap-3 border-t border-slate-100 px-4 py-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+			<div className="flex flex-col gap-3 border-t border-slate-100 px-4 py-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
 				<span>
 					Affichage de {firstShown} à {lastShown} sur {rows.length} résultat(s)
 				</span>
