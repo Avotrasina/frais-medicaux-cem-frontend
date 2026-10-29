@@ -104,6 +104,9 @@ export default function PrestatairePage() {
 				provider.nif,
 				provider.stat,
 				provider.listePrestation,
+				provider.echeanceRenouvellement,
+				provider.echeanceResiliation,
+				provider.observation,
 				labelProviderStatus(provider.statut),
 				categorieNames.get(provider.categorieID),
 				lieuNames.get(provider.lieuID),
@@ -167,14 +170,15 @@ export default function PrestatairePage() {
 		{
 			key: "listePrestation",
 			label: "Actes / Prestations",
-			className: "w-[260px] max-w-[260px] whitespace-normal",
+			className: "w-[260px] max-w-[260px]",
+			wrap: true,
 			render: (row) => {
 				const prestations = orDash(row.listePrestation);
 				if (prestations.length <= 110) {
 					return <span className="text-xs text-slate-600">{prestations}</span>;
 				}
 				return (
-					<details className="group max-w-[260px] whitespace-normal">
+					<details className="group max-w-[260px] whitespace-normal break-words">
 						<summary
 							className="flex cursor-pointer list-none items-start gap-2 rounded-sm text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
 							title="Afficher ou réduire la liste complète"
@@ -194,12 +198,30 @@ export default function PrestatairePage() {
 								className="mt-0.5 shrink-0 text-slate-400 transition-transform group-open:rotate-180"
 							/>
 						</summary>
-						<div className="mt-2 border-l-2 border-red-100 pl-2 text-xs leading-5 text-slate-700">
+						<div className="mt-2 border-l-2 border-red-100 pl-2 text-xs leading-5 break-words text-slate-700">
 							{prestations}
 						</div>
 					</details>
 				);
 			},
+		},
+		{
+			key: "echeanceRenouvellement",
+			label: "Échéance renouvellement",
+			className: "min-w-[180px] max-w-[220px] whitespace-normal",
+			render: (row) => orDash(row.echeanceRenouvellement),
+		},
+		{
+			key: "echeanceResiliation",
+			label: "Échéance résiliation",
+			className: "min-w-[180px] max-w-[220px] whitespace-normal",
+			render: (row) => orDash(row.echeanceResiliation),
+		},
+		{
+			key: "observation",
+			label: "Observation",
+			className: "min-w-[180px] max-w-[260px] whitespace-normal",
+			render: (row) => orDash(row.observation),
 		},
 		{
 			key: "convention",

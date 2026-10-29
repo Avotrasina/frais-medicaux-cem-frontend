@@ -173,14 +173,14 @@ export function AgentForm({
 
 	// A retired agent must not carry a structure or a function; switching to
 	// RETRAITE is impossible through PATCH because nulls are ignored
-	// (API.md �?? ???? ��? ’�?? ?¢â‚¬Å¡�?? ???? �â€š�?? ?‚Â§13.5), so the option is disabled while editing.
+	// (API.md §13.5), so the option is disabled while editing.
 	const retireDisabled = isEdit && agent?.backOfficeFrontOffice !== "RETRAITE";
 
 	/**
 	 * True when the update turns a retired agent into an active one. Only then
 	 * must the structure and the function be supplied: a PATCH leaves both
 	 * untouched otherwise, and the listing never returns the structure codes
-	 * (API.md �?? ???? ��? ’�?? ?¢â‚¬Å¡�?? ???? �â€š�?? ?‚Â§13.1), so demanding them would block every edit of an active
+	 * (API.md §13.1), so demanding them would block every edit of an active
 	 * agent.
 	 */
 	const requiresAffectation =
@@ -196,7 +196,7 @@ export function AgentForm({
 				!Number.isSafeInteger(Number(state.matricule)) ||
 				Number(state.matricule) < 1
 			) {
-				found.push("Le matricule doit �?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Âªtre un entier positif.");
+				found.push("Le matricule doit être un entier positif.");
 			}
 			if (!image)
 				found.push("La carte professionnelle (image) est obligatoire.");
@@ -207,13 +207,13 @@ export function AgentForm({
 		}
 		if (!state.nom.trim()) found.push("Le nom est obligatoire.");
 		else if (state.nom.trim().length > 25)
-			found.push("Le nom ne peut pas d�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©passer 25 caract�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â¨res.");
-		if (!state.prenom.trim()) found.push("Le pr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©nom est obligatoire.");
+			found.push("Le nom ne peut pas dépasser 25 caractères.");
+		if (!state.prenom.trim()) found.push("Le prénom est obligatoire.");
 		else if (state.prenom.trim().length > 100)
-			found.push("Le pr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©nom ne peut pas d�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©passer 100 caract�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â¨res.");
+			found.push("Le prénom ne peut pas dépasser 100 caractères.");
 		if (!state.dateNaissance)
 			found.push("La date de naissance est obligatoire.");
-		if (!state.dateEntree) found.push("La date d'entr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©e est obligatoire.");
+		if (!state.dateEntree) found.push("La date d'entrée est obligatoire.");
 
 		if (requiresAffectation) {
 			if (!state.fonction.trim())
@@ -231,7 +231,7 @@ export function AgentForm({
 			state.dateEntree &&
 			state.dateEntree < state.dateNaissance
 		) {
-			found.push("La date d'entr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©e ne peut pas pr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©c�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©der la date de naissance.");
+			found.push("La date d'entrée ne peut pas précéder la date de naissance.");
 		}
 		return found;
 	}
@@ -288,7 +288,7 @@ export function AgentForm({
 				if (state.codeService) payload.codeService = state.codeService;
 			}
 			if (Object.keys(payload).length === 0) {
-				setErrors(["Aucune modification �?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â�?  enregistrer."]);
+				setErrors(["Aucune modification à enregistrer."]);
 				return;
 			}
 			await onUpdate(agent.matricule, payload as UpdateAgentInput);
@@ -329,10 +329,10 @@ export function AgentForm({
 						isEdit
 							? "Le matricule n'est pas modifiable."
 							: matriculeSuggestionLoading
-								? "Calcul de la prochaine suggestion�?? ???? ��? ’�?? ?‚Â¢�?? ???? �Â¢�?? ?¢â‚¬Å¡�?? ?‚Â¬�?? ???? �â€š�?? ?‚Â¦"
+							? "Calcul de la prochaine suggestion…"
 								: suggestedMatricule
-									? "Proposition bas�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©e sur le matricule num�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©rique le plus �?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©lev�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©; modifiable."
-									: "Saisissez un matricule num�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©rique unique."
+									? "Proposition basée sur le matricule numérique le plus élevé ; modifiable."
+									: "Saisissez un matricule numérique unique."
 					}
 				/>
 				<TextField
@@ -343,7 +343,7 @@ export function AgentForm({
 					maxLength={25}
 				/>
 				<TextField
-					label="Pr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©nom"
+					label="Prénom"
 					value={state.prenom}
 					onChange={(value) => update("prenom", value)}
 					required
@@ -378,7 +378,7 @@ export function AgentForm({
 					required
 					hint={
 						retireDisabled
-							? "Le passage �?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â�?  RETRAITE n'est pas possible via PATCH : les champs structure/fonction ne peuvent pas �?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Âªtre effac�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©s (API.md �?? ???? ��? ’�?? ?¢â‚¬Å¡�?? ???? �â€š�?? ?‚Â§13.5)."
+							? "Le passage à RETRAITE n'est pas possible via PATCH : les champs structure/fonction ne peuvent pas être effacés (API.md §13.5)."
 							: undefined
 					}
 				/>
@@ -390,7 +390,7 @@ export function AgentForm({
 					required
 				/>
 				<TextField
-					label="Date d'entr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©e"
+					label="Date d'entrée"
 					type="date"
 					value={state.dateEntree}
 					onChange={(value) => update("dateEntree", value)}
@@ -405,16 +405,16 @@ export function AgentForm({
 					maxLength={100}
 					hint={
 						isRetired
-							? "Sans objet pour un agent retrait�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©."
+							? "Sans objet pour un agent retraité."
 							: "Obligatoire pour un agent actif."
 					}
 				/>
 				<SelectField
-					label="Cat�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©gorie agent"
+					label="Catégorie agent"
 					value={state.categorieID}
 					onChange={(value) => update("categorieID", value)}
 					options={categorieOptions}
-					hint="La valeur transmise est le code de cat�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©gorie."
+					hint="La valeur transmise est le code de catégorie."
 				/>
 				<SelectField
 					label="Agence"
@@ -446,7 +446,7 @@ export function AgentForm({
 					}
 					options={directionOptions}
 					disabled={isRetired || usesAgence}
-					placeholder="-- S�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©lectionner une direction --"
+					placeholder="-- Sélectionner une direction --"
 				/>
 				<SelectField
 					label="Service"
@@ -455,7 +455,7 @@ export function AgentForm({
 					options={serviceOptions}
 					disabled={isRetired || usesAgence || !state.codeDirection}
 					placeholder="-- Aucun --"
-					hint="Les services sont filtr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©s par direction."
+					hint="Les services sont filtrés par direction."
 				/>
 				{!isEdit && (
 					<FileField
@@ -476,13 +476,13 @@ export function AgentForm({
 
 			{isRetired && (
 				<p className="text-xs text-slate-500">
-					Agent retrait�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â© : la structure, le service et la fonction sont
-					volontairement exclus de la requ�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Âªte.
+					Agent retraité : la structure, le service et la fonction sont
+					volontairement exclus de la requête.
 				</p>
 			)}
 			{isEdit && !isRetired && !state.codeAgence && !state.codeDirection && (
 				<p className="text-xs text-slate-500">
-					La structure actuelle n'est pas renvoy�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©e par l'API (API.md �?? ???? ��? ’�?? ?¢â‚¬Å¡�?? ???? �â€š�?? ?‚Â§13.1).
+					La structure actuelle n'est pas renvoyée par l'API (API.md §13.1).
 					Laissez l'agence et la direction vides pour la conserver, ou
 					choisissez-en une pour l'ajuster.
 				</p>
@@ -499,10 +499,10 @@ export function AgentForm({
 				</button>
 				<button className="btn-primary" disabled={submitting}>
 					{submitting
-						? "Enregistrement�?? ???? ��? ’�?? ?‚Â¢�?? ???? �Â¢�?? ?¢â‚¬Å¡�?? ?‚Â¬�?? ???? �â€š�?? ?‚Â¦"
+						? "Enregistrement…"
 						: isEdit
 							? "Enregistrer les modifications"
-							: "Cr�?? ???? ��? ’�?? ?�? â€™�?? ???? �â€š�?? ?‚Â©er l'agent"}
+							: "Créer l'agent"}
 				</button>
 			</div>
 		</form>

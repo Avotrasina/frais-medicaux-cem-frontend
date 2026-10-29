@@ -25,6 +25,9 @@ interface ProviderFormState {
 	dateDebutConvention: string;
 	dateFinConvention: string;
 	listePrestation: string;
+	echeanceRenouvellement: string;
+	echeanceResiliation: string;
+	observation: string;
 	lieuID: string;
 	categorieID: string;
 	convention: File | null;
@@ -40,6 +43,9 @@ function blankState(): ProviderFormState {
 		dateDebutConvention: "",
 		dateFinConvention: "",
 		listePrestation: "",
+		echeanceRenouvellement: "",
+		echeanceResiliation: "",
+		observation: "",
 		lieuID: "",
 		categorieID: "",
 		convention: null,
@@ -56,6 +62,9 @@ function fromProvider(provider: Provider): ProviderFormState {
 		dateDebutConvention: toDateInputValue(provider.dateDebutConvention),
 		dateFinConvention: toDateInputValue(provider.dateFinConvention),
 		listePrestation: provider.listePrestation,
+		echeanceRenouvellement: provider.echeanceRenouvellement ?? "",
+		echeanceResiliation: provider.echeanceResiliation ?? "",
+		observation: provider.observation ?? "",
 		lieuID: String(provider.lieuID),
 		categorieID: String(provider.categorieID),
 		convention: null,
@@ -153,6 +162,9 @@ export function ProviderForm({
 			dateDebutConvention: state.dateDebutConvention,
 			dateFinConvention: state.dateFinConvention,
 			listePrestation: state.listePrestation.trim(),
+			echeanceRenouvellement: state.echeanceRenouvellement.trim(),
+			echeanceResiliation: state.echeanceResiliation.trim(),
+			observation: state.observation.trim(),
 			lieuID: Number(state.lieuID),
 			categorieID: Number(state.categorieID),
 		};
@@ -271,6 +283,22 @@ export function ProviderForm({
 					value={state.listePrestation}
 					onChange={(value) => update("listePrestation", value)}
 					required
+					className="md:col-span-2"
+				/>
+				<TextField
+					label="Échéance de renouvellement"
+					value={state.echeanceRenouvellement}
+					onChange={(value) => update("echeanceRenouvellement", value)}
+				/>
+				<TextField
+					label="Échéance de résiliation"
+					value={state.echeanceResiliation}
+					onChange={(value) => update("echeanceResiliation", value)}
+				/>
+				<TextAreaField
+					label="Observation"
+					value={state.observation}
+					onChange={(value) => update("observation", value)}
 					className="md:col-span-2"
 				/>
 				<FileField

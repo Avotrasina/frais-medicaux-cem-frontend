@@ -188,6 +188,9 @@ export interface Provider {
 	dateDebutConvention: string;
 	dateFinConvention: string;
 	listePrestation: string;
+	echeanceRenouvellement: string | null;
+	echeanceResiliation: string | null;
+	observation: string | null;
 	lieuID: number;
 	categorieID: number;
 }
@@ -202,6 +205,9 @@ export interface CreateProviderInput {
 	dateDebutConvention: string;
 	dateFinConvention: string;
 	listePrestation: string;
+	echeanceRenouvellement?: string | null;
+	echeanceResiliation?: string | null;
+	observation?: string | null;
 	lieuID: number;
 	categorieID: number;
 }

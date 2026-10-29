@@ -184,11 +184,11 @@ export default function BeneficiairePage() {
 					input,
 				);
 			}
-			notify("Bénéficiaire mis �???  jour.");
+			notify("Bénéficiaire mis à jour.");
 			setEditTarget(null);
 			await fetchBeneficiaries(() => false);
 		} catch (caught) {
-			notify(errorMessage(caught, "Mise �???  jour impossible."), "error");
+			notify(errorMessage(caught, "Mise à jour impossible."), "error");
 		} finally {
 			setSubmitting(false);
 		}
@@ -298,7 +298,7 @@ export default function BeneficiairePage() {
 			<ToastViewport />
 			<PageHeader
 				title="Gestion des Bénéficiaires"
-				description="Bénéficiaires (IDP) rattachés aux agents : consultation, mise �???  jour de l'état civil et de l'observation."
+				description="Bénéficiaires (IDP) rattachés aux agents : consultation, mise à jour de l'état civil et de l'observation."
 				actions={
 					<>
 						<button className="btn-secondary" onClick={() => void refresh()}>
@@ -374,7 +374,7 @@ export default function BeneficiairePage() {
 				<p className="text-xs text-slate-400">
 					{appliedSearch
 						? `Recherche ${searchMode === "idp" ? "par IDP" : "par matricule"} : ${appliedSearch}`
-						: `${rows.length} bénéficiaire(s) chargé(s) �???  partir de ${agents.length} agent(s).`}
+						: `${rows.length} bénéficiaire(s) chargé(s) à partir de ${agents.length} agent(s).`}
 				</p>
 			</div>
 
