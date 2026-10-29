@@ -319,7 +319,7 @@ export default function PrestatairePage() {
 						<label className="label" htmlFor="provider-search">
 							Recherche
 						</label>
-						<div className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100">
+						<div className="flex h-[2.75rem] items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100">
 							<Search size={15} className="shrink-0 text-slate-400" />
 							<input
 								id="provider-search"
