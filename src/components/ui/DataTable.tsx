@@ -6,6 +6,7 @@ export type Column<T> = {
 	label: string;
 	render?: (row: T) => ReactNode;
 	className?: string;
+	wrap?: boolean;
 };
 
 interface DataTableProps<T extends { id: string | number }> {
@@ -104,7 +105,7 @@ export function DataTable<T extends { id: string | number }>({
 								{columns.map((column) => (
 									<td
 										key={String(column.key)}
-										className={`whitespace-nowrap px-4 py-3 ${column.className ?? ""}`}
+										className={`${column.wrap ? "whitespace-normal" : "whitespace-nowrap"} px-4 py-3 ${column.className ?? ""}`}
 									>
 										{column.render
 											? column.render(row)
