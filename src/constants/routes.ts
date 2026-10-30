@@ -6,4 +6,5 @@ export const ROUTES = {
   coverage: "/pec",
   referentials: "/referentiels",
   deletionRequests: "/demandes-suppression",
+  invoice:"/factures"
 } as const;

@@ -7,6 +7,7 @@ import DeletionRequestsPage from "../pages/DeletionRequestsPage";
 import PrestatairePage from "../pages/PrestatairePage";
 import PriseEnChargePage from "../pages/PriseEnChargePage";
 import ReferentielsPage from "../pages/ReferentielsPage";
+import InvoicePage  from "../pages/InvoicePage"
 import { ROUTES } from "../constants/routes";
 
 function AppShell({ children }: { children: ReactNode }) {
@@ -23,6 +24,7 @@ export default function AppRoutes() {
       <Route path={ROUTES.coverage} element={<AppShell><PriseEnChargePage /></AppShell>} />
       <Route path={ROUTES.referentials} element={<AppShell><ReferentielsPage /></AppShell>} />
       <Route path={ROUTES.deletionRequests} element={<AppShell><DeletionRequestsPage /></AppShell>} />
+      <Route path={ROUTES.invoice} element={<AppShell><InvoicePage></InvoicePage></AppShell>} />
       <Route path="*" element={<Navigate to={ROUTES.agents} replace />} />
     </Routes>
   );

@@ -13,6 +13,7 @@ import {
   Stethoscope,
   UserRound,
   Users,
+  Receipt,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const nav: NavEntry[] = [
   { to: "/beneficiaires", label: "Bénéficiaires", icon: UserRound },
   { to: "/prestataires", label: "Prestataires", icon: Stethoscope },
   { to: "/pec", label: "Prises en charge", icon: ShieldCheck },
+  { to: "/factures", label:"Factures", icon:Receipt},
   { section: "Paramétrage" },
   { to: "/referentiels", label: "Référentiels", icon: Settings },
   { to: "/demandes-suppression", label: "Demandes de suppression", icon: ClipboardCheck },
