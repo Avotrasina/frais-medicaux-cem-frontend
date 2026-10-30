@@ -1,0 +1,43 @@
+import type { T5ParAnParActeRow } from "../types/t5ParAnParActe";
+
+export const initialT5ParAnParActeRowsMock: T5ParAnParActeRow[] = [
+	{
+		id: 1,
+		refSocial: "25/001",
+		dateActe: "2026-01-15",
+		libelle: "Consultation médicale",
+		montantActe: 150000,
+		depassementActe: 0,
+		cumulActeConsomme: 150000,
+		soldePlafond: 850000,
+		depassementPlafond: 0,
+		totalDepassement: 0,
+		nomEtablissement: "CLINIQUE MEDICO-CHIRURGICALE SAINT PAUL",
+	},
+	{
+		id: 2,
+		refSocial: "25/002",
+		dateActe: "2026-03-15",
+		libelle: "Examens biologiques",
+		montantActe: 1200000,
+		depassementActe: 200000,
+		cumulActeConsomme: 1350000,
+		soldePlafond: 0,
+		depassementPlafond: 350000,
+		totalDepassement: 550000,
+		nomEtablissement: "HOPITALY LOTERANA ANDRANOMADIO",
+	},
+	{
+		id: 3,
+		refSocial: "25/003",
+		dateActe: "2026-05-02",
+		libelle: "Hospitalisation",
+		montantActe: 450000,
+		depassementActe: 0,
+		cumulActeConsomme: 1800000,
+		soldePlafond: 400000,
+		depassementPlafond: 0,
+		totalDepassement: 200000,
+		nomEtablissement: "CARE MEDICAL",
+	},
+];
