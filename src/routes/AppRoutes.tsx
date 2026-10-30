@@ -11,6 +11,7 @@ import ReferentielsPage from "../pages/ReferentielsPage";
 import InvoicePage  from "../pages/InvoicePage"
 import T5ParAnPage from "../pages/T5ParAn";
 import T5ParAnParActePage from "../pages/T5ParAnParActe";
+import T5ParSeancePage from "../pages/T5ParSeance";
 import { ROUTES } from "../constants/routes";
 
 function AppShell({ children }: { children: ReactNode }) {
@@ -43,6 +44,7 @@ export default function AppRoutes() {
       <Route path={ROUTES.invoice} element={<AppShell><InvoicePage></InvoicePage></AppShell>} />
       <Route path={ROUTES.T5ParAn} element={<LookupLayout onSearchIdp={fakeSearchIdp}><T5ParAnPage title="T5 par an" plafond={10_000_000} /></LookupLayout>} />
       <Route path={ROUTES.T5ParAnParActe} element={<LookupLayout onSearchIdp={fakeSearchIdp}><T5ParAnParActePage title="T5 par an et par acte" plafondParAn={10_000_000} plafondParActe={1_000_000} /></LookupLayout>} />
+      <Route path={ROUTES.T5Parseance} element={<LookupLayout onSearchIdp={fakeSearchIdp}><T5ParSeancePage title="T5 par séance" nombreSeance={3} /></LookupLayout>} />
       <Route path="*" element={<Navigate to={ROUTES.agents} replace />} />
     </Routes>
   );
