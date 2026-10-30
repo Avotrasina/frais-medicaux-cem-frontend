@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
 import { ROUTES } from "../constants/routes";
 import T5ParAnTable from "../features/invoice/components/t5ParAnTable";
 import type { T5ParAnColumnKey, T5ParAnRow } from "../features/invoice/types/t5ParAn";
@@ -50,16 +49,6 @@ export default function T5ParAn({ title, plafond }: Props) {
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
 				<T5ParAnTable rows={rows} onCellChange={updateCell} />
 			</section>
-			<div className="fixed bottom-12 right-8 z-20">
-				<button
-					type="button"
-					className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200"
-					onClick={() => {}}
-					aria-label="Ajouter une ligne"
-				>
-					<Plus size={26} />
-				</button>
-			</div>
 		</div>
 	);
 }
