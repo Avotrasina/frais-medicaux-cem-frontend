@@ -1,3 +1,5 @@
+import type { RefObject } from "react";
+
 export const ContrainteType = {
 	PAR_AN : "PAR_AN",
 	PAR_SEANCE : "PAR SEANCE",
@@ -38,7 +40,10 @@ export type FactureGlobaleRow = {
 };
 
 export type FactureGlobaleTableProps = {
-		rows: FactureGlobaleRow[];
+	rows: FactureGlobaleRow[];
+	addRowId: number;
+	containerRef: RefObject<HTMLDivElement | null>;
+	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (
 		rowId: number,
 		key: FactureGlobaleColumnKey,
@@ -81,3 +86,4 @@ export const dateColumn = {
 	dateValidation : "dateValidation"
 } as const;
 export type dateColumn = (typeof dateColumn) [keyof typeof dateColumn];
+

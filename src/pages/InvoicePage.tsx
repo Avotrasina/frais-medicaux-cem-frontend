@@ -1,23 +1,13 @@
 
-import { useState } from "react";
-import { FactureGlobaleTable, initialFactureGlobaleRows } from "../features/invoice";
-import type { FactureGlobaleColumnKey } from "../features/invoice";
+import { Plus } from "lucide-react";
+import { FactureGlobaleTable } from "../features/invoice";
 import { PageHeader, ToastViewport } from "../components/ui";
+import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
+import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
 
 export default function FactureGlobalePage() {
-	const [rows, setRows] = useState(initialFactureGlobaleRows);
-
-	function updateCell(
-		rowId: number,
-		key: FactureGlobaleColumnKey,
-		value: string,
-	) {
-		setRows((current) =>
-			current.map((row) =>
-				row.id === rowId ? { ...row, [key]: value } : row,
-			),
-		);
-	}
+	const { rows, addRowId, isLoaded, updateCell } = useFactureGlobaleRows();
+	const { containerRef, addRowRef, focusAddRow } = useScrollToAddInvoiceRow(isLoaded);
 
 	return (
 		<>
@@ -28,12 +18,29 @@ export default function FactureGlobalePage() {
 					description="Suivi des factures, des montants pris en charge et de leur circuit de validation. Cliquez sur une cellule pour la modifier."
 				/>
 				<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-					<FactureGlobaleTable
-						rows={rows}
-						onCellChange={updateCell}
-					/>
+					{isLoaded ? (
+						<FactureGlobaleTable
+							rows={rows}
+							addRowId={addRowId}
+							containerRef={containerRef}
+							addRowRef={addRowRef}
+							onCellChange={updateCell}
+						/>
+					) : (
+						<div className="flex flex-1 items-center justify-center text-sm text-slate-500" role="status">
+							Chargement des factures…
+						</div>
+					)}
 				</section>
 			</div>
+			{isLoaded && <button
+				type="button"
+				className="fixed bottom-12 right-8 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200"
+				aria-label="Ajouter une ligne"
+				onClick={focusAddRow}
+			>
+				<Plus size={26} strokeWidth={2.5} />
+			</button>}
 		</>
 	);
 }

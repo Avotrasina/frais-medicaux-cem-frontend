@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { dropdownOptionType as dropdownOptionProps } from "../types/dropDown";
+import {TypeContrainte} from "../types/dropDown";
+
+export type dropdownOptionProps = {
+    id: number,
+    label:string,
+    typeContrainte: TypeContrainte,
+}
 
 export default function DropDownCell({
   options,
@@ -26,13 +32,9 @@ export default function DropDownCell({
         <ul className="absolute left-0 top-full z-10 w-max min-w-full bg-white shadow-md">
           {options.map((option) => (
             <li key={option.label} className="h-10 px-3 flex items-center justify-center cursor-pointer hover:bg-slate-50">
-              {option.path ? (
-                <Link to={option.path} className="w-full">
-                  {option.label}
-                </Link>
-              ) : (
-                option.label
-              )}
+               {option.typeContrainte == TypeContrainte.PAR_AN && <Link to={`/ParAn/:${option.id}/:${option.label}`}>{option.label}</Link>}
+               {option.typeContrainte == TypeContrainte.PAR_AN_PAR_ACTE && <Link to={`/ParAnParActe/:${option.id}/:${option.label}`}>{option.label}</Link>}
+               {option.typeContrainte == TypeContrainte.PAR_SEANCE && <Link to={`/ParSeance/:${option.id}/:${option.label }`}>{option.label}</Link>}
             </li>
           ))}
         </ul>

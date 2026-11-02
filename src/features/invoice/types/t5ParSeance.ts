@@ -11,6 +11,12 @@ export type T5ParSeanceRow = {
 
 export type T5ParSeanceColumnKey = Exclude<keyof T5ParSeanceRow, "id">;
 
+export type T5ParSeanceColumn = {
+	key: T5ParSeanceColumnKey;
+	label: string;
+	width: string;
+};
+
 export type T5ParSeanceTableProps = {
 	rows: T5ParSeanceRow[];
 	onCellChange: (

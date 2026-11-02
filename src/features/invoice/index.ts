@@ -3,8 +3,15 @@ export { default as FactureGlobaleTable } from "./components/invoiceGlobalTable"
 export { default as T5ParAnTable } from "./components/t5ParAnTable";
 export { default as T5ParAnParActeTable } from "./components/t5ParAnParActeTable";
 export { default as T5ParSeanceTable } from "./components/t5ParSeanceTable";
-export { factureGlobaleColumns } from "./data/tableColumn";
+export {
+	factureGlobaleColumns,
+	t5ParAnColumns,
+	t5ParAnParActeColumns,
+	t5ParSeanceColumns,
+} from "./data/tableColumn";
 export { initialFactureGlobaleRowsMock as initialFactureGlobaleRows } from "./mocks/invoiceTable";
+export { filterFactureGlobaleRows } from "./services/filterFactureGlobaleRows";
+export type { FactureGlobaleFilters, InvoiceDateRange } from "./services/filterFactureGlobaleRows";
 export { initialT5ParAnRowsMock } from "./mocks/t5ParAn";
 export { initialT5ParAnParActeRowsMock } from "./mocks/t5ParAnParActe";
 export { initialT5ParSeanceRowsMock } from "./mocks/t5ParSeance";
@@ -18,18 +25,21 @@ export type {
 	FactureT5X,
 } from "./types/invoiceTable";
 export type {
+	T5ParAnColumn,
 	T5ParAnColumnKey,
 	T5ParAnRow,
 	T5ParAnTableProps,
 } from "./types/t5ParAn";
 export type {
+	T5ParAnParActeColumn,
 	T5ParAnParActeColumnKey,
 	T5ParAnParActeRow,
 	T5ParAnParActeTableProps,
 } from "./types/t5ParAnParActe";
 export type {
+	T5ParSeanceColumn,
 	T5ParSeanceColumnKey,
 	T5ParSeanceRow,
 	T5ParSeanceTableProps,
 } from "./types/t5ParSeance";
-export type { dropdownOptionType } from "./types/dropDown";
+export type { dropdownOptionProps } from "./components/dropDownCell";

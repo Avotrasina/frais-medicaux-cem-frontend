@@ -12,6 +12,12 @@ export type T5ParAnRow = {
 
 export type T5ParAnColumnKey = Exclude<keyof T5ParAnRow, "id">;
 
+export type T5ParAnColumn = {
+	key: T5ParAnColumnKey;
+	label: string;
+	width: string;
+};
+
 export type T5ParAnTableProps = {
 	rows: T5ParAnRow[];
 	onCellChange: (

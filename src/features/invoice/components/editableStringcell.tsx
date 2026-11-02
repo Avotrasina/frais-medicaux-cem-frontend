@@ -6,6 +6,7 @@ type Props = {
   isLocked?: boolean;
   placeholder?: string;
   className?: string;
+  emptyValue?: string;
   onSave: (value: string) => void;
 };
 
@@ -14,6 +15,7 @@ export default function EditableStringCell({
   isLocked = false,
   placeholder,
   className = "",
+  emptyValue = "",
   onSave,
 }: Props) {
   const [editing, setEditing] = useState(false);
@@ -34,7 +36,7 @@ export default function EditableStringCell({
 
   return (
     <td
-      className={`relative h-full cursor-pointer truncate px-3 text-xs hover:bg-slate-50 ${className}`}
+      className={`relative h-full  max-w-20 cursor-pointer truncate px-3 text-xs hover:bg-slate-50 ${className}`}
       onClick={startEditing}
     >
       {editing ? (
@@ -74,7 +76,7 @@ export default function EditableStringCell({
           </span>
         </>
       ) : (
-        value
+        value || (emptyValue && <span className="absolute inset-0 flex items-center justify-center">{emptyValue}</span>)
       )}
     </td>
   );

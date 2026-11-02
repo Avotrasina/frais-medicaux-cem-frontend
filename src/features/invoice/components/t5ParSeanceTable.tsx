@@ -1,20 +1,10 @@
 import EditableDateCell from "./editableDateCell";
 import EditableNumberCell from "./editableNumberCell";
 import EditableStringCell from "./editableStringcell";
+import { t5ParSeanceColumns as columns } from "../data/tableColumn";
 import type {
-	T5ParSeanceColumnKey,
 	T5ParSeanceTableProps,
 } from "../types/t5ParSeance";
-
-const columns: { key: T5ParSeanceColumnKey; label: string; width: string }[] = [
-	{ key: "refSocial", label: "Réf. social", width: "w-32" },
-	{ key: "dateActe", label: "Date de l’acte", width: "w-40" },
-	{ key: "libelle", label: "Libellé", width: "w-64" },
-	{ key: "montantActe", label: "Montant de l’acte", width: "w-40" },
-	{ key: "numeroSeance", label: "N° séance", width: "w-32" },
-	{ key: "montantDepassement", label: "Montant dépassement", width: "w-44" },
-	{ key: "nomEtablissement", label: "Nom établissement", width: "w-64" },
-];
 
 const cellClass = "border border-slate-200 px-2 py-2 text-slate-900";
 const amountFormatter = new Intl.NumberFormat("fr-FR", {
