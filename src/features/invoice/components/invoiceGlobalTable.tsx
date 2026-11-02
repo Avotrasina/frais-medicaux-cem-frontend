@@ -47,6 +47,7 @@ export default function FactureGlobaleTable({
 	onCellChange,
 }: FactureGlobaleTableProps) {
 	const [openFilter, setOpenFilter] = useState<string | null>(null);
+	const [pinnedFilter, setPinnedFilter] = useState<DateFilterKey | null>(null);
 	const [textFilters, setTextFilters] = useState<FactureGlobaleFilters["text"]>({});
 	const [dateDrafts, setDateDrafts] = useState<FactureGlobaleFilters["dates"]>({});
 	const [dateFilters, setDateFilters] = useState<FactureGlobaleFilters["dates"]>({});
@@ -70,6 +71,8 @@ export default function FactureGlobaleTable({
 		setDateFilters((current) => {
 			return { ...current, [key]: range };
 		});
+		setPinnedFilter(null);
+		setOpenFilter(null);
 	}
 
 	function clearTextFilter(key: TextFilterKey) {
@@ -91,6 +94,8 @@ export default function FactureGlobaleTable({
 			delete next[key];
 			return next;
 		});
+		setPinnedFilter(null);
+		setOpenFilter(null);
 	}
 
 	return (
@@ -108,8 +113,8 @@ export default function FactureGlobaleTable({
 								<th
 									key={column.key}
 									className={`relative border border-slate-700 px-3 py-3 text-left text-[10px] font-extrabold uppercase tracking-wide ${column.width} ${filterable ? "cursor-pointer" : ""} ${column.key === "majT5" ? "bg-yellow-300 text-red-800" : ""} ${isOpen ? "z-30" : ""}`}
-									onMouseEnter={() => filterable && setOpenFilter(column.key)}
-									onMouseLeave={() => isOpen && setOpenFilter(null)}
+									onMouseEnter={() => filterable && (!pinnedFilter || pinnedFilter === column.key) && setOpenFilter(column.key)}
+									onMouseLeave={() => isOpen && pinnedFilter !== column.key && setOpenFilter(null)}
 									aria-expanded={filterable ? isOpen : undefined}
 								>
 									<span className="block w-full text-left">
@@ -136,6 +141,7 @@ export default function FactureGlobaleTable({
 													<input
 														type="date"
 														aria-label="Date de début"
+														onFocus={() => { setPinnedFilter(dateKey); setOpenFilter(dateKey); }}
 														value={dateDrafts[dateKey]?.from ?? dateFilters[dateKey]?.from ?? ""}
 														className="w-full rounded-md border border-slate-300 px-2 py-2 text-xs font-normal normal-case outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 														onChange={(event) => setDateDrafts((current) => ({ ...current, [dateKey]: { from: event.target.value, to: current[dateKey]?.to ?? dateFilters[dateKey]?.to ?? "" } }))}
@@ -143,6 +149,7 @@ export default function FactureGlobaleTable({
 													<input
 														type="date"
 														aria-label="Date de fin"
+														onFocus={() => { setPinnedFilter(dateKey); setOpenFilter(dateKey); }}
 														value={dateDrafts[dateKey]?.to ?? dateFilters[dateKey]?.to ?? ""}
 														className="w-full rounded-md border border-slate-300 px-2 py-2 text-xs font-normal normal-case outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 														onChange={(event) => setDateDrafts((current) => ({ ...current, [dateKey]: { from: current[dateKey]?.from ?? dateFilters[dateKey]?.from ?? "", to: event.target.value } }))}
