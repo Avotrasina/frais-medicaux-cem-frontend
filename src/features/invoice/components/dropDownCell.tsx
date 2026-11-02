@@ -11,9 +11,11 @@ export type dropdownOptionProps = {
 
 export default function DropDownCell({
   options,
+  refSocial,
   className = "",
 }: {
   options: dropdownOptionProps[];
+  refSocial: string;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -32,9 +34,9 @@ export default function DropDownCell({
         <ul className="absolute left-0 top-full z-10 w-max min-w-full bg-white shadow-md">
           {options.map((option) => (
             <li key={option.label} className="h-10 px-3 flex items-center justify-center cursor-pointer hover:bg-slate-50">
-               {option.typeContrainte == TypeContrainte.PAR_AN && <Link to={`/ParAn/:${option.id}/:${option.label}`}>{option.label}</Link>}
-               {option.typeContrainte == TypeContrainte.PAR_AN_PAR_ACTE && <Link to={`/ParAnParActe/:${option.id}/:${option.label}`}>{option.label}</Link>}
-               {option.typeContrainte == TypeContrainte.PAR_SEANCE && <Link to={`/ParSeance/:${option.id}/:${option.label }`}>{option.label}</Link>}
+               {option.typeContrainte == TypeContrainte.PAR_AN && <Link to={`/ParAn/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
+               {option.typeContrainte == TypeContrainte.PAR_AN_PAR_ACTE && <Link to={`/ParAnParActe/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
+               {option.typeContrainte == TypeContrainte.PAR_SEANCE && <Link to={`/ParSeance/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
             </li>
           ))}
         </ul>

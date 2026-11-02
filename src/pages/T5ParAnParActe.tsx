@@ -1,12 +1,19 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLookupResult } from "../components/layout/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParAnParActeTable from "../features/invoice/components/t5ParAnParActeTable";
-import { initialT5ParAnParActeRowsMock } from "../features/invoice/mocks/t5ParAnParActe";
 import type {
-	T5ParAnParActeColumnKey,
 	T5ParAnParActeRow,
 } from "../features/invoice/types/t5ParAnParActe";
+import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+
+function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParActeRow {
+	return {
+		id, refSocial, dateActe: "", libelle: "", montantActe: 0, depassementActe: 0,
+		cumulActeConsomme: 0, soldePlafond: 0, depassementPlafond: 0,
+		totalDepassement: 0, nomEtablissement: "",
+	};
+}
 
 type Props = {
 	title: string;
@@ -24,24 +31,21 @@ export default function T5ParAnParActe({
 	plafondParAn,
 	plafondParActe,
 }: Props) {
-	const [rows, setRows] = useState<T5ParAnParActeRow[]>(initialT5ParAnParActeRowsMock);
+	const { label, refSocial } = useParams();
+	const lookupResult = useLookupResult();
+	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+		lookupResult?.t5Data.parAnParActe,
+		refSocial,
+		createEmptyParAnParActeRow,
+	);
 	const navigate = useNavigate();
-
-	function updateCell(
-		rowId: number,
-		key: T5ParAnParActeColumnKey,
-		value: string | number,
-	) {
-		setRows((current) =>
-			current.map((row) => (row.id === rowId ? { ...row, [key]: value } : row)),
-		);
-	}
+	const pageTitle = label ?? title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
 			<div className="relative">
 				<h1 className="text-center text-2xl font-extrabold tracking-tight text-slate-900">
-					{title}
+					{pageTitle}
 				</h1>
 				<button
 					type="button"
@@ -60,7 +64,13 @@ export default function T5ParAnParActe({
 				</div>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-				<T5ParAnParActeTable rows={rows} onCellChange={updateCell} />
+				{!lookupResult ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Veuillez rechercher l’agent correspondant à cette référence.</div>
+				) : !isReady ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Chargement des données T5…</div>
+				) : (
+					<T5ParAnParActeTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+				)}
 			</section>
 		</div>
 	);

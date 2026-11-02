@@ -22,6 +22,7 @@ export type T5ParAnParActeColumn = {
 
 export type T5ParAnParActeTableProps = {
 	rows: T5ParAnParActeRow[];
+	focusRefSocial?: string;
 	onCellChange: (
 		rowId: number,
 		key: T5ParAnParActeColumnKey,

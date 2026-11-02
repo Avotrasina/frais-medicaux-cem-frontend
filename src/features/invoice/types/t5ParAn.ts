@@ -20,6 +20,7 @@ export type T5ParAnColumn = {
 
 export type T5ParAnTableProps = {
 	rows: T5ParAnRow[];
+	focusRefSocial?: string;
 	onCellChange: (
 		rowId: number,
 		key: T5ParAnColumnKey,

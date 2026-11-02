@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import EditableDateCell from "./editableDateCell";
 import EditableNumberCell from "./editableNumberCell";
 import EditableStringCell from "./editableStringcell";
@@ -11,7 +12,16 @@ const amountFormatter = new Intl.NumberFormat("fr-FR", {
 	maximumFractionDigits: 0,
 });
 
-export default function T5ParSeanceTable({ rows, onCellChange }: T5ParSeanceTableProps) {
+export default function T5ParSeanceTable({ rows, onCellChange, focusRefSocial }: T5ParSeanceTableProps) {
+	const targetRowRef = useRef<HTMLTableRowElement>(null);
+	const targetRowId = rows.find((row) => row.refSocial === focusRefSocial)?.id;
+
+	useEffect(() => {
+		if (!targetRowRef.current) return;
+		targetRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+		targetRowRef.current.focus({ preventScroll: true });
+	}, [targetRowId]);
+
 	return (
 		<div className="min-h-0 flex-1 overflow-auto">
 			<table className="h-fit w-max min-w-full table-fixed border-collapse text-sm">
@@ -29,10 +39,13 @@ export default function T5ParSeanceTable({ rows, onCellChange }: T5ParSeanceTabl
 				</thead>
 				<tbody>
 					{rows.map((row) => (
-						<tr key={row.id} className="h-12 bg-white hover:bg-slate-50">
+						<tr key={row.id} ref={row.id === targetRowId ? targetRowRef : undefined} tabIndex={row.id === targetRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === targetRowId ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
 							{columns.map((column) => {
 								const className = `${cellClass} ${column.width}`;
-								if (column.key === "refSocial" || column.key === "libelle") {
+								if (column.key === "refSocial") {
+									return <td key={column.key} className={`${className} truncate`}>{row.refSocial || "—"}</td>;
+								}
+								if (column.key === "libelle") {
 									return (
 										<EditableStringCell
 											key={column.key}

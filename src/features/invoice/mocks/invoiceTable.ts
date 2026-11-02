@@ -108,7 +108,9 @@ export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
 		return {
 			...template,
 			id: index + 1,
-			refSocial: `26/${String(index + 1).padStart(3, "0")}`,
+			refSocial: index < initialFactureGlobaleRowsMock.length
+				? template.refSocial
+				: `26/${String(index + 1).padStart(3, "0")}`,
 			dateReception: formatMockDate(receptionDate),
 			numFacture: `${template.numFacture}-${String(index + 1).padStart(3, "0")}`,
 		};

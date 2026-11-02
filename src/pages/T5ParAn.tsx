@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLookupResult } from "../components/layout/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParAnTable from "../features/invoice/components/t5ParAnTable";
-import type { T5ParAnColumnKey, T5ParAnRow } from "../features/invoice/types/t5ParAn";
-import { initialT5ParAnRowsMock } from "../features/invoice/mocks/t5ParAn";
+import type { T5ParAnRow } from "../features/invoice/types/t5ParAn";
+import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
 
 type Props = {
 	title: string;
@@ -15,23 +15,29 @@ const moneyFormatter = new Intl.NumberFormat("fr-FR", {
 	maximumFractionDigits: 2,
 });
 
-export default function T5ParAn({ title, plafond }: Props) {
-	const [rows, setRows] = useState<T5ParAnRow[]>(initialT5ParAnRowsMock);
-	const navigate = useNavigate();
+function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
+	return {
+		id, refSocial, dateActe: "", libelle: "", montantActe: 0, montantCumule: null,
+		soldePlafond: null, montantDepassement: null, nomEtablissement: "",
+	};
+}
 
-	function updateCell(rowId: number, key: T5ParAnColumnKey, value: string | number) {
-		setRows((current) =>
-			current.map((row) =>
-				row.id === rowId ? { ...row, [key]: value } : row,
-			),
-		);
-	}
+export default function T5ParAn({ title, plafond }: Props) {
+	const { label, refSocial } = useParams();
+	const lookupResult = useLookupResult();
+	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+		lookupResult?.t5Data.parAn,
+		refSocial,
+		createEmptyParAnRow,
+	);
+	const navigate = useNavigate();
+	const pageTitle = label ?? title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
 			<div className="relative">
 				<h1 className="text-center text-2xl font-extrabold tracking-tight text-slate-900">
-					{title}
+					{pageTitle}
 				</h1>
 				<button
 					type="button"
@@ -47,7 +53,13 @@ export default function T5ParAn({ title, plafond }: Props) {
 				</p>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-				<T5ParAnTable rows={rows} onCellChange={updateCell} />
+				{!lookupResult ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Veuillez rechercher l’agent correspondant à cette référence.</div>
+				) : !isReady ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Chargement des données T5…</div>
+				) : (
+					<T5ParAnTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+				)}
 			</section>
 		</div>
 	);

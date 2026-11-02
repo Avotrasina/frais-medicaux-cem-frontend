@@ -19,6 +19,7 @@ export type T5ParSeanceColumn = {
 
 export type T5ParSeanceTableProps = {
 	rows: T5ParSeanceRow[];
+	focusRefSocial?: string;
 	onCellChange: (
 		rowId: number,
 		key: T5ParSeanceColumnKey,

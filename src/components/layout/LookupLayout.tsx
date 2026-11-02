@@ -1,13 +1,14 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Bell, Menu, Search, X } from "lucide-react";
-import type { IdpLookupInfo } from "../../types/LookUp";
+import type { IdpLookupResult } from "../../types/LookUp";
+import { LookupResultContext } from "./LookupContext";
 import logo from "../../assets/logo.jpg";
 
 
 
 type Props = {
 	children: ReactNode;
-	onSearchIdp: (idp: string) => Promise<IdpLookupInfo>;
+	onSearchIdp: (idp: string) => Promise<IdpLookupResult>;
 };
 
 export default function LookupLayout({
@@ -16,7 +17,7 @@ export default function LookupLayout({
 }: Props) {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [idp, setIdp] = useState("");
-	const [idpInfo, setIdpInfo] = useState<IdpLookupInfo | null>(null);
+	const [lookupResult, setLookupResult] = useState<IdpLookupResult | null>(null);
 	const [idpError, setIdpError] = useState<string | null>(null);
 	const [idpLoading, setIdpLoading] = useState(false);
 
@@ -26,10 +27,11 @@ export default function LookupLayout({
 		if (!query) return;
 		setIdpLoading(true);
 		setIdpError(null);
+		setLookupResult(null);
 		try {
-			setIdpInfo(await onSearchIdp(query));
+			setLookupResult(await onSearchIdp(query));
 		} catch (error) {
-			setIdpInfo(null);
+			setLookupResult(null);
 			setIdpError(error instanceof Error ? error.message : "Recherche IDP impossible.");
 		} finally {
 			setIdpLoading(false);
@@ -73,21 +75,21 @@ export default function LookupLayout({
 						loading={idpLoading}
 						error={idpError}
 					>
-						<InfoField label="Nom" value={idpInfo?.nom} />
-						<InfoField label="Prénom" value={idpInfo?.prenom} />
-						<InfoField label="Code famille" value={idpInfo?.codeFam} />
-						<InfoField label="Observation IDP" value={idpInfo?.observationIdp} />
+						<InfoField label="Nom" value={lookupResult?.agent.nom} />
+						<InfoField label="Prénom" value={lookupResult?.agent.prenom} />
+						<InfoField label="Code famille" value={lookupResult?.agent.codeFam} />
+						<InfoField label="Observation IDP" value={lookupResult?.agent.observationIdp} />
 					</LookupSection>
 
 					<section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
 						<h2 className="mb-3 text-xs font-extrabold uppercase tracking-wide text-slate-700">Informations matricule</h2>
 						<div className="space-y-2">
-							<InfoField label="Matricule" value={idpInfo?.matricule} />
-							<InfoField label="Nom" value={idpInfo?.nom} />
-							<InfoField label="Prénom" value={idpInfo?.prenom} />
-							<InfoField label="Back-office / Front-office" value={idpInfo?.backOfficeFrontOffice} />
-							<InfoField label="Direction" value={idpInfo?.direction} />
-							<InfoField label="Agence / Service" value={idpInfo?.agenceService} />
+							<InfoField label="Matricule" value={lookupResult?.agent.matricule} />
+							<InfoField label="Nom" value={lookupResult?.agent.nom} />
+							<InfoField label="Prénom" value={lookupResult?.agent.prenom} />
+							<InfoField label="Back-office / Front-office" value={lookupResult?.agent.backOfficeFrontOffice} />
+							<InfoField label="Direction" value={lookupResult?.agent.direction} />
+							<InfoField label="Agence / Service" value={lookupResult?.agent.agenceService} />
 						</div>
 					</section>
 				</div>
@@ -122,9 +124,11 @@ export default function LookupLayout({
 						<span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-xs font-extrabold text-red-700">AR</span>
 					</div>
 				</header>
-				<main className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
-					{children}
-				</main>
+				<LookupResultContext.Provider value={lookupResult}>
+					<main className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
+						{children}
+					</main>
+				</LookupResultContext.Provider>
 			</div>
 		</div>
 	);

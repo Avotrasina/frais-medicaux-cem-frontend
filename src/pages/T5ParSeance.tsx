@@ -1,12 +1,18 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLookupResult } from "../components/layout/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParSeanceTable from "../features/invoice/components/t5ParSeanceTable";
-import { initialT5ParSeanceRowsMock } from "../features/invoice/mocks/t5ParSeance";
 import type {
-	T5ParSeanceColumnKey,
 	T5ParSeanceRow,
 } from "../features/invoice/types/t5ParSeance";
+import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+
+function createEmptyParSeanceRow(id: number, refSocial: string): T5ParSeanceRow {
+	return {
+		id, refSocial, dateActe: "", libelle: "", montantActe: 0, numeroSeance: "",
+		montantDepassement: 0, nomEtablissement: "",
+	};
+}
 
 type Props = {
 	title: string;
@@ -14,24 +20,21 @@ type Props = {
 };
 
 export default function T5ParSeance({ title, nombreSeance }: Props) {
-	const [rows, setRows] = useState<T5ParSeanceRow[]>(initialT5ParSeanceRowsMock);
+	const { label, refSocial } = useParams();
+	const lookupResult = useLookupResult();
+	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+		lookupResult?.t5Data.parSeance,
+		refSocial,
+		createEmptyParSeanceRow,
+	);
 	const navigate = useNavigate();
-
-	function updateCell(
-		rowId: number,
-		key: T5ParSeanceColumnKey,
-		value: string | number,
-	) {
-		setRows((current) =>
-			current.map((row) => (row.id === rowId ? { ...row, [key]: value } : row)),
-		);
-	}
+	const pageTitle = label ?? title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
 			<div className="relative">
 				<h1 className="text-center text-2xl font-extrabold tracking-tight text-slate-900">
-					{title}
+					{pageTitle}
 				</h1>
 				<button
 					type="button"
@@ -47,7 +50,13 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 				</p>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-				<T5ParSeanceTable rows={rows} onCellChange={updateCell} />
+				{!lookupResult ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Veuillez rechercher l’agent correspondant à cette référence.</div>
+				) : !isReady ? (
+					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Chargement des données T5…</div>
+				) : (
+					<T5ParSeanceTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+				)}
 			</section>
 		</div>
 	);

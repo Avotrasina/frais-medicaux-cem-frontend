@@ -185,8 +185,8 @@ export default function FactureGlobaleTable({
 								const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
 
 								if (column.key === "majT5") {
-									return hasInvoiceData(row) ? (
-										<DropDownCell key={column.key} options={DropDownMock} className={`${cellClass} bg-yellow-100 text-red-800`} />
+									return hasInvoiceData(row) && row.refSocial.trim() ? (
+										<DropDownCell key={column.key} options={DropDownMock} refSocial={row.refSocial} className={`${cellClass} bg-yellow-100 text-red-800`} />
 									) : (
 										<td key={column.key} className={`${cellClass} bg-yellow-100 text-red-800`} />
 									);
