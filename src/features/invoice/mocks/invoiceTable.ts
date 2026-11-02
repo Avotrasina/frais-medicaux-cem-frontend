@@ -94,3 +94,29 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 	},
 
 ];
+
+const formatMockDate = (date: Date) =>
+	`${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+
+// Dataset temporaire assez volumineux pour simuler le défilement jusqu'aux factures récentes.
+export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
+	await new Promise((resolve) => setTimeout(resolve, 300));
+
+	const rows = Array.from({ length: 60 }, (_, index) => {
+		const template = initialFactureGlobaleRowsMock[index % initialFactureGlobaleRowsMock.length];
+		const receptionDate = new Date(2026, 0, 5 + index * 2);
+		return {
+			...template,
+			id: index + 1,
+			refSocial: `26/${String(index + 1).padStart(3, "0")}`,
+			dateReception: formatMockDate(receptionDate),
+			numFacture: `${template.numFacture}-${String(index + 1).padStart(3, "0")}`,
+		};
+	});
+
+	return rows.sort((a, b) => {
+		const [dayA, monthA, yearA] = a.dateReception.split("/").map(Number);
+		const [dayB, monthB, yearB] = b.dateReception.split("/").map(Number);
+		return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+	});
+}

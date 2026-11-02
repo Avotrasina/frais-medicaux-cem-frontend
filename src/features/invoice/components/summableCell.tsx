@@ -6,6 +6,7 @@ type Props = {
   isLocked?: boolean;
   placeholder?: string;
   className?: string;
+  emptyValue?: string;
   onSave: (value: number) => void;
 };
 
@@ -32,6 +33,7 @@ export default function SummableNumberCell({
   isLocked = false,
   placeholder = "Montant à ajouter",
   className = "",
+  emptyValue = "",
   onSave,
 }: Props) {
   const [editing, setEditing] = useState(false);
@@ -131,7 +133,9 @@ export default function SummableNumberCell({
           </span>
         </>
       ) : (
-        formatNumber(value)
+        value === 0 && emptyValue
+          ? <span className="absolute inset-0 flex items-center justify-center">{emptyValue}</span>
+          : formatNumber(value)
       )}
     </td>
   );

@@ -6,6 +6,7 @@ type Props = {
   isLocked?: boolean;
   placeholder?: string;
   className?: string;
+  emptyValue?: string;
   onSave: (value: string) => void;
 };
 
@@ -14,6 +15,7 @@ export default function EditableDateCell({
   isLocked = false,
   placeholder,
   className = "",
+  emptyValue = "",
   onSave,
 }: Props) {
   const [editing, setEditing] = useState(false);
@@ -74,7 +76,7 @@ export default function EditableDateCell({
           </span>
         </>
       ) : (
-        value
+        value || (emptyValue && <span className="absolute inset-0 flex items-center justify-center">{emptyValue}</span>)
       )}
     </td>
   );
