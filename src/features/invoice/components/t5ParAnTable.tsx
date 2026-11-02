@@ -1,18 +1,8 @@
 import EditableDateCell from "./editableDateCell";
 import EditableNumberCell from "./editableNumberCell";
 import EditableStringCell from "./editableStringcell";
-import type { T5ParAnColumnKey, T5ParAnTableProps } from "../types/t5ParAn";
-
-const columns: { key: T5ParAnColumnKey; label: string; width: string }[] = [
-	{ key: "refSocial", label: "Réf. social", width: "w-32" },
-	{ key: "dateActe", label: "Date de l’acte", width: "w-40" },
-	{ key: "libelle", label: "Libellé", width: "w-64" },
-	{ key: "montantActe", label: "Montant de l’acte", width: "w-40" },
-	{ key: "montantCumule", label: "Montant cumulé", width: "w-40" },
-	{ key: "soldePlafond", label: "Solde plafond", width: "w-40" },
-	{ key: "montantDepassement", label: "Montant dépassement", width: "w-44" },
-	{ key: "nomEtablissement", label: "Nom établissement", width: "w-64" },
-];
+import { t5ParAnColumns as columns } from "../data/tableColumn";
+import type { T5ParAnTableProps } from "../types/t5ParAn";
 
 const cellClass = "border border-slate-200 px-2 py-2 text-slate-900";
 const moneyFormatter = new Intl.NumberFormat("fr-FR", {
