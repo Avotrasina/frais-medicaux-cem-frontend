@@ -1,4 +1,3 @@
-
 export const ROUTES = {
   home: "/",
   agents: "/agents",
@@ -8,7 +7,7 @@ export const ROUTES = {
   referentials: "/referentiels",
   deletionRequests: "/demandes-suppression",
   invoice: "/factures",
-  T5ParAn: "/ParAn",
-  T5Parseance: "/ParSeance",
-  T5ParAnParActe: "/ParAnParActe"
+  T5ParAn: "/ParAn/:id/:label",
+  T5Parseance: "/ParSeance/:id/:label",
+  T5ParAnParActe: "/ParAnParActe/:id/:label",
 } as const;
