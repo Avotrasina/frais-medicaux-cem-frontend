@@ -98,6 +98,12 @@ export default function FactureGlobaleTable({
 		setOpenFilter(null);
 	}
 
+	function addSummableValue(row: FactureGlobaleRow, key: keyof typeof numberColumn, addedValue: number) {
+		const currentValue = Number(row[key]) || 0;
+		const newValue = Math.round((currentValue + addedValue) * 100) / 100;
+		onCellChange(row.id, key, String(newValue));
+	}
+
 	return (
 		<div ref={containerRef} className="min-h-0 flex-1 overflow-auto">
 			<table className="h-fit w-max min-w-full table-fixed border-collapse text-sm">
@@ -212,7 +218,7 @@ export default function FactureGlobaleTable({
 											value={value as number}
 											className={cellClass}
 											emptyValue="—"
-											onSave={(nextValue) => onSave(String(nextValue))}
+											onSave={(addedValue) => addSummableValue(row, column.key as keyof typeof numberColumn, addedValue)}
 										/>
 									);
 								}

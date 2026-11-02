@@ -69,8 +69,7 @@ export default function SummableNumberCell({
   const commit = () => {
     const added = parseFloat(draft.replace(",", "."));
     if (!Number.isNaN(added)) {
-      // arrondi à 2 décimales pour éviter 0.1 + 0.2 = 0.30000000000000004
-      onSave(Math.round((value + added) * 100) / 100);
+      onSave(added);
     }
     setEditing(false);
   };

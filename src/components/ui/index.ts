@@ -2,6 +2,7 @@ export { Badge } from "./Badge";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { DataTable } from "./DataTable";
 export { ErrorBlock, LoadingBlock } from "./Feedback";
+export { default as LoadingState } from "./LoadingState";
 export { ImageThumb } from "./ImageThumb";
 export { InlineCell } from "./InlineCell";
 export { Modal } from "./Modal";

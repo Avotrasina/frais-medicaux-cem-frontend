@@ -100,7 +100,7 @@ const formatMockDate = (date: Date) =>
 
 // Dataset temporaire assez volumineux pour simuler le défilement jusqu'aux factures récentes.
 export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
+	await new Promise((resolve) => setTimeout(resolve, 2000));
 
 	const rows = Array.from({ length: 60 }, (_, index) => {
 		const template = initialFactureGlobaleRowsMock[index % initialFactureGlobaleRowsMock.length];

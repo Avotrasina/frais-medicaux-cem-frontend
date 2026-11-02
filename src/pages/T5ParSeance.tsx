@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useLookupResult } from "../components/layout/LookupContext";
+import { useLookupLoading, useLookupResult } from "../components/layout/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParSeanceTable from "../features/invoice/components/t5ParSeanceTable";
 import type {
 	T5ParSeanceRow,
 } from "../features/invoice/types/t5ParSeance";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+import { LoadingState } from "../components/ui";
 
 function createEmptyParSeanceRow(id: number, refSocial: string): T5ParSeanceRow {
 	return {
@@ -22,6 +23,7 @@ type Props = {
 export default function T5ParSeance({ title, nombreSeance }: Props) {
 	const { label, refSocial } = useParams();
 	const lookupResult = useLookupResult();
+	const isLookupLoading = useLookupLoading();
 	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parSeance,
 		refSocial,
@@ -50,10 +52,12 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 				</p>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-				{!lookupResult ? (
+				{isLookupLoading ? (
+					<LoadingState message="Recherche de l’agent et chargement des données T5…" />
+				) : !lookupResult ? (
 					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Veuillez rechercher l’agent correspondant à cette référence.</div>
 				) : !isReady ? (
-					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Chargement des données T5…</div>
+					<LoadingState message="Chargement des données T5…" />
 				) : (
 					<T5ParSeanceTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
 				)}

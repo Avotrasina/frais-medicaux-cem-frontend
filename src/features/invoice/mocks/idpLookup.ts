@@ -4,7 +4,7 @@ import { initialT5ParAnParActeRowsMock } from "./t5ParAnParActe";
 import { initialT5ParSeanceRowsMock } from "./t5ParSeance";
 
 export async function fetchIdpLookupMock(_idp: string): Promise<IdpLookupResult> {
-	await new Promise((resolve) => setTimeout(resolve, 250));
+	await new Promise((resolve) => setTimeout(resolve, 2000));
 	return {
 		agent: {
 			nom: "Rakoto",

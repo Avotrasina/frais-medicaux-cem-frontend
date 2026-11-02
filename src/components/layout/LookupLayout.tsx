@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Bell, Menu, Search, X } from "lucide-react";
 import type { IdpLookupResult } from "../../types/LookUp";
-import { LookupResultContext } from "./LookupContext";
+import { LookupLoadingContext, LookupResultContext } from "./LookupContext";
 import logo from "../../assets/logo.jpg";
 
 
@@ -124,11 +124,13 @@ export default function LookupLayout({
 						<span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-xs font-extrabold text-red-700">AR</span>
 					</div>
 				</header>
-				<LookupResultContext.Provider value={lookupResult}>
-					<main className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
-						{children}
-					</main>
-				</LookupResultContext.Provider>
+				<LookupLoadingContext.Provider value={idpLoading}>
+					<LookupResultContext.Provider value={lookupResult}>
+						<main className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
+							{children}
+						</main>
+					</LookupResultContext.Provider>
+				</LookupLoadingContext.Provider>
 			</div>
 		</div>
 	);
