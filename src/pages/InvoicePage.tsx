@@ -1,7 +1,6 @@
 
-import { Plus } from "lucide-react";
 import { FactureGlobaleTable } from "../features/invoice";
-import { LoadingState, PageHeader, ToastViewport } from "../components/ui";
+import { AddRowButton, LoadingState, PageHeader, ToastViewport } from "../components/ui";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
 
@@ -31,14 +30,9 @@ export default function FactureGlobalePage() {
 					)}
 				</section>
 			</div>
-			{isLoaded && <button
-				type="button"
-				className="fixed bottom-12 right-8 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200"
-				aria-label="Ajouter une ligne"
-				onClick={focusAddRow}
-			>
-				<Plus size={26} strokeWidth={2.5} />
-			</button>}
+			{isLoaded && <div className="fixed bottom-12 right-8 z-20">
+				<AddRowButton ariaLabel="Ajouter une ligne" title="Ajouter une ligne" variant="red" onClick={focusAddRow} />
+			</div>}
 		</>
 	);
 }

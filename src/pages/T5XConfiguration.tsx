@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Plus, Save } from "lucide-react";
-import { LoadingState, PageHeader } from "../components/ui";
+import { AddRowButton, LoadingState, PageHeader, SaveRowButton } from "../components/ui";
 import T5XConstraintsTable from "../features/t5x/components/T5XConstraintsTable";
 import T5XTypesTable from "../features/t5x/components/T5XTypesTable";
 import useT5XActs from "../features/t5x/hooks/useT5XActs";
@@ -74,25 +73,11 @@ export default function T5XConfigurationPage() {
 		</div>
 		{!isLoading && (
 			<div className="fixed bottom-12 right-8 z-20 flex items-center gap-3">
-				<button
-					type="button"
-					className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300 disabled:cursor-not-allowed disabled:bg-blue-700 disabled:text-white disabled:opacity-100"
-					aria-label="Enregistrer la ligne"
-					title="Enregistrer la ligne"
+				<SaveRowButton
 					disabled={activeTable === "categories" ? !categoryTable.canSaveRow : !actTable.canSaveRow}
 					onClick={activeTable === "categories" ? categoryTable.saveAddRow : actTable.saveAddRow}
-				>
-					<Save size={23} strokeWidth={2.4} />
-				</button>
-				<button
-					type="button"
-					className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
-					aria-label="Aller à la ligne d’ajout"
-					title="Aller à la ligne d’ajout"
-					onClick={() => focusAddRow(tableKey)}
-				>
-					<Plus size={26} strokeWidth={2.5} />
-				</button>
+				/>
+				<AddRowButton onClick={() => focusAddRow(tableKey)} />
 			</div>
 		)}
 		</>
