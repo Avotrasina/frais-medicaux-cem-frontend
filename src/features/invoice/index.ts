@@ -1,8 +1,8 @@
-export { default as DropDown } from "./components/dropDownCell";
-export { default as FactureGlobaleTable } from "./components/invoiceGlobalTable";
-export { default as T5ParAnTable } from "./components/t5ParAnTable";
-export { default as T5ParAnParActeTable } from "./components/t5ParAnParActeTable";
-export { default as T5ParSeanceTable } from "./components/t5ParSeanceTable";
+export { default as DropDown } from "./components/ui/dropDownCell";
+export { default as FactureGlobaleTable } from "./components/ui/invoiceGlobalTable";
+export { default as T5ParAnTable } from "./components/ui/t5ParAnTable";
+export { default as T5ParAnParActeTable } from "./components/ui/t5ParAnParActeTable";
+export { default as T5ParSeanceTable } from "./components/ui/t5ParSeanceTable";
 export {
 	factureGlobaleColumns,
 	t5ParAnColumns,
@@ -42,4 +42,4 @@ export type {
 	T5ParSeanceRow,
 	T5ParSeanceTableProps,
 } from "./types/t5ParSeance";
-export type { dropdownOptionProps } from "./components/dropDownCell";
+export type { dropdownOptionProps } from "./components/ui/dropDownCell";

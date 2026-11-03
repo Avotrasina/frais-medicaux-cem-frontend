@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
-import {TypeContrainte} from "../types/dropDown";
+import {TypeContrainte} from "../../types/dropDown";
 
 export type dropdownOptionProps = {
     id: number,

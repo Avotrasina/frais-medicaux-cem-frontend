@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Sidebar from "../components/layout/Sidebar";
-import LookupLayout from "../components/layout/LookupLayout"
+import LookupLayout from "../features/invoice/components/layout/LookupLayout"
 import AgentPage from "../pages/AgentPage";
 import BeneficiairePage from "../pages/BeneficiairePage";
 import DeletionRequestsPage from "../pages/DeletionRequestsPage";

@@ -1,7 +1,7 @@
 
 import { Plus } from "lucide-react";
 import { FactureGlobaleTable } from "../features/invoice";
-import { PageHeader, ToastViewport } from "../components/ui";
+import { LoadingState, PageHeader, ToastViewport } from "../components/ui";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
 
@@ -27,9 +27,7 @@ export default function FactureGlobalePage() {
 							onCellChange={updateCell}
 						/>
 					) : (
-						<div className="flex flex-1 items-center justify-center text-sm text-slate-500" role="status">
-							Chargement des factures…
-						</div>
+						<LoadingState message="Chargement des factures…" />
 					)}
 				</section>
 			</div>

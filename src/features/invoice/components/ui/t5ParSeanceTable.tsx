@@ -2,10 +2,10 @@ import { useEffect, useRef } from "react";
 import EditableDateCell from "./editableDateCell";
 import EditableNumberCell from "./editableNumberCell";
 import EditableStringCell from "./editableStringcell";
-import { t5ParSeanceColumns as columns } from "../data/tableColumn";
+import { t5ParSeanceColumns as columns } from "../../data/tableColumn";
 import type {
 	T5ParSeanceTableProps,
-} from "../types/t5ParSeance";
+} from "../../types/t5ParSeance";
 
 const cellClass = "border border-slate-200 px-2 py-2 text-slate-900";
 const amountFormatter = new Intl.NumberFormat("fr-FR", {

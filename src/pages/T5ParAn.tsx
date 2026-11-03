@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useLookupResult } from "../components/layout/LookupContext";
+import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
-import T5ParAnTable from "../features/invoice/components/t5ParAnTable";
+import T5ParAnTable from "../features/invoice/components/ui/t5ParAnTable";
 import type { T5ParAnRow } from "../features/invoice/types/t5ParAn";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+import { LoadingState } from "../components/ui";
 
 type Props = {
 	title: string;
@@ -25,6 +26,7 @@ function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
 export default function T5ParAn({ title, plafond }: Props) {
 	const { label, refSocial } = useParams();
 	const lookupResult = useLookupResult();
+	const isLookupLoading = useLookupLoading();
 	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parAn,
 		refSocial,
@@ -53,10 +55,12 @@ export default function T5ParAn({ title, plafond }: Props) {
 				</p>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
-				{!lookupResult ? (
+				{isLookupLoading ? (
+					<LoadingState message="Recherche de l’agent et chargement des données T5…" />
+				) : !lookupResult ? (
 					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Veuillez rechercher l’agent correspondant à cette référence.</div>
 				) : !isReady ? (
-					<div className="flex flex-1 items-center justify-center text-sm text-slate-500">Chargement des données T5…</div>
+					<LoadingState message="Chargement des données T5…" />
 				) : (
 					<T5ParAnTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
 				)}
