@@ -3,6 +3,8 @@ export { ConfirmDialog } from "./ConfirmDialog";
 export { DataTable } from "./DataTable";
 export { ErrorBlock, LoadingBlock } from "./Feedback";
 export { default as LoadingState } from "./LoadingState";
+export { default as EditableNumberCell } from "./EditableNumberCell";
+export { default as EditableStringCell } from "./EditableStringCell";
 export { ImageThumb } from "./ImageThumb";
 export { InlineCell } from "./InlineCell";
 export { Modal } from "./Modal";

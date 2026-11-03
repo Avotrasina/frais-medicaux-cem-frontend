@@ -27,7 +27,7 @@ export default function FactureGlobalePage() {
 							onCellChange={updateCell}
 						/>
 					) : (
-						<LoadingState message="Chargement des factures…" />
+						<LoadingState message="Chargement des données…" />
 					)}
 				</section>
 			</div>

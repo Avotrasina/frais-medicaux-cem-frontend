@@ -10,4 +10,5 @@ export const ROUTES = {
   T5ParAn: "/ParAn/:id/:label/:refSocial",
   T5Parseance: "/ParSeance/:id/:label/:refSocial",
   T5ParAnParActe: "/ParAnParActe/:id/:label/:refSocial",
+  T5X: "/T5X",
 } as const;

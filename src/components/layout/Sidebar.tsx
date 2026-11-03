@@ -14,6 +14,7 @@ import {
   UserRound,
   Users,
   Receipt,
+  ClipboardPlus,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -32,6 +33,7 @@ const nav: NavEntry[] = [
   { to: "/prestataires", label: "Prestataires", icon: Stethoscope },
   { to: "/pec", label: "Prises en charge", icon: ShieldCheck },
   { to: "/factures", label:"Factures", icon:Receipt},
+  { to: "/T5X", label: "Acte et prestation", icon: ClipboardPlus },
   { section: "Paramétrage" },
   { to: "/referentiels", label: "Référentiels", icon: Settings },
   { to: "/demandes-suppression", label: "Demandes de suppression", icon: ClipboardCheck },

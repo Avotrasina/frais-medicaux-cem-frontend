@@ -41,7 +41,7 @@ export default function EditableStringCell({
     >
       {editing ? (
         <>
-          <input type="tewt"
+          <input type="text"
             autoFocus
             className="h-full w-full pr-14"
             placeholder={placeholder}
