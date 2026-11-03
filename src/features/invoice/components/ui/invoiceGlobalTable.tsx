@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
-import { factureGlobaleColumns } from "../data/tableColumn";
+import { factureGlobaleColumns } from "../../data/tableColumn";
 import DropDownCell, { type dropdownOptionProps} from "./dropDownCell";
 import EditableDateCell from "./editableDateCell";
 import EditableStringCell from "./editableStringcell";
 import SummableNumberCell from "./summableCell";
-import {TypeContrainte, } from "../types/dropDown";
-import {numberColumn,dateColumn} from "../types/invoiceTable";
+import {TypeContrainte, } from "../../types/dropDown";
+import {numberColumn,dateColumn} from "../../types/invoiceTable";
 import {
 	dateFilterKeys,
 	filterFactureGlobaleRows,
@@ -14,12 +14,12 @@ import {
 	type DateFilterKey,
 	type FactureGlobaleFilters,
 	type TextFilterKey,
-} from "../services/filterFactureGlobaleRows";
+} from "../../services/filterFactureGlobaleRows";
 
 import type {
 	FactureGlobaleRow,
 	FactureGlobaleTableProps
-} from "../types/invoiceTable";
+} from "../../types/invoiceTable";
 
 
 const DropDownMock : dropdownOptionProps[] = [

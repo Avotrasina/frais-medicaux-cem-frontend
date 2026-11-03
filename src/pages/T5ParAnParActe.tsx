@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useLookupLoading, useLookupResult } from "../components/layout/LookupContext";
+import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
-import T5ParAnParActeTable from "../features/invoice/components/t5ParAnParActeTable";
+import T5ParAnParActeTable from "../features/invoice/components/ui/t5ParAnParActeTable";
 import type {
 	T5ParAnParActeRow,
 } from "../features/invoice/types/t5ParAnParActe";

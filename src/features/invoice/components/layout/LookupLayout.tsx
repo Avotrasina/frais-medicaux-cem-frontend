@@ -1,8 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Bell, Menu, Search, X } from "lucide-react";
-import type { IdpLookupResult } from "../../types/LookUp";
-import { LookupLoadingContext, LookupResultContext } from "./LookupContext";
-import logo from "../../assets/logo.jpg";
+import type { IdpLookupResult } from "../../../../types/LookUp";
+import { LookupLoadingContext, LookupResultContext } from "../../context/LookupContext";
+import logo from "../../../../assets/logo.jpg";
 
 
 
