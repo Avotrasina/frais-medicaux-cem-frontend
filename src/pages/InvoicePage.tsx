@@ -31,7 +31,7 @@ export default function FactureGlobalePage() {
 				</section>
 			</div>
 			{isLoaded && <div className="fixed bottom-12 right-8 z-20">
-				<AddRowButton ariaLabel="Ajouter une ligne" title="Ajouter une ligne" variant="red" onClick={focusAddRow} />
+				<AddRowButton ariaLabel="Ajouter une ligne" title="Ajouter une ligne" onClick={focusAddRow} />
 			</div>}
 		</>
 	);
