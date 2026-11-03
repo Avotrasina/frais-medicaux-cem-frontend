@@ -1,6 +1,7 @@
 
 import { FactureGlobaleTable } from "../features/invoice";
 import { AddRowButton, LoadingState, PageHeader, ToastViewport } from "../components/ui";
+import InvoiceFloatingCalculator from "../features/invoice/components/ui/InvoiceFloatingCalculator";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
 
@@ -30,9 +31,12 @@ export default function FactureGlobalePage() {
 					)}
 				</section>
 			</div>
-			{isLoaded && <div className="fixed bottom-12 right-8 z-20">
-				<AddRowButton ariaLabel="Ajouter une ligne" title="Ajouter une ligne" onClick={focusAddRow} />
-			</div>}
+			{isLoaded && <>
+				<InvoiceFloatingCalculator />
+				<div className="fixed bottom-12 right-8 z-20">
+					<AddRowButton ariaLabel="Ajouter une ligne" title="Ajouter une ligne" onClick={focusAddRow} />
+				</div>
+			</>}
 		</>
 	);
 }
