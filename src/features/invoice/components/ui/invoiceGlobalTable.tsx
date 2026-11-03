@@ -3,7 +3,7 @@ import { Search, X } from "lucide-react";
 import { factureGlobaleColumns } from "../../data/tableColumn";
 import DropDownCell, { type dropdownOptionProps} from "./dropDownCell";
 import EditableDateCell from "./editableDateCell";
-import EditableStringCell from "./editableStringcell";
+import { EditableStringCell } from "../../../../components/ui";
 import SummableNumberCell from "./summableCell";
 import {TypeContrainte, } from "../../types/dropDown";
 import {numberColumn,dateColumn} from "../../types/invoiceTable";

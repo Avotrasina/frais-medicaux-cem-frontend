@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import EditableDateCell from "./editableDateCell";
-import EditableNumberCell from "./editableNumberCell";
-import EditableStringCell from "./editableStringcell";
+import { EditableNumberCell, EditableStringCell } from "../../../../components/ui";
 import { t5ParSeanceColumns as columns } from "../../data/tableColumn";
 import type {
 	T5ParSeanceTableProps,
