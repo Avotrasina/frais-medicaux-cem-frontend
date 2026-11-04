@@ -22,7 +22,7 @@ export type FactureGlobaleRow = {
 	partAgent20: number;
 	totalPartAgent: number;
 	localite: string;
-	moisPrestation: string;
+	moisPrestation: Date | null;
 	refAgence: string;
 	remarques1: string;
 	retourPrestataire: string;
@@ -39,15 +39,22 @@ export type FactureGlobaleRow = {
 	serviceSortie: string;
 };
 
+export type FactureGlobaleChanges = Partial<{
+	[K in Exclude<keyof FactureGlobaleRow, "id">]: FactureGlobaleRow[K] | undefined;
+}>;
+
+export type FactureGlobaleCellValue = string | number | Date | null;
+
 export type FactureGlobaleTableProps = {
 	rows: FactureGlobaleRow[];
 	addRowId: number;
+	activeRowId: number | null;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (
 		rowId: number,
 		key: FactureGlobaleColumnKey,
-		value: string,
+		value: FactureGlobaleCellValue,
 	) => void;
 }
 

@@ -36,7 +36,7 @@ export default function EditableStringCell({
 
   return (
     <td
-      className={`relative h-full  max-w-20 cursor-pointer truncate px-3 text-xs hover:bg-slate-50 ${className}`}
+      className={`relative h-full max-w-20 truncate px-3 text-xs ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer hover:bg-slate-50"} ${className}`}
       onClick={startEditing}
     >
       {editing ? (

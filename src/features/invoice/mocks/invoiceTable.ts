@@ -1,4 +1,4 @@
-import type { FactureGlobaleRow } from "../types/invoiceTable";
+import type { FactureGlobaleChanges, FactureGlobaleRow } from "../types/invoiceTable";
 
 
 export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
@@ -16,7 +16,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 		partAgent20: 200000,
 		totalPartAgent: 1200000,
 		localite: "008 TULEAR",
-		moisPrestation: "janv-26",
+		moisPrestation: new Date(Date.UTC(2026, 0, 1)),
 		refAgence: "FRM-60-008-1224-PR03",
 		remarques1: "Tsy ampy ordonnance",
 		retourPrestataire: "15/02/26 ; 25/02/26",
@@ -46,7 +46,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 		partAgent20: 20000,
 		totalPartAgent: 40000,
 		localite: "009 ANTSIRABE",
-		moisPrestation: "févr-26",
+		moisPrestation: new Date(Date.UTC(2026, 1, 1)),
 		refAgence: "",
 		remarques1: "",
 		retourPrestataire: "",
@@ -76,7 +76,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 		partAgent20: 20000,
 		totalPartAgent: 20000,
 		localite: "ANTANANARIVO",
-		moisPrestation: "févr-26",
+		moisPrestation: new Date(Date.UTC(2026, 1, 1)),
 		refAgence: "",
 		remarques1: "",
 		retourPrestataire: "",
@@ -121,4 +121,12 @@ export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
 		const [dayB, monthB, yearB] = b.dateReception.split("/").map(Number);
 		return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
 	});
+}
+
+export async function saveFactureGlobaleMock(
+	rowId: number,
+	changes: FactureGlobaleChanges,
+): Promise<{ rowId: number; changes: FactureGlobaleChanges }> {
+	await Promise.resolve();
+	return { rowId, changes };
 }

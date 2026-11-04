@@ -1,4 +1,5 @@
 export { default as AddRowButton } from "./AddRowButton";
+export { default as CancelRowButton } from "./CancelRowButton";
 export { Badge } from "./Badge";
 export { ConfirmDialog } from "./ConfirmDialog";
 export { DataTable } from "./DataTable";
