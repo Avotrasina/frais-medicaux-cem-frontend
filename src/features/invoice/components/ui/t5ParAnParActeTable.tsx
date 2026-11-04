@@ -11,15 +11,16 @@ const amountFormatter = new Intl.NumberFormat("fr-FR", {
 	maximumFractionDigits: 0,
 });
 
-export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial }: T5ParAnParActeTableProps) {
-	const targetRowRef = useRef<HTMLTableRowElement>(null);
+export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial, activeRowId = null }: T5ParAnParActeTableProps) {
+	const focusedRowRef = useRef<HTMLTableRowElement>(null);
 	const targetRowId = rows.find((row) => row.refSocial === focusRefSocial)?.id;
+	const focusedRowId = activeRowId ?? targetRowId;
 
 	useEffect(() => {
-		if (!targetRowRef.current) return;
-		targetRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-		targetRowRef.current.focus({ preventScroll: true });
-	}, [targetRowId]);
+		if (!focusedRowRef.current) return;
+		focusedRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+		focusedRowRef.current.focus({ preventScroll: true });
+	}, [focusedRowId]);
 
 	return (
 		<div className="min-h-0 flex-1 overflow-auto">
@@ -38,11 +39,12 @@ export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial
 				</thead>
 				<tbody>
 					{rows.map((row) => (
-						<tr key={row.id} ref={row.id === targetRowId ? targetRowRef : undefined} tabIndex={row.id === targetRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === targetRowId ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
+						<tr key={row.id} ref={row.id === focusedRowId ? focusedRowRef : undefined} tabIndex={row.id === focusedRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === activeRowId ? "bg-yellow-50 outline outline-2 outline-red-400" : ""} ${row.id === targetRowId && activeRowId === null ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
 							{columns.map((column) => {
 								const className = `${cellClass} ${column.width}`;
+								const isLocked = activeRowId !== null && activeRowId !== row.id;
 								if (column.key === "refSocial") {
-									return <td key={column.key} className={`${className} truncate`}>{row.refSocial || "—"}</td>;
+									return <td key={column.key} className={`${className} truncate ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>{row.refSocial || "—"}</td>;
 								}
 								if (column.key === "libelle") {
 									return (
@@ -50,7 +52,8 @@ export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial
 											key={column.key}
 											value={row[column.key]}
 											className={className}
-											onSave={(value) => onCellChange(row.id, column.key, value)}
+											isLocked={isLocked}
+											onSave={(value) => onCellChange(row.id, "libelle", value)}
 										/>
 									);
 								}
@@ -60,7 +63,8 @@ export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial
 											key={column.key}
 											value={row.dateActe}
 											className={className}
-											onSave={(value) => onCellChange(row.id, column.key, value)}
+											isLocked={isLocked}
+											onSave={(value) => onCellChange(row.id, "dateActe", value)}
 										/>
 									);
 								}
@@ -70,14 +74,15 @@ export default function T5ParAnParActeTable({ rows, onCellChange, focusRefSocial
 											key={column.key}
 											value={row.montantActe}
 											className={className}
-											onSave={(value) => onCellChange(row.id, column.key, value)}
+											isLocked={isLocked}
+											onSave={(value) => onCellChange(row.id, "montantActe", value)}
 										/>
 									);
 								}
 
 								const value = row[column.key];
 								return (
-									<td key={column.key} className={`${className} truncate`}>
+									<td key={column.key} className={`${className} truncate ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>
 										{typeof value === "number" ? amountFormatter.format(value) : value}
 									</td>
 								);
