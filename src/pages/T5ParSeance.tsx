@@ -2,11 +2,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParSeanceTable from "../features/invoice/components/ui/t5ParSeanceTable";
+import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type {
 	T5ParSeanceRow,
 } from "../features/invoice/types/t5ParSeance";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
-import { LoadingState } from "../components/ui";
+import { ErrorBlock, LoadingState } from "../components/ui";
 
 function createEmptyParSeanceRow(id: number, refSocial: string): T5ParSeanceRow {
 	return {
@@ -24,10 +25,21 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 	const { label, refSocial } = useParams();
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
-	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+	const {
+		rows,
+		isReady,
+		activeRowId,
+		canSave,
+		isSaving,
+		saveError,
+		updateCell,
+		saveActiveRow,
+		resetActiveRow,
+	} = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parSeance,
 		refSocial,
 		createEmptyParSeanceRow,
+		"parSeance",
 	);
 	const navigate = useNavigate();
 	const pageTitle = label ?? title;
@@ -59,9 +71,26 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 				) : !isReady ? (
 					<LoadingState message="Chargement des données T5…" />
 				) : (
-					<T5ParSeanceTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+					<>
+						{saveError && <ErrorBlock message={saveError} />}
+						<T5ParSeanceTable
+							rows={rows}
+							onCellChange={updateCell}
+							focusRefSocial={refSocial}
+							activeRowId={activeRowId}
+						/>
+					</>
 				)}
 			</section>
+			{isReady && (
+				<T5RowActions
+					canSave={canSave}
+					hasActiveRow={activeRowId !== null}
+					isSaving={isSaving}
+					onSave={saveActiveRow}
+					onReset={resetActiveRow}
+				/>
+			)}
 		</div>
 	);
 }

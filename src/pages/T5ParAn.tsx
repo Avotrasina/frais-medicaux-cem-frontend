@@ -2,9 +2,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParAnTable from "../features/invoice/components/ui/t5ParAnTable";
+import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type { T5ParAnRow } from "../features/invoice/types/t5ParAn";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
-import { LoadingState } from "../components/ui";
+import { ErrorBlock, LoadingState } from "../components/ui";
 
 type Props = {
 	title: string;
@@ -27,10 +28,21 @@ export default function T5ParAn({ title, plafond }: Props) {
 	const { label, refSocial } = useParams();
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
-	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+	const {
+		rows,
+		isReady,
+		activeRowId,
+		canSave,
+		isSaving,
+		saveError,
+		updateCell,
+		saveActiveRow,
+		resetActiveRow,
+	} = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parAn,
 		refSocial,
 		createEmptyParAnRow,
+		"parAn",
 	);
 	const navigate = useNavigate();
 	const pageTitle = label ?? title;
@@ -62,9 +74,26 @@ export default function T5ParAn({ title, plafond }: Props) {
 				) : !isReady ? (
 					<LoadingState message="Chargement des données T5…" />
 				) : (
-					<T5ParAnTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+					<>
+						{saveError && <ErrorBlock message={saveError} />}
+						<T5ParAnTable
+							rows={rows}
+							onCellChange={updateCell}
+							focusRefSocial={refSocial}
+							activeRowId={activeRowId}
+						/>
+					</>
 				)}
 			</section>
+			{isReady && (
+				<T5RowActions
+					canSave={canSave}
+					hasActiveRow={activeRowId !== null}
+					isSaving={isSaving}
+					onSave={saveActiveRow}
+					onReset={resetActiveRow}
+				/>
+			)}
 		</div>
 	);
 }

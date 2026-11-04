@@ -20,9 +20,10 @@ export type T5ParSeanceColumn = {
 export type T5ParSeanceTableProps = {
 	rows: T5ParSeanceRow[];
 	focusRefSocial?: string;
+	activeRowId?: number | null;
 	onCellChange: (
 		rowId: number,
-		key: T5ParSeanceColumnKey,
+		key: Extract<T5ParSeanceColumnKey, "dateActe" | "libelle" | "montantActe">,
 		value: string | number,
 	) => void;
 };

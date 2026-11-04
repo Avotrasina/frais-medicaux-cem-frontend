@@ -2,11 +2,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParAnParActeTable from "../features/invoice/components/ui/t5ParAnParActeTable";
+import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type {
 	T5ParAnParActeRow,
 } from "../features/invoice/types/t5ParAnParActe";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
-import { LoadingState } from "../components/ui";
+import { ErrorBlock, LoadingState } from "../components/ui";
 
 function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParActeRow {
 	return {
@@ -35,10 +36,21 @@ export default function T5ParAnParActe({
 	const { label, refSocial } = useParams();
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
-	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+	const {
+		rows,
+		isReady,
+		activeRowId,
+		canSave,
+		isSaving,
+		saveError,
+		updateCell,
+		saveActiveRow,
+		resetActiveRow,
+	} = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parAnParActe,
 		refSocial,
 		createEmptyParAnParActeRow,
+		"parAnParActe",
 	);
 	const navigate = useNavigate();
 	const pageTitle = label ?? title;
@@ -73,9 +85,26 @@ export default function T5ParAnParActe({
 				) : !isReady ? (
 					<LoadingState message="Chargement des données T5…" />
 				) : (
-					<T5ParAnParActeTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+					<>
+						{saveError && <ErrorBlock message={saveError} />}
+						<T5ParAnParActeTable
+							rows={rows}
+							onCellChange={updateCell}
+							focusRefSocial={refSocial}
+							activeRowId={activeRowId}
+						/>
+					</>
 				)}
 			</section>
+			{isReady && (
+				<T5RowActions
+					canSave={canSave}
+					hasActiveRow={activeRowId !== null}
+					isSaving={isSaving}
+					onSave={saveActiveRow}
+					onReset={resetActiveRow}
+				/>
+			)}
 		</div>
 	);
 }
