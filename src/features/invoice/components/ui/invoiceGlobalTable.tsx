@@ -3,8 +3,8 @@ import { Search, X } from "lucide-react";
 import { factureGlobaleColumns } from "../../data/tableColumn";
 import DropDownCell, { type dropdownOptionProps} from "./dropDownCell";
 import EditableDateCell from "./editableDateCell";
-import { EditableStringCell } from "../../../../components/ui";
-import SummableNumberCell from "./summableCell";
+import EditableMonthCell from "./editableMonthCell";
+import { EditableNumberCell, EditableStringCell } from "../../../../components/ui";
 import {TypeContrainte, } from "../../types/dropDown";
 import {numberColumn,dateColumn} from "../../types/invoiceTable";
 import {
@@ -42,6 +42,7 @@ function hasInvoiceData(row: FactureGlobaleRow): boolean {
 export default function FactureGlobaleTable({
 	rows,
 	addRowId,
+	activeRowId,
 	containerRef,
 	addRowRef,
 	onCellChange,
@@ -96,12 +97,6 @@ export default function FactureGlobaleTable({
 		});
 		setPinnedFilter(null);
 		setOpenFilter(null);
-	}
-
-	function addSummableValue(row: FactureGlobaleRow, key: keyof typeof numberColumn, addedValue: number) {
-		const currentValue = Number(row[key]) || 0;
-		const newValue = Math.round((currentValue + addedValue) * 100) / 100;
-		onCellChange(row.id, key, String(newValue));
 	}
 
 	return (
@@ -192,12 +187,25 @@ export default function FactureGlobaleTable({
 
 								if (column.key === "majT5") {
 									return hasInvoiceData(row) && row.refSocial.trim() ? (
-										<DropDownCell key={column.key} options={DropDownMock} refSocial={row.refSocial} className={`${cellClass} bg-yellow-100 text-red-800`} />
+										<DropDownCell key={column.key} options={DropDownMock} refSocial={row.refSocial} className={`${cellClass} bg-yellow-100 text-red-800`} isLocked={activeRowId !== null && activeRowId !== row.id} />
 									) : (
 										<td key={column.key} className={`${cellClass} bg-yellow-100 text-red-800`} />
 									);
 								}
 								const value = row[column.key];
+
+								if (column.key === "moisPrestation") {
+									return (
+										<EditableMonthCell
+											key={column.key}
+											value={value as Date | null}
+											className={cellClass}
+											isLocked={activeRowId !== null && activeRowId !== row.id}
+											emptyValue="—"
+											onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)}
+										/>
+									);
+								}
 
 								if ((Object.values(dateColumn) as string[]).includes(column.key)) {
 									return (
@@ -205,6 +213,7 @@ export default function FactureGlobaleTable({
 											key={column.key}
 											value={value as string}
 											className={cellClass}
+											isLocked={activeRowId !== null && activeRowId !== row.id}
 											emptyValue="—"
 											onSave={onSave}
 										/>
@@ -213,12 +222,13 @@ export default function FactureGlobaleTable({
 
 								if ((Object.values(numberColumn) as string[]).includes(column.key)) {
 									return (
-										<SummableNumberCell
+						<EditableNumberCell
 											key={column.key}
 											value={value as number}
 											className={cellClass}
+											isLocked={activeRowId !== null && activeRowId !== row.id}
 											emptyValue="—"
-											onSave={(addedValue) => addSummableValue(row, column.key as keyof typeof numberColumn, addedValue)}
+							onSave={(nextValue) => onCellChange(row.id, column.key, String(nextValue))}
 										/>
 									);
 								}
@@ -228,6 +238,7 @@ export default function FactureGlobaleTable({
 										key={column.key}
 										value={String(value)}
 										className={cellClass}
+										isLocked={activeRowId !== null && activeRowId !== row.id}
 										emptyValue="—"
 										onSave={onSave}
 									/>

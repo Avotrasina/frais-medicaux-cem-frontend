@@ -20,6 +20,7 @@ export type {
 	ContarinteType,
 	FactureGlobaleColumn,
 	FactureGlobaleColumnKey,
+	FactureGlobaleChanges,
 	FactureGlobaleRow,
 	FactureGlobaleTableProps,
 	FactureT5X,

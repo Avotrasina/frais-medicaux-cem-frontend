@@ -6,6 +6,7 @@ type Props = {
 	className?: string;
 	isLocked?: boolean;
 	placeholder?: string;
+	emptyValue?: string;
 	onSave: (value: number) => void;
 };
 
@@ -19,6 +20,7 @@ export default function EditableNumberCell({
 	className = "",
 	isLocked = false,
 	placeholder,
+	emptyValue = "",
 	onSave,
 }: Props) {
 	const [editing, setEditing] = useState(false);
@@ -40,7 +42,7 @@ export default function EditableNumberCell({
 
 	return (
 		<td
-			className={`relative h-full cursor-pointer truncate px-3 text-xs hover:bg-slate-50 ${className}`}
+			className={`relative h-full truncate px-3 text-xs ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer hover:bg-slate-50"} ${className}`}
 			onClick={startEditing}
 		>
 			{editing ? (
@@ -87,7 +89,9 @@ export default function EditableNumberCell({
 					</span>
 				</>
 			) : (
-				numberFormatter.format(value)
+				value === 0 && emptyValue
+					? <span className="absolute inset-0 flex items-center justify-center">{emptyValue}</span>
+					: numberFormatter.format(value)
 			)}
 		</td>
 	);

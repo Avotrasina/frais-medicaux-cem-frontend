@@ -31,7 +31,11 @@ export function filterFactureGlobaleRows(
 	return rows.filter((row) => {
 		const matchesText = textFilterKeys.every((key) => {
 			const query = filters.text[key]?.trim().toLocaleLowerCase();
-			return !query || row[key].toLocaleLowerCase().includes(query);
+			const rawValue = row[key];
+			const value = rawValue instanceof Date
+				? `${rawValue.getUTCFullYear()}-${String(rawValue.getUTCMonth() + 1).padStart(2, "0")}`
+				: rawValue ?? "";
+			return !query || value.toLocaleLowerCase().includes(query);
 		});
 		if (!matchesText) return false;
 
