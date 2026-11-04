@@ -39,9 +39,37 @@ export type FactureGlobaleRow = {
 	serviceSortie: string;
 };
 
+
 export type FactureGlobaleChanges = Partial<{
 	[K in Exclude<keyof FactureGlobaleRow, "id">]: FactureGlobaleRow[K] | undefined;
 }>;
+
+export type FactureGlobaleCreateInput = Pick<
+	FactureGlobaleRow,
+	"dateReception" | "numFacture" | "dateFacture" | "nomEtablissement" | "montantTotal"
+>;
+
+export const FACTURE_GLOBALE_UPDATE_KEYS = [
+	"dateReception",
+	"numFacture",
+	"dateFacture",
+	"nomEtablissement",
+	"montantTotal",
+	"partCem100",
+	"depassement",
+	"partCem80",
+	"partAgent20",
+	"totalPartAgent",
+	"localite",
+	"moisPrestation",
+	"refAgence",
+	"remarques1",
+] as const satisfies readonly (keyof FactureGlobaleRow)[];
+
+export type FactureGlobaleUpdateKey = (typeof FACTURE_GLOBALE_UPDATE_KEYS)[number];
+export type FactureGlobaleUpdateChanges = Partial<
+	Pick<FactureGlobaleRow, FactureGlobaleUpdateKey>
+>;
 
 export type FactureGlobaleCellValue = string | number | Date | null;
 
@@ -94,3 +122,12 @@ export const dateColumn = {
 } as const;
 export type dateColumn = (typeof dateColumn) [keyof typeof dateColumn];
 
+export const SaveColumnKey = [
+    "dateReception",
+    "numFacture",
+    "dateFacture",
+    "nomEtablissement",
+    "montantTotal"
+] as const;
+
+export type SaveColumnKey = (typeof SaveColumnKey)[number];
