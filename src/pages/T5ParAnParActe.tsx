@@ -7,6 +7,7 @@ import type {
 	T5ParAnParActeRow,
 } from "../features/invoice/types/t5ParAnParActe";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
 import { ErrorBlock, LoadingState } from "../components/ui";
 
 function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParActeRow {
@@ -17,23 +18,14 @@ function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParAc
 	};
 }
 
-type Props = {
-	title: string;
-	plafondParAn: number;
-	plafondParActe: number;
-};
-
 const amountFormatter = new Intl.NumberFormat("fr-FR", {
 	minimumFractionDigits: 2,
 	maximumFractionDigits: 2,
 });
 
-export default function T5ParAnParActe({
-	title,
-	plafondParAn,
-	plafondParActe,
-}: Props) {
-	const { label, refSocial } = useParams();
+export default function T5ParAnParActe() {
+	const { id, label, refSocial } = useParams();
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
 	const {
@@ -53,7 +45,12 @@ export default function T5ParAnParActe({
 		"parAnParActe",
 	);
 	const navigate = useNavigate();
-	const pageTitle = label ?? title;
+	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
+	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configuration?.kind !== "parAnParActe") {
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an et par acte." />;
+	}
+	const pageTitle = label ?? configuration.title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
@@ -70,10 +67,10 @@ export default function T5ParAnParActe({
 				</button>
 				<div className="mt-2 flex flex-wrap justify-center gap-2 text-sm">
 					<span className="rounded-lg bg-yellow-300 px-4 py-2 font-semibold text-red-800">
-						Plafond par an : {amountFormatter.format(plafondParAn)}
+						Plafond par an : {amountFormatter.format(configuration.plafondParAn)}
 					</span>
 					<span className="rounded-lg bg-yellow-300 px-4 py-2 font-semibold text-red-800">
-						Plafond par acte : {amountFormatter.format(plafondParActe)}
+						Plafond par acte : {amountFormatter.format(configuration.plafondParActe)}
 					</span>
 				</div>
 			</div>

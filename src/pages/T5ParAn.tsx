@@ -5,12 +5,8 @@ import T5ParAnTable from "../features/invoice/components/ui/t5ParAnTable";
 import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type { T5ParAnRow } from "../features/invoice/types/t5ParAn";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
+import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
 import { ErrorBlock, LoadingState } from "../components/ui";
-
-type Props = {
-	title: string;
-	plafond: number;
-};
 
 const moneyFormatter = new Intl.NumberFormat("fr-FR", {
 	minimumFractionDigits: 2,
@@ -24,8 +20,9 @@ function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
 	};
 }
 
-export default function T5ParAn({ title, plafond }: Props) {
-	const { label, refSocial } = useParams();
+export default function T5ParAn() {
+	const { id, label, refSocial } = useParams();
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
 	const {
@@ -45,7 +42,12 @@ export default function T5ParAn({ title, plafond }: Props) {
 		"parAn",
 	);
 	const navigate = useNavigate();
-	const pageTitle = label ?? title;
+	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
+	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configuration?.kind !== "parAn") {
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an." />;
+	}
+	const pageTitle = label ?? configuration.title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
@@ -62,7 +64,7 @@ export default function T5ParAn({ title, plafond }: Props) {
 				</button>
 				<p className="mt-2 text-center">
 					<span className="inline-block rounded-lg bg-yellow-300 px-4 py-2 text-sm font-semibold text-red-800">
-						Plafond fixé : {moneyFormatter.format(plafond)}
+						Plafond fixé : {moneyFormatter.format(configuration.plafond)}
 					</span>
 				</p>
 			</div>
