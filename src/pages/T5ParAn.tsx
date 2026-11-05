@@ -2,18 +2,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParAnTable from "../features/invoice/components/ui/t5ParAnTable";
+import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type { T5ParAnRow } from "../features/invoice/types/t5ParAn";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
-import { LoadingState } from "../components/ui";
-
-type Props = {
-	title: string;
-	plafond: number;
-};
+import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
+import { ErrorBlock, LoadingState } from "../components/ui";
 
 const moneyFormatter = new Intl.NumberFormat("fr-FR", {
-	minimumFractionDigits: 2,
-	maximumFractionDigits: 2,
+	maximumFractionDigits: 0,
 });
 
 function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
@@ -23,17 +19,34 @@ function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
 	};
 }
 
-export default function T5ParAn({ title, plafond }: Props) {
-	const { label, refSocial } = useParams();
+export default function T5ParAn() {
+	const { id, label, refSocial } = useParams();
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
-	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+	const {
+		rows,
+		isReady,
+		activeRowId,
+		canSave,
+		isSaving,
+		saveError,
+		updateCell,
+		saveActiveRow,
+		resetActiveRow,
+	} = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parAn,
 		refSocial,
 		createEmptyParAnRow,
+		"parAn",
 	);
 	const navigate = useNavigate();
-	const pageTitle = label ?? title;
+	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
+	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configuration?.kind !== "parAn") {
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an." />;
+	}
+	const pageTitle = label ?? configuration.title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
@@ -50,7 +63,7 @@ export default function T5ParAn({ title, plafond }: Props) {
 				</button>
 				<p className="mt-2 text-center">
 					<span className="inline-block rounded-lg bg-yellow-300 px-4 py-2 text-sm font-semibold text-red-800">
-						Plafond fixé : {moneyFormatter.format(plafond)}
+						Plafond fixé : {moneyFormatter.format(configuration.plafond)} MGA
 					</span>
 				</p>
 			</div>
@@ -62,9 +75,26 @@ export default function T5ParAn({ title, plafond }: Props) {
 				) : !isReady ? (
 					<LoadingState message="Chargement des données T5…" />
 				) : (
-					<T5ParAnTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+					<>
+						{saveError && <ErrorBlock message={saveError} />}
+						<T5ParAnTable
+							rows={rows}
+							onCellChange={updateCell}
+							focusRefSocial={refSocial}
+							activeRowId={activeRowId}
+						/>
+					</>
 				)}
 			</section>
+			{isReady && (
+				<T5RowActions
+					canSave={canSave}
+					hasActiveRow={activeRowId !== null}
+					isSaving={isSaving}
+					onSave={saveActiveRow}
+					onReset={resetActiveRow}
+				/>
+			)}
 		</div>
 	);
 }

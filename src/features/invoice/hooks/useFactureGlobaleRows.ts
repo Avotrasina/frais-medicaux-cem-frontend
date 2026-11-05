@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchFactureGlobaleMock } from "../mocks/invoiceTable";
+import { useCallback, useMemo, useState } from "react";
+import useGetFactureGlobaleRows from "./useGetFactureGlobaleRows";
 import type { FactureGlobaleCellValue, FactureGlobaleColumnKey, FactureGlobaleRow } from "../types/invoiceTable";
+
 
 const numericKeys = new Set<FactureGlobaleColumnKey>([
 	"montantTotal", "partCem100", "depassement", "partCem80", "partAgent20", "totalPartAgent",
@@ -17,10 +18,6 @@ function createEmptyInvoice(id: number): FactureGlobaleRow {
 	};
 }
 
-function hasInvoiceValue(row: FactureGlobaleRow) {
-	return Object.entries(row).some(([key, value]) => key !== "id" && value !== "" && value !== 0 && value !== null);
-}
-
 function receptionTimestamp(value: string) {
 	if (!value) return Number.POSITIVE_INFINITY;
 	const [day, month, year] = value.split("/").map(Number);
@@ -29,20 +26,19 @@ function receptionTimestamp(value: string) {
 }
 
 export default function useFactureGlobaleRows() {
-	const [dataRows, setDataRows] = useState<FactureGlobaleRow[]>([]);
-	const [addRow, setAddRow] = useState(() => createEmptyInvoice(1));
-	const [isLoaded, setIsLoaded] = useState(false);
-
-	useEffect(() => {
-		let active = true;
-		fetchFactureGlobaleMock().then((loadedRows) => {
-			if (!active) return;
-			setDataRows(loadedRows);
-			setAddRow(createEmptyInvoice(Math.max(...loadedRows.map((row) => row.id)) + 1));
-			setIsLoaded(true);
-		});
-		return () => { active = false; };
-	}, []);
+	const factureRowsQuery = useGetFactureGlobaleRows();
+	const reloadRows = factureRowsQuery.reload;
+	const [storedDataRows, setStoredDataRows] = useState<FactureGlobaleRow[] | null>(null);
+	const [storedAddRow, setStoredAddRow] = useState<FactureGlobaleRow | null>(null);
+	const dataRows = useMemo(
+		() => storedDataRows ?? factureRowsQuery.data ?? [],
+		[storedDataRows, factureRowsQuery.data],
+	);
+	const nextId = Math.max(0, ...dataRows.map((row) => row.id)) + 1;
+	const addRow = useMemo(
+		() => storedAddRow ?? createEmptyInvoice(nextId),
+		[storedAddRow, nextId],
+	);
 
 	const updateCell = useCallback((rowId: number, key: FactureGlobaleColumnKey, value: FactureGlobaleCellValue) => {
 		const nextValue: string | number | Date | null = key === "moisPrestation"
@@ -57,15 +53,10 @@ export default function useFactureGlobaleRows() {
 						+ (key === "partAgent20" ? Number(nextValue) : addRow.partAgent20),
 				}),
 			} as FactureGlobaleRow;
-			if (hasInvoiceValue(updated)) {
-				setDataRows((currentRows) => [...currentRows, updated].sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
-				setAddRow(createEmptyInvoice(updated.id + 1));
-			} else {
-				setAddRow(updated);
-			}
+			setStoredAddRow(updated);
 			return;
 		}
-		setDataRows((current) => current
+		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
 			.map((row) => row.id === rowId ? {
 				...row,
 				[key]: nextValue,
@@ -75,19 +66,44 @@ export default function useFactureGlobaleRows() {
 				}),
 			} as FactureGlobaleRow : row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
-	}, [addRow]);
+	}, [addRow, factureRowsQuery.data]);
 
 	const restoreRow = useCallback((rowId: number, originalRow: FactureGlobaleRow, wasAddRow: boolean) => {
 		if (wasAddRow) {
-			setDataRows((current) => current.filter((row) => row.id !== rowId));
-			setAddRow(createEmptyInvoice(rowId));
+			setStoredAddRow((current) => (current ?? addRow).id === rowId ? originalRow : current);
 			return;
 		}
-		setDataRows((current) => current
+		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
 			.map((row) => row.id === rowId ? originalRow : row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
-	}, []);
+	}, [addRow, factureRowsQuery.data]);
+
+	const refreshRows = useCallback(async (created = false) => {
+		if (created) setStoredAddRow(null);
+		const latestRows = await reloadRows();
+		if (!latestRows) {
+			throw new Error("Impossible d’actualiser les factures. Réessayez le chargement.");
+		}
+		setStoredDataRows(latestRows);
+		return latestRows;
+	}, [reloadRows]);
+
+	const reload = useCallback(async () => {
+		const latestRows = await reloadRows();
+		if (!latestRows) return false;
+		setStoredDataRows(latestRows);
+		return true;
+	}, [reloadRows]);
 
 	const rows = useMemo(() => [...dataRows, addRow], [dataRows, addRow]);
-	return { rows, addRowId: addRow.id, isLoaded, updateCell, restoreRow };
+	return {
+		rows,
+		addRowId: addRow.id,
+		isLoaded: factureRowsQuery.data !== null && !factureRowsQuery.isLoading,
+		loadError: factureRowsQuery.error,
+		reload,
+		updateCell,
+		refreshRows,
+		restoreRow,
+	};
 }

@@ -1,4 +1,8 @@
-import type { FactureGlobaleChanges, FactureGlobaleRow } from "../types/invoiceTable";
+import type {
+	FactureGlobaleCreateInput,
+	FactureGlobaleRow,
+	FactureGlobaleUpdateChanges,
+} from "../types/invoiceTable";
 
 
 export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
@@ -98,10 +102,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 const formatMockDate = (date: Date) =>
 	`${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
 
-// Dataset temporaire assez volumineux pour simuler le défilement jusqu'aux factures récentes.
-export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
-	await new Promise((resolve) => setTimeout(resolve, 2000));
-
+function createInitialRows(): FactureGlobaleRow[] {
 	const rows = Array.from({ length: 60 }, (_, index) => {
 		const template = initialFactureGlobaleRowsMock[index % initialFactureGlobaleRowsMock.length];
 		const receptionDate = new Date(2026, 0, 5 + index * 2);
@@ -123,10 +124,73 @@ export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
 	});
 }
 
-export async function saveFactureGlobaleMock(
-	rowId: number,
-	changes: FactureGlobaleChanges,
-): Promise<{ rowId: number; changes: FactureGlobaleChanges }> {
+let factureGlobaleRows: FactureGlobaleRow[] | null = null;
+
+function getFactureGlobaleRows(): FactureGlobaleRow[] {
+	factureGlobaleRows ??= createInitialRows();
+	return factureGlobaleRows;
+}
+
+function cloneFactureGlobaleRow(row: FactureGlobaleRow): FactureGlobaleRow {
+	return { ...row, moisPrestation: row.moisPrestation ? new Date(row.moisPrestation) : null };
+}
+
+export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
+	await new Promise((resolve) => setTimeout(resolve, 2000));
+	return getFactureGlobaleRows().map(cloneFactureGlobaleRow);
+}
+
+export async function createFactureGlobaleMock(
+	input: FactureGlobaleCreateInput,
+): Promise<FactureGlobaleRow> {
 	await Promise.resolve();
-	return { rowId, changes };
+	const rows = getFactureGlobaleRows();
+	const id = Math.max(0, ...rows.map((row) => row.id)) + 1;
+	const createdRow: FactureGlobaleRow = {
+		id,
+		refSocial: `26/${String(id).padStart(3, "0")}`,
+		dateReception: input.dateReception,
+		numFacture: input.numFacture,
+		dateFacture: input.dateFacture,
+		nomEtablissement: input.nomEtablissement,
+		montantTotal: input.montantTotal,
+		partCem100: 0,
+		depassement: 0,
+		partCem80: 0,
+		partAgent20: 0,
+		totalPartAgent: 0,
+		localite: "",
+		moisPrestation: null,
+		refAgence: "",
+		remarques1: "",
+		retourPrestataire: "",
+		recuApresModification: "",
+		dateEnregistrement: "",
+		parQuiEnregistrement: "",
+		dateEnvoiValidation: "",
+		pourQuiValidation: "",
+		remarques2: "",
+		retourCorrection: "",
+		dateValidation: "",
+		parQuiValidationFinale: "",
+		dateSortie: "",
+		serviceSortie: "",
+	};
+	factureGlobaleRows = [...rows, createdRow];
+	return cloneFactureGlobaleRow(createdRow);
+}
+
+export async function modifyFactureGlobaleMock(
+	refSocial: string,
+	changes: FactureGlobaleUpdateChanges,
+): Promise<FactureGlobaleRow> {
+	await Promise.resolve();
+	const rows = getFactureGlobaleRows();
+	const rowIndex = rows.findIndex((row) => row.refSocial === refSocial);
+	if (rowIndex === -1) {
+		throw new Error(`Aucune facture trouvée pour la référence sociale ${refSocial}.`);
+	}
+	const updatedRow = { ...rows[rowIndex], ...changes };
+	factureGlobaleRows = rows.map((row, index) => index === rowIndex ? updatedRow : row);
+	return cloneFactureGlobaleRow(updatedRow);
 }

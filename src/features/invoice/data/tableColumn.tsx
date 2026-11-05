@@ -67,3 +67,4 @@ export const t5ParSeanceColumns: T5ParSeanceColumn[] = [
 	{ key: "montantDepassement", label: "Montant dépassement", width: "w-44 min-w-44 max-w-44" },
 	{ key: "nomEtablissement", label: "Nom établissement", width: "w-64 min-w-64 max-w-64" },
 ];
+

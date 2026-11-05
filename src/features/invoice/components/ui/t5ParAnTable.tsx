@@ -1,30 +1,47 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import EditableDateCell from "./editableDateCell";
 import { EditableNumberCell, EditableStringCell } from "../../../../components/ui";
 import { t5ParAnColumns as columns } from "../../data/tableColumn";
 import type { T5ParAnTableProps } from "../../types/t5ParAn";
+import T5RefSocialFilterHeader from "./T5RefSocialFilterHeader";
 
 const cellClass = "border border-slate-200 px-2 py-2 text-slate-900";
 const moneyFormatter = new Intl.NumberFormat("fr-FR", {
 	maximumFractionDigits: 0,
 });
 
-export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5ParAnTableProps) {
-	const targetRowRef = useRef<HTMLTableRowElement>(null);
+export default function T5ParAnTable({ rows, onCellChange, focusRefSocial, activeRowId = null }: T5ParAnTableProps) {
+	const focusedRowRef = useRef<HTMLTableRowElement>(null);
+	const [refSocialFilter, setRefSocialFilter] = useState("");
 	const targetRowId = rows.find((row) => row.refSocial === focusRefSocial)?.id;
+	const focusedRowId = activeRowId ?? targetRowId;
+	const visibleRows = useMemo(() => {
+		const query = refSocialFilter.trim().toLocaleLowerCase();
+		return rows.filter((row) =>
+			row.id === activeRowId || !query || row.refSocial.toLocaleLowerCase().includes(query),
+		);
+	}, [rows, activeRowId, refSocialFilter]);
 
 	useEffect(() => {
-		if (!targetRowRef.current) return;
-		targetRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-		targetRowRef.current.focus({ preventScroll: true });
-	}, [targetRowId]);
+		if (!focusedRowRef.current) return;
+		focusedRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+		focusedRowRef.current.focus({ preventScroll: true });
+	}, [focusedRowId]);
 
 	return (
 		<div className="min-h-0 flex-1 overflow-auto">
 			<table className="h-fit w-max min-w-full table-fixed border-collapse text-sm">
 				<thead className="sticky top-0 z-10 bg-slate-900 text-white">
 					<tr>
-						{columns.map((column) => (
+						{columns.map((column) => column.key === "refSocial" ? (
+							<T5RefSocialFilterHeader
+								key={column.key}
+								label={column.label}
+								width={column.width}
+								value={refSocialFilter}
+								onChange={setRefSocialFilter}
+							/>
+						) : (
 							<th
 								key={column.key}
 								className={`border border-slate-700 px-3 py-3 text-left text-[10px] font-extrabold uppercase tracking-wide ${column.width}`}
@@ -35,13 +52,14 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5P
 					</tr>
 				</thead>
 				<tbody>
-					{rows.map((row) => (
-						<tr key={row.id} ref={row.id === targetRowId ? targetRowRef : undefined} tabIndex={row.id === targetRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === targetRowId ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
+					{visibleRows.map((row) => (
+						<tr key={row.id} ref={row.id === focusedRowId ? focusedRowRef : undefined} tabIndex={row.id === focusedRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === activeRowId ? "bg-yellow-50 outline outline-2 outline-red-400" : ""} ${row.id === targetRowId && activeRowId === null ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
 							{columns.map((column) => {
 								const className = `${cellClass} ${column.width}`;
+								const isLocked = activeRowId !== null && activeRowId !== row.id;
 
 								if (column.key === "refSocial") {
-									return <td key={column.key} className={`${className} truncate`}>{row.refSocial || "—"}</td>;
+									return <td key={column.key} className={`${className} truncate ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>{row.refSocial || "—"}</td>;
 								}
 
 								if (column.key === "libelle") {
@@ -50,7 +68,8 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5P
 											key={column.key}
 											value={row[column.key]}
 											className={className}
-											onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)}
+											isLocked={isLocked}
+											onSave={(nextValue) => onCellChange(row.id, "libelle", nextValue)}
 										/>
 									);
 								}
@@ -61,7 +80,8 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5P
 											key={column.key}
 											value={row.dateActe}
 											className={className}
-											onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)}
+											isLocked={isLocked}
+											onSave={(nextValue) => onCellChange(row.id, "dateActe", nextValue)}
 										/>
 									);
 								}
@@ -72,7 +92,8 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5P
 											key={column.key}
 											value={row.montantActe}
 											className={className}
-											onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)}
+											isLocked={isLocked}
+											onSave={(nextValue) => onCellChange(row.id, "montantActe", nextValue)}
 										/>
 									);
 								}
@@ -83,7 +104,7 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial }: T5P
 										? moneyFormatter.format(value)
 										: value ?? "";
 								return (
-									<td key={column.key} className={`${className} truncate`}>
+									<td key={column.key} className={`${className} truncate ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>
 										{displayValue}
 									</td>
 								);

@@ -32,9 +32,9 @@ export default function AppRoutes() {
       <Route path={ROUTES.deletionRequests} element={<AppShell><DeletionRequestsPage /></AppShell>} />
       <Route path={ROUTES.invoice} element={<AppShell><InvoicePage></InvoicePage></AppShell>} />
       <Route path={ROUTES.T5X} element={<AppShell><T5XConfigurationPage /></AppShell>} />
-      <Route path={ROUTES.T5ParAn} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnPage title="T5 par an" plafond={10_000_000} /></LookupLayout>} />
-      <Route path={ROUTES.T5ParAnParActe} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnParActePage title="T5 par an et par acte" plafondParAn={10_000_000} plafondParActe={1_000_000} /></LookupLayout>} />
-      <Route path={ROUTES.T5Parseance} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParSeancePage title="T5 par séance" nombreSeance={3} /></LookupLayout>} />
+      <Route path={ROUTES.T5ParAn} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnPage /></LookupLayout>} />
+      <Route path={ROUTES.T5ParAnParActe} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnParActePage /></LookupLayout>} />
+      <Route path={ROUTES.T5Parseance} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParSeancePage /></LookupLayout>} />
       <Route path="*" element={<Navigate to={ROUTES.agents} replace />} />
     </Routes>
   );

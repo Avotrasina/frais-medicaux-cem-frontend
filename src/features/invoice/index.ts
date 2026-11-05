@@ -21,8 +21,11 @@ export type {
 	FactureGlobaleColumn,
 	FactureGlobaleColumnKey,
 	FactureGlobaleChanges,
+	FactureGlobaleCreateInput,
 	FactureGlobaleRow,
 	FactureGlobaleTableProps,
+	FactureGlobaleUpdateChanges,
+	FactureGlobaleUpdateKey,
 	FactureT5X,
 } from "./types/invoiceTable";
 export type {

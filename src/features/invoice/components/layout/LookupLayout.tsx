@@ -1,7 +1,8 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Bell, Menu, Search, X } from "lucide-react";
 import type { IdpLookupResult } from "../../../../types/LookUp";
-import { LookupLoadingContext, LookupResultContext } from "../../context/LookupContext";
+import { LookupLoadingContext, LookupRefreshContext, LookupResultContext } from "../../context/LookupContext";
+import useSearchIdp from "../../hooks/useSearchIdp";
 import logo from "../../../../assets/logo.jpg";
 
 
@@ -17,25 +18,13 @@ export default function LookupLayout({
 }: Props) {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [idp, setIdp] = useState("");
-	const [lookupResult, setLookupResult] = useState<IdpLookupResult | null>(null);
-	const [idpError, setIdpError] = useState<string | null>(null);
-	const [idpLoading, setIdpLoading] = useState(false);
+	const lookup = useSearchIdp(onSearchIdp);
 
 	async function submitIdp(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const query = idp.trim();
 		if (!query) return;
-		setIdpLoading(true);
-		setIdpError(null);
-		setLookupResult(null);
-		try {
-			setLookupResult(await onSearchIdp(query));
-		} catch (error) {
-			setLookupResult(null);
-			setIdpError(error instanceof Error ? error.message : "Recherche IDP impossible.");
-		} finally {
-			setIdpLoading(false);
-		}
+		await lookup.search(query);
 	}
 
 	return (
@@ -72,24 +61,24 @@ export default function LookupLayout({
 						searchValue={idp}
 						setSearchValue={setIdp}
 						onSubmit={submitIdp}
-						loading={idpLoading}
-						error={idpError}
+						loading={lookup.isLoading}
+						error={lookup.error}
 					>
-						<InfoField label="Nom" value={lookupResult?.agent.nom} />
-						<InfoField label="Prénom" value={lookupResult?.agent.prenom} />
-						<InfoField label="Code famille" value={lookupResult?.agent.codeFam} />
-						<InfoField label="Observation IDP" value={lookupResult?.agent.observationIdp} />
+						<InfoField label="Nom" value={lookup.result?.agent.nom} />
+						<InfoField label="Prénom" value={lookup.result?.agent.prenom} />
+						<InfoField label="Code famille" value={lookup.result?.agent.codeFam} />
+						<InfoField label="Observation IDP" value={lookup.result?.agent.observationIdp} />
 					</LookupSection>
 
 					<section className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
 						<h2 className="mb-3 text-xs font-extrabold uppercase tracking-wide text-slate-700">Informations matricule</h2>
 						<div className="space-y-2">
-							<InfoField label="Matricule" value={lookupResult?.agent.matricule} />
-							<InfoField label="Nom" value={lookupResult?.agent.nom} />
-							<InfoField label="Prénom" value={lookupResult?.agent.prenom} />
-							<InfoField label="Back-office / Front-office" value={lookupResult?.agent.backOfficeFrontOffice} />
-							<InfoField label="Direction" value={lookupResult?.agent.direction} />
-							<InfoField label="Agence / Service" value={lookupResult?.agent.agenceService} />
+							<InfoField label="Matricule" value={lookup.result?.agent.matricule} />
+							<InfoField label="Nom" value={lookup.result?.agent.nom} />
+							<InfoField label="Prénom" value={lookup.result?.agent.prenom} />
+							<InfoField label="Back-office / Front-office" value={lookup.result?.agent.backOfficeFrontOffice} />
+							<InfoField label="Direction" value={lookup.result?.agent.direction} />
+							<InfoField label="Agence / Service" value={lookup.result?.agent.agenceService} />
 						</div>
 					</section>
 				</div>
@@ -124,11 +113,13 @@ export default function LookupLayout({
 						<span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-xs font-extrabold text-red-700">AR</span>
 					</div>
 				</header>
-				<LookupLoadingContext.Provider value={idpLoading}>
-					<LookupResultContext.Provider value={lookupResult}>
+				<LookupLoadingContext.Provider value={lookup.isLoading}>
+					<LookupResultContext.Provider value={lookup.result}>
+						<LookupRefreshContext.Provider value={lookup.refresh}>
 						<main className="mx-auto w-full max-w-[1600px] p-4 md:p-6 lg:p-8">
 							{children}
 						</main>
+						</LookupRefreshContext.Provider>
 					</LookupResultContext.Provider>
 				</LookupLoadingContext.Provider>
 			</div>

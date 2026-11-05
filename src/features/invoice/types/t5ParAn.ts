@@ -21,9 +21,10 @@ export type T5ParAnColumn = {
 export type T5ParAnTableProps = {
 	rows: T5ParAnRow[];
 	focusRefSocial?: string;
+	activeRowId?: number | null;
 	onCellChange: (
 		rowId: number,
-		key: T5ParAnColumnKey,
+		key: Extract<T5ParAnColumnKey, "dateActe" | "libelle" | "montantActe">,
 		value: string | number,
 	) => void;
 };

@@ -2,11 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLookupLoading, useLookupResult } from "../features/invoice/context/LookupContext";
 import { ROUTES } from "../constants/routes";
 import T5ParSeanceTable from "../features/invoice/components/ui/t5ParSeanceTable";
+import T5RowActions from "../features/invoice/components/ui/T5RowActions";
 import type {
 	T5ParSeanceRow,
 } from "../features/invoice/types/t5ParSeance";
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
-import { LoadingState } from "../components/ui";
+import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
+import { ErrorBlock, LoadingState } from "../components/ui";
 
 function createEmptyParSeanceRow(id: number, refSocial: string): T5ParSeanceRow {
 	return {
@@ -15,22 +17,34 @@ function createEmptyParSeanceRow(id: number, refSocial: string): T5ParSeanceRow 
 	};
 }
 
-type Props = {
-	title: string;
-	nombreSeance: number;
-};
-
-export default function T5ParSeance({ title, nombreSeance }: Props) {
-	const { label, refSocial } = useParams();
+export default function T5ParSeance() {
+	const { id, label, refSocial } = useParams();
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
-	const { rows, isReady, updateCell } = useT5RowsByRefSocial(
+	const {
+		rows,
+		isReady,
+		activeRowId,
+		canSave,
+		isSaving,
+		saveError,
+		updateCell,
+		saveActiveRow,
+		resetActiveRow,
+	} = useT5RowsByRefSocial(
 		lookupResult?.t5Data.parSeance,
 		refSocial,
 		createEmptyParSeanceRow,
+		"parSeance",
 	);
 	const navigate = useNavigate();
-	const pageTitle = label ?? title;
+	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
+	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configuration?.kind !== "parSeance") {
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par séance." />;
+	}
+	const pageTitle = label ?? configuration.title;
 
 	return (
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col gap-2">
@@ -47,7 +61,7 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 				</button>
 				<p className="mt-2 text-center">
 					<span className="inline-block rounded-lg bg-yellow-300 px-4 py-2 text-sm font-semibold text-red-800">
-						Nombre de séances : {nombreSeance}
+						Nombre de séances : {configuration.nombreSeance}
 					</span>
 				</p>
 			</div>
@@ -59,9 +73,26 @@ export default function T5ParSeance({ title, nombreSeance }: Props) {
 				) : !isReady ? (
 					<LoadingState message="Chargement des données T5…" />
 				) : (
-					<T5ParSeanceTable rows={rows} onCellChange={updateCell} focusRefSocial={refSocial} />
+					<>
+						{saveError && <ErrorBlock message={saveError} />}
+						<T5ParSeanceTable
+							rows={rows}
+							onCellChange={updateCell}
+							focusRefSocial={refSocial}
+							activeRowId={activeRowId}
+						/>
+					</>
 				)}
 			</section>
+			{isReady && (
+				<T5RowActions
+					canSave={canSave}
+					hasActiveRow={activeRowId !== null}
+					isSaving={isSaving}
+					onSave={saveActiveRow}
+					onReset={resetActiveRow}
+				/>
+			)}
 		</div>
 	);
 }
