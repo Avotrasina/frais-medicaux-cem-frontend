@@ -9,8 +9,7 @@ import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
 import { ErrorBlock, LoadingState } from "../components/ui";
 
 const moneyFormatter = new Intl.NumberFormat("fr-FR", {
-	minimumFractionDigits: 2,
-	maximumFractionDigits: 2,
+	maximumFractionDigits: 0,
 });
 
 function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
@@ -64,7 +63,7 @@ export default function T5ParAn() {
 				</button>
 				<p className="mt-2 text-center">
 					<span className="inline-block rounded-lg bg-yellow-300 px-4 py-2 text-sm font-semibold text-red-800">
-						Plafond fixé : {moneyFormatter.format(configuration.plafond)}
+						Plafond fixé : {moneyFormatter.format(configuration.plafond)} MGA
 					</span>
 				</p>
 			</div>

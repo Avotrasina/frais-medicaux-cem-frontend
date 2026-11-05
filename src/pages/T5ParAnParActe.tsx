@@ -19,8 +19,7 @@ function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParAc
 }
 
 const amountFormatter = new Intl.NumberFormat("fr-FR", {
-	minimumFractionDigits: 2,
-	maximumFractionDigits: 2,
+	maximumFractionDigits: 0,
 });
 
 export default function T5ParAnParActe() {
@@ -67,10 +66,10 @@ export default function T5ParAnParActe() {
 				</button>
 				<div className="mt-2 flex flex-wrap justify-center gap-2 text-sm">
 					<span className="rounded-lg bg-yellow-300 px-4 py-2 font-semibold text-red-800">
-						Plafond par an : {amountFormatter.format(configuration.plafondParAn)}
+						Plafond par an : {amountFormatter.format(configuration.plafondParAn)} MGA
 					</span>
 					<span className="rounded-lg bg-yellow-300 px-4 py-2 font-semibold text-red-800">
-						Plafond par acte : {amountFormatter.format(configuration.plafondParActe)}
+						Plafond par acte : {amountFormatter.format(configuration.plafondParActe)} MGA
 					</span>
 				</div>
 			</div>
