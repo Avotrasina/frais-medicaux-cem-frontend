@@ -1,7 +1,7 @@
 import type { FactureGlobaleRow } from "../types/invoiceTable";
 
 export const textFilterKeys = [
-	"refSocial", "numFacture", "nomEtablissement", "moisPrestation",
+	"refSocial", "numFacture", "nomEtablissement",
 ] as const;
 
 export const dateFilterKeys = ["dateReception", "dateFacture"] as const;
@@ -9,9 +9,11 @@ export const dateFilterKeys = ["dateReception", "dateFacture"] as const;
 export type TextFilterKey = (typeof textFilterKeys)[number];
 export type DateFilterKey = (typeof dateFilterKeys)[number];
 export type InvoiceDateRange = { from: string; to: string };
+export type InvoiceMonthFilter = { month: string; year: string };
 export type FactureGlobaleFilters = {
 	text: Partial<Record<TextFilterKey, string>>;
 	dates: Partial<Record<DateFilterKey, InvoiceDateRange>>;
+	monthPrestation: InvoiceMonthFilter;
 };
 
 function parseDate(value: string): number | null {
@@ -31,13 +33,20 @@ export function filterFactureGlobaleRows(
 	return rows.filter((row) => {
 		const matchesText = textFilterKeys.every((key) => {
 			const query = filters.text[key]?.trim().toLocaleLowerCase();
-			const rawValue = row[key];
-			const value = rawValue instanceof Date
-				? `${rawValue.getUTCFullYear()}-${String(rawValue.getUTCMonth() + 1).padStart(2, "0")}`
-				: rawValue ?? "";
+			const value = row[key] ?? "";
 			return !query || value.toLocaleLowerCase().includes(query);
 		});
 		if (!matchesText) return false;
+
+		const { month, year } = filters.monthPrestation;
+		if (month || year) {
+			const prestationDate = row.moisPrestation;
+			if (!prestationDate
+				|| (month && String(prestationDate.getUTCMonth() + 1) !== month)
+				|| (year && String(prestationDate.getUTCFullYear()) !== year)) {
+				return false;
+			}
+		}
 
 		return dateFilterKeys.every((key) => {
 			const range = filters.dates[key];

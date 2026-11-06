@@ -41,13 +41,23 @@ const updateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
 
 function filterableFiltersActive(
     filters: FactureGlobaleFilters["text"],
-    dates: FactureGlobaleFilters["dates"]
+    dates: FactureGlobaleFilters["dates"],
+    monthPrestation: FactureGlobaleFilters["monthPrestation"],
 ) {
     return (
         Object.values(filters).some((value) => Boolean(value?.trim())) ||
-        Object.values(dates).some((range) => Boolean(range?.from && range.to))
+        Object.values(dates).some((range) => Boolean(range?.from && range.to)) ||
+        Boolean(monthPrestation.month || monthPrestation.year)
     );
 }
+
+const monthOptions = Array.from({ length: 12 }, (_, index) => {
+    const date = new Date(Date.UTC(2026, index, 1));
+    return {
+        value: String(index + 1),
+        label: new Intl.DateTimeFormat("fr-FR", { month: "long", timeZone: "UTC" }).format(date),
+    };
+});
 
 function hasInvoiceData(row: FactureGlobaleRow): boolean {
     return factureGlobaleColumns.some(
@@ -73,6 +83,10 @@ export default function FactureGlobaleTable({
     const [textFilters, setTextFilters] = useState<FactureGlobaleFilters["text"]>({});
     const [dateDrafts, setDateDrafts] = useState<FactureGlobaleFilters["dates"]>({});
     const [dateFilters, setDateFilters] = useState<FactureGlobaleFilters["dates"]>({});
+    const [monthPrestationFilter, setMonthPrestationFilter] = useState<FactureGlobaleFilters["monthPrestation"]>({
+        month: "",
+        year: "",
+    });
 
     const dataRows = useMemo(
         () => rows.filter((row) => row.id !== addRowId),
@@ -87,9 +101,10 @@ export default function FactureGlobaleTable({
     const filteredRows = useMemo(
         () => filterFactureGlobaleRows(dataRows, {
             text: textFilters,
-            dates: dateFilters
+            dates: dateFilters,
+            monthPrestation: monthPrestationFilter,
         }),
-        [dataRows, textFilters, dateFilters]
+        [dataRows, textFilters, dateFilters, monthPrestationFilter]
     );
 
     const visibleRows = useMemo(
@@ -107,6 +122,13 @@ export default function FactureGlobaleTable({
     function isDateFilterKey(key: string): key is DateFilterKey {
         return (dateFilterKeys as readonly string[]).includes(key);
     }
+
+    const prestationYears = useMemo(
+        () => Array.from(new Set(dataRows.flatMap((row) =>
+            row.moisPrestation ? [String(row.moisPrestation.getUTCFullYear())] : [],
+        ))).sort((a, b) => Number(b) - Number(a)),
+        [dataRows],
+    );
 
     function applyDateFilter(key: DateFilterKey) {
         const range = dateDrafts[key];
@@ -156,7 +178,8 @@ export default function FactureGlobaleTable({
 
                             const textKey = isTextFilterKey(column.key) ? column.key : null;
                             const dateKey = isDateFilterKey(column.key) ? column.key : null;
-                            const filterable = textKey !== null || dateKey !== null;
+                            const isPrestationMonthFilter = column.key === "moisPrestation";
+                            const filterable = textKey !== null || dateKey !== null || isPrestationMonthFilter;
                             const isOpen = openFilter === column.key;
 
                             const dateRangeDraft = dateKey
@@ -180,7 +203,51 @@ export default function FactureGlobaleTable({
                                             className="absolute left-0 top-full z-40 w-64 rounded-b-lg border border-slate-200 bg-white p-3 text-slate-800 shadow-xl normal-case"
                                             onClick={(event) => event.stopPropagation()}
                                         >
-                                            {textKey ? (
+                                            {isPrestationMonthFilter ? (
+                                                <div className="space-y-2">
+                                                    <label className="block text-xs font-semibold text-slate-600">
+                                                        Mois
+                                                        <select
+                                                            aria-label="Filtrer par mois de prestation"
+                                                            value={monthPrestationFilter.month}
+                                                            className="mt-1 w-full rounded-md border border-slate-300 px-2 py-2 text-xs font-normal normal-case outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                                            onChange={(event) => setMonthPrestationFilter((current) => ({
+                                                                ...current,
+                                                                month: event.target.value,
+                                                            }))}
+                                                        >
+                                                            <option value="">Tous les mois</option>
+                                                            {monthOptions.map((month) => (
+                                                                <option key={month.value} value={month.value}>{month.label}</option>
+                                                            ))}
+                                                        </select>
+                                                    </label>
+                                                    <label className="block text-xs font-semibold text-slate-600">
+                                                        Année
+                                                        <select
+                                                            aria-label="Filtrer par année de prestation"
+                                                            value={monthPrestationFilter.year}
+                                                            className="mt-1 w-full rounded-md border border-slate-300 px-2 py-2 text-xs font-normal normal-case outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                                            onChange={(event) => setMonthPrestationFilter((current) => ({
+                                                                ...current,
+                                                                year: event.target.value,
+                                                            }))}
+                                                        >
+                                                            <option value="">Toutes les années</option>
+                                                            {prestationYears.map((year) => (
+                                                                <option key={year} value={year}>{year}</option>
+                                                            ))}
+                                                        </select>
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold normal-case text-slate-600 hover:bg-slate-100"
+                                                        onClick={() => setMonthPrestationFilter({ month: "", year: "" })}
+                                                    >
+                                                        <X size={14} /> Effacer le filtre
+                                                    </button>
+                                                </div>
+                                            ) : textKey ? (
                                                 <div>
                                                     <input
                                                         autoFocus
@@ -270,7 +337,7 @@ export default function FactureGlobaleTable({
 
                     {filteredRows.length === 0 &&
                         dataRows.length > 0 &&
-                        filterableFiltersActive(textFilters, dateFilters) && (
+                        filterableFiltersActive(textFilters, dateFilters, monthPrestationFilter) && (
                             <tr key="no-results">
                                 <td
                                     colSpan={factureGlobaleColumns.length}
@@ -287,7 +354,7 @@ export default function FactureGlobaleTable({
                             ref={row.id === addRowId ? addRowRef : undefined}
                             tabIndex={row.id === addRowId ? -1 : undefined}
                             onClick={() => onRowSelect(row.id)}
-                            className={`h-15 ${isRoleY ? "" : "cursor-pointer"} bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId ? "focus:bg-yellow-50 focus:outline focus:outline-2 focus:outline-red-400" : ""} ${(activeRowId ?? selectedRowId) === row.id ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2 [&>td:first-child]:border-l-blue-600 [&>td:last-child]:border-r-blue-600" : ""}`}
+                            className={`h-15 ${isRoleY ? "" : "cursor-pointer"} bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId ? "focus:relative focus:z-[1] focus:bg-blue-50 focus:[&>td]:border-y-2 focus:[&>td]:border-blue-600 focus:[&>td:first-child]:border-l-2 focus:[&>td:last-child]:border-r-2 focus:[&>td:first-child]:border-l-blue-600 focus:[&>td:last-child]:border-r-blue-600" : ""} ${(activeRowId ?? selectedRowId) === row.id ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2 [&>td:first-child]:border-l-blue-600 [&>td:last-child]:border-r-blue-600" : ""}`}
                         >
 
                             {isRoleY ? (
@@ -300,6 +367,7 @@ export default function FactureGlobaleTable({
                                                 options={DropDownMock}
                                                 refSocial={row.refSocial}
                                                 className={`${cellClass} bg-yellow-100 text-red-800`}
+                                                isLocked={activeRowId !== null}
                                             />
                                         ) : (
                                             <td key={column.key} className={`${cellClass} bg-yellow-100 text-red-800`} />
@@ -329,13 +397,12 @@ export default function FactureGlobaleTable({
                                     const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
 
                                     if (column.key === "majT5") {
-                                        return hasInvoiceData(row) && row.refSocial.trim() ? (
+                                        return activeRowId === null && hasInvoiceData(row) && row.refSocial.trim() ? (
                                             <DropDownCell
                                                 key={column.key}
                                                 options={DropDownMock}
                                                 refSocial={row.refSocial}
                                                 className={`${cellClass} bg-yellow-100 text-red-800`}
-                                                isLocked={activeRowId !== null && activeRowId !== row.id}
                                             />
                                         ) : (
                                             <td

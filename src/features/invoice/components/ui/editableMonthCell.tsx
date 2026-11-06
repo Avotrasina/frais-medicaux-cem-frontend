@@ -123,7 +123,7 @@ export default function EditableMonthCell({
 						<input
 							autoFocus
 							type="month"
-							className="h-full w-full pr-14"
+							className="h-full w-full pr-14 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
 							value={draft}
 							onChange={(event) => setDraft(event.target.value)}
 							onKeyDown={handleKeyDown}
@@ -140,7 +140,7 @@ export default function EditableMonthCell({
 					>
 						<select
 							autoFocus
-							className="rounded border border-slate-300 bg-white px-1 py-1 text-xs"
+							className="rounded border border-slate-300 bg-white px-1 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
 							value={month}
 							onChange={(event) => setMonth(Number(event.target.value))}
 						>
@@ -149,7 +149,7 @@ export default function EditableMonthCell({
 							))}
 						</select>
 						<select
-							className="rounded border border-slate-300 bg-white px-1 py-1 text-xs"
+							className="rounded border border-slate-300 bg-white px-1 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
 							value={year}
 							onChange={(event) => setYear(Number(event.target.value))}
 						>

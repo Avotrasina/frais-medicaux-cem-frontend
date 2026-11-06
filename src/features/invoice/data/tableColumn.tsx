@@ -5,9 +5,9 @@ import type { T5ParSeanceColumn } from "../types/t5ParSeance";
 
 export const factureGlobaleColumns: FactureGlobaleColumn[] = [
     { key: "refSocial", label: "Réf. Social", width: "w-28 min-w-28 max-w-28" },
-    { key: "dateReception", label: "Date réception", width: "w-36 min-w-36" },
+    { key: "dateReception", label: "Date réception", width: "w-45 min-w-45" },
     { key: "numFacture", label: "Num facture", width: "w-36 min-w-36 " },
-    { key: "dateFacture", label: "Date facture", width: "w-32 min-w-32 " },
+    { key: "dateFacture", label: "Date facture", width: "w-45 min-w-45" },
     { key: "nomEtablissement", label: "Nom de l'établissement", width: "w-80 min-w-80 max-w-80" },
     { key: "majT5", label: "Maj T5", width: "w-32 min-w-32 max-w-32" },
     { key: "montantTotal", label: "Montant total", width: "w-36 min-w-36 max-w-36" },
@@ -20,8 +20,8 @@ export const factureGlobaleColumns: FactureGlobaleColumn[] = [
     { key: "moisPrestation", label: "Mois de la prestation", width: "w-36 min-w-36 max-w-36" },
     { key: "refAgence", label: "Réf. agence", width: "w-44 min-w-44 max-w-44" },
     { key: "remarques1", label: "Remarques 1", width: "w-48 min-w-48 max-w-48" },
-    { key: "retourPrestataire", label: "Retour vers prestataire", width: "w-44 min-w-44 max-w-44" },
-    { key: "recuApresModification", label: "Reçu après modification", width: "w-44 min-w-44 max-w-44" },
+    { key: "retourPrestataire", label: "Retour vers prestataire", width: "w-45 min-w-45 max-w-45" },
+    { key: "recuApresModification", label: "Reçu après modification", width: "w-45 min-w-45 max-w-45" },
     { key: "dateEnregistrement", label: "Date enregistrement", width: "w-36 min-w-36" },
     { key: "parQuiEnregistrement", label: "Enregistré par", width: "w-32 min-w-32 max-w-32" },
     { key: "dateEnvoiValidation", label: "Date envoi pour validation", width: "w-40 min-w-40" },

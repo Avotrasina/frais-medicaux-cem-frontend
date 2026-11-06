@@ -59,7 +59,7 @@ export default function EditableNumberCell({
 						autoFocus
 						type="text"
 						inputMode="decimal"
-						className="h-full w-full pr-14"
+						className="h-full w-full pr-14 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
 						placeholder={placeholder}
 						value={draft}
 						onChange={(event) => {

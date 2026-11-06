@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { FactureGlobaleTable } from "../features/invoice";
-import { CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState, PageHeader, SaveRowButton, ToastViewport } from "../components/ui";
+import { AddRowButton, CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState, PageHeader, SaveRowButton, ToastViewport } from "../components/ui";
 import InvoiceFloatingCalculator from "../features/invoice/components/ui/InvoiceFloatingCalculator";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
 import useInvoiceRowEditing from "../features/invoice/hooks/useInvoiceRowEditing";
@@ -11,8 +11,34 @@ import { useAuth } from "../features/auth";
 
 const validationRoles = ["Adjoint", "Chef"] as const;
 
+type ConfirmableRowAction = "requestValidation" | "reviewValidate" | "reviewReject" | "sortie";
+
+const rowActionConfirmation: Record<ConfirmableRowAction, { title: string; confirmLabel: string; message: string }> = {
+	requestValidation: {
+		title: "Confirmer l’envoi",
+		confirmLabel: "Envoyer",
+		message: "Voulez-vous vraiment envoyer cette demande de validation ?",
+	},
+	reviewValidate: {
+		title: "Confirmer la validation",
+		confirmLabel: "Valider",
+		message: "Voulez-vous vraiment valider cette facture ?",
+	},
+	reviewReject: {
+		title: "Confirmer le rejet",
+		confirmLabel: "Rejeter",
+		message: "Voulez-vous vraiment rejeter cette facture et demander une correction ?",
+	},
+	sortie: {
+		title: "Confirmer la sortie",
+		confirmLabel: "Confirmer",
+		message: "Voulez-vous vraiment confirmer la sortie de cette facture ?",
+	},
+};
+
 export default function FactureGlobalePage() {
 	const [isSaveConfirmationOpen, setIsSaveConfirmationOpen] = useState(false);
+	const [confirmableRowAction, setConfirmableRowAction] = useState<ConfirmableRowAction | null>(null);
 	const [openRowAction, setOpenRowAction] = useState<"validate" | "review" | "sortie" | null>(null);
 	const [validationDate, setValidationDate] = useState("");
 	const [validationRole, setValidationRole] = useState<(typeof validationRoles)[number]>(validationRoles[0]);
@@ -24,7 +50,7 @@ export default function FactureGlobalePage() {
 	const canEditRows = role !== "Y";
 	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, refreshRows, restoreRow } = useFactureGlobaleRows();
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
-	const { containerRef, addRowRef } = useScrollToAddInvoiceRow(isLoaded);
+	const { containerRef, addRowRef, focusAddRow } = useScrollToAddInvoiceRow(isLoaded);
 	const activeRow = useMemo(
 		() => rows.find((row) => row.id === selectedRowId) ?? null,
 		[rows, selectedRowId],
@@ -56,7 +82,7 @@ export default function FactureGlobalePage() {
 
 	function applyReviewDecision() {
 		if (!activeRow || reviewAction !== "correct" || !correctionComment.trim()) return;
-		updateCell(activeRow.id, "retourCorrection", correctionComment.trim());
+		updateCell(activeRow.id, "remarques2", correctionComment.trim());
 		resetReviewForm();
 		setReviewAction(null);
 		setOpenRowAction(null);
@@ -85,9 +111,37 @@ export default function FactureGlobalePage() {
 		resetSortieForm();
 	}
 
+	function confirmRowAction() {
+		if (!confirmableRowAction) return;
+		switch (confirmableRowAction) {
+			case "requestValidation":
+				applyValidationToRow();
+				break;
+			case "reviewValidate":
+				validateReviewedRow();
+				break;
+			case "reviewReject":
+				applyReviewDecision();
+				break;
+			case "sortie":
+				applySortieDecision();
+				break;
+		}
+		setConfirmableRowAction(null);
+	}
+
 	return (
 		<>
 			<ToastViewport />
+			<ConfirmDialog
+				open={confirmableRowAction !== null}
+				title={confirmableRowAction ? rowActionConfirmation[confirmableRowAction].title : "Confirmation"}
+				confirmLabel={confirmableRowAction ? rowActionConfirmation[confirmableRowAction].confirmLabel : "Confirmer"}
+				variant="primary"
+				message={confirmableRowAction ? rowActionConfirmation[confirmableRowAction].message : ""}
+				onCancel={() => setConfirmableRowAction(null)}
+				onConfirm={confirmRowAction}
+			/>
 			<ConfirmDialog
 				open={isSaveConfirmationOpen}
 				title="Confirmer l’enregistrement"
@@ -152,7 +206,7 @@ export default function FactureGlobalePage() {
 									setOpenRowAction("validate");
 								}}
 							>
-								Valider
+								A Valider
 							</button>
 						)}
 						<CancelRowButton
@@ -167,6 +221,10 @@ export default function FactureGlobalePage() {
 							disabled={!rowEditing.canSave || rowEditing.isSaving}
 							onClick={() => setIsSaveConfirmationOpen(true)}
 						/>
+						<AddRowButton
+							disabled={rowEditing.hasActiveRow}
+							onClick={focusAddRow}
+						/>
 						<InvoiceFloatingCalculator />
 					</div>
 				)}
@@ -175,7 +233,7 @@ export default function FactureGlobalePage() {
 						<button type="button" className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-slate-800" onClick={() => {
 							setReviewAction(null);
 							setOpenRowAction("review");
-						}}>Review</button>
+						}}>Evaluer</button>
 						<button type="button" className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-lg ring-1 ring-slate-200 hover:bg-slate-50" onClick={() => {
 							resetSortieForm();
 							setOpenRowAction("sortie");
@@ -185,10 +243,10 @@ export default function FactureGlobalePage() {
 				{canEditRows && canActOnSelectedRow && openRowAction === "validate" && (
 					<div className="fixed bottom-28 right-8 z-40 w-[340px] rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
 						<button type="button" aria-label="Fermer" className="absolute right-3 top-3 rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" onClick={closeRowAction}><X size={18} /></button>
-						<h3 className="mb-3 pr-8 text-sm font-bold text-slate-900">Validation de facture</h3>
+						<h3 className="mb-3 pr-8 text-sm font-bold text-slate-900">Demande de validation</h3>
 						<div className="space-y-3">
 							<label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-								Date de validation
+								Date de la demande
 								<input type="date" value={validationDate} onChange={(event) => setValidationDate(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
 							</label>
 							<label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -202,7 +260,7 @@ export default function FactureGlobalePage() {
 						</div>
 						<div className="mt-4 flex justify-end gap-2">
 							<button type="button" className="btn-secondary" onClick={resetValidationForm}>Réinitialiser</button>
-							<button type="button" className="btn-primary" onClick={applyValidationToRow} disabled={!validationDate}>OK</button>
+							<button type="button" className="btn-primary" onClick={() => setConfirmableRowAction("requestValidation")} disabled={!validationDate}>OK</button>
 						</div>
 					</div>
 				)}
@@ -216,7 +274,7 @@ export default function FactureGlobalePage() {
 						</label>
 						<div className="mt-4 flex justify-end gap-2">
 							<button type="button" className="btn-secondary" onClick={resetReviewForm}>Réinitialiser</button>
-							<button type="button" className="btn-primary" onClick={applyReviewDecision} disabled={!correctionComment.trim()}>OK</button>
+							<button type="button" className="btn-primary" onClick={() => setConfirmableRowAction("reviewReject")} disabled={!correctionComment.trim()}>OK</button>
 						</div>
 					</div>
 				)}
@@ -225,7 +283,7 @@ export default function FactureGlobalePage() {
 						<button type="button" aria-label="Fermer" className="absolute right-3 top-3 rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" onClick={closeRowAction}><X size={18} /></button>
 						<h3 className="mb-3 pr-8 text-sm font-bold text-slate-900">Choisir une action</h3>
 						<div className="flex gap-2">
-							<button type="button" className="btn-primary flex-1" onClick={validateReviewedRow}>Valider</button>
+							<button type="button" className="btn-primary flex-1" onClick={() => setConfirmableRowAction("reviewValidate")}>Valider</button>
 							<button type="button" className="btn-secondary flex-1" onClick={() => setReviewAction("correct")}>Rejeter</button>
 						</div>
 					</div>
@@ -246,7 +304,7 @@ export default function FactureGlobalePage() {
 						</div>
 						<div className="mt-4 flex justify-end gap-2">
 							<button type="button" className="btn-secondary" onClick={resetSortieForm}>Réinitialiser</button>
-							<button type="button" className="btn-primary" onClick={applySortieDecision} disabled={!sortieDate || !serviceSortie.trim()}>OK</button>
+							<button type="button" className="btn-primary" onClick={() => setConfirmableRowAction("sortie")} disabled={!sortieDate || !serviceSortie.trim()}>OK</button>
 						</div>
 					</div>
 				)}

@@ -48,7 +48,7 @@ export default function EditableStringCell({
         <>
           <input type="text"
             autoFocus
-            className="h-full w-full pr-14"
+            className="h-full w-full pr-14 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
             placeholder={placeholder}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
