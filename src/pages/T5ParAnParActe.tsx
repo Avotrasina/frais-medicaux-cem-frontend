@@ -9,6 +9,7 @@ import type {
 import useT5RowsByRefSocial from "../features/invoice/hooks/useT5RowsByRefSocial";
 import useT5Configuration from "../features/invoice/hooks/useT5Configuration";
 import { ErrorBlock, LoadingState } from "../components/ui";
+import { useAuth } from "../features/auth";
 
 function createEmptyParAnParActeRow(id: number, refSocial: string): T5ParAnParActeRow {
 	return {
@@ -27,6 +28,8 @@ export default function T5ParAnParActe() {
 	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
+	const { role } = useAuth();
+	const canEditRows = role !== "Y";
 	const {
 		rows,
 		isReady,
@@ -42,6 +45,7 @@ export default function T5ParAnParActe() {
 		refSocial,
 		createEmptyParAnParActeRow,
 		"parAnParActe",
+		canEditRows,
 	);
 	const navigate = useNavigate();
 	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
@@ -88,11 +92,12 @@ export default function T5ParAnParActe() {
 							onCellChange={updateCell}
 							focusRefSocial={refSocial}
 							activeRowId={activeRowId}
+							canEditRows={canEditRows}
 						/>
 					</>
 				)}
 			</section>
-			{isReady && (
+			{isReady && canEditRows && (
 				<T5RowActions
 					canSave={canSave}
 					hasActiveRow={activeRowId !== null}

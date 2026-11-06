@@ -24,6 +24,7 @@ export type T5ParAnParActeTableProps = {
 	rows: T5ParAnParActeRow[];
 	focusRefSocial?: string;
 	activeRowId?: number | null;
+	canEditRows?: boolean;
 	onCellChange: (
 		rowId: number,
 		key: Extract<T5ParAnParActeColumnKey, "dateActe" | "libelle" | "montantActe">,

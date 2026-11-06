@@ -10,7 +10,7 @@ const moneyFormatter = new Intl.NumberFormat("fr-FR", {
 	maximumFractionDigits: 0,
 });
 
-export default function T5ParAnTable({ rows, onCellChange, focusRefSocial, activeRowId = null }: T5ParAnTableProps) {
+export default function T5ParAnTable({ rows, onCellChange, focusRefSocial, activeRowId = null, canEditRows = true }: T5ParAnTableProps) {
 	const focusedRowRef = useRef<HTMLTableRowElement>(null);
 	const [refSocialFilter, setRefSocialFilter] = useState("");
 	const targetRowId = rows.find((row) => row.refSocial === focusRefSocial)?.id;
@@ -53,13 +53,22 @@ export default function T5ParAnTable({ rows, onCellChange, focusRefSocial, activ
 				</thead>
 				<tbody>
 					{visibleRows.map((row) => (
-						<tr key={row.id} ref={row.id === focusedRowId ? focusedRowRef : undefined} tabIndex={row.id === focusedRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === activeRowId ? "bg-yellow-50 outline outline-2 outline-red-400" : ""} ${row.id === targetRowId && activeRowId === null ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
+						<tr key={row.id} ref={row.id === focusedRowId ? focusedRowRef : undefined} tabIndex={row.id === focusedRowId ? -1 : undefined} className={`h-12 bg-white hover:bg-slate-50 ${row.id === activeRowId ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2 [&>td:first-child]:border-l-blue-600 [&>td:last-child]:border-r-blue-600" : ""} ${row.id === targetRowId && activeRowId === null ? "focus:outline focus:outline-2 focus:outline-red-400" : ""}`}>
 							{columns.map((column) => {
 								const className = `${cellClass} ${column.width}`;
 								const isLocked = activeRowId !== null && activeRowId !== row.id;
 
 								if (column.key === "refSocial") {
 									return <td key={column.key} className={`${className} truncate ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>{row.refSocial || "—"}</td>;
+								}
+
+								if (!canEditRows) {
+									const value = row[column.key];
+									return (
+										<td key={column.key} className={`${className} truncate`}>
+											{typeof value === "number" ? moneyFormatter.format(value) : value ?? "—"}
+										</td>
+									);
 								}
 
 								if (column.key === "libelle") {

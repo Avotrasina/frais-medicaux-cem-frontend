@@ -43,6 +43,7 @@ export default function useT5RowsByRefSocial<T extends T5Row>(
 	refSocial: string | undefined,
 	createEmptyRow: (id: number, refSocial: string) => T,
 	table: T5TableKind,
+	canEditRows = true,
 ) {
 	const refreshLookup = useLookupRefresh();
 	const [storedRows, setStoredRows] = useState<T[] | null>(null);
@@ -73,6 +74,7 @@ export default function useT5RowsByRefSocial<T extends T5Row>(
 	const currentActiveIsNew = hasCurrentEdits && activeIsNew;
 
 	const updateCell = useCallback((rowId: number, key: EditableKey, value: EditableValue) => {
+		if (!canEditRows) return;
 		const isSameSource = editedSource !== null
 			&& editedSource.rows === sourceRows
 			&& editedSource.refSocial === refSocial;
@@ -95,16 +97,18 @@ export default function useT5RowsByRefSocial<T extends T5Row>(
 		setStoredRows((current) => (current && sessionActiveRowId !== null ? current : rows).map((item) =>
 			item.id === rowId ? { ...item, [key]: value } as T : item,
 		));
-	}, [activeRowId, editedSource, refSocial, rows, sourceRows]);
+	}, [activeRowId, canEditRows, editedSource, refSocial, rows, sourceRows]);
 
 	const activeRow = rows.find((row) => row.id === currentActiveRowId);
-	const canSave = activeRow !== undefined
+	const canSave = canEditRows
+		&& activeRow !== undefined
 		&& currentOriginalRow !== null
 		&& (currentActiveIsNew
 			? isValidForCreate(activeRow)
 			: Object.keys(getChangedValues(currentOriginalRow, activeRow)).length > 1);
 
 	const saveActiveRow = useCallback(async () => {
+		if (!canEditRows) return false;
 		if (!activeRow || !currentOriginalRow || currentActiveRowId === null || !canSave || isSaving) return false;
 		setIsSaving(true);
 		setSaveError(null);
@@ -144,9 +148,10 @@ export default function useT5RowsByRefSocial<T extends T5Row>(
 		} finally {
 			setIsSaving(false);
 		}
-	}, [activeRow, canSave, currentActiveIsNew, currentActiveRowId, currentOriginalRow, isSaving, refreshLookup, table]);
+	}, [activeRow, canEditRows, canSave, currentActiveIsNew, currentActiveRowId, currentOriginalRow, isSaving, refreshLookup, table]);
 
 	const resetActiveRow = useCallback(() => {
+		if (!canEditRows) return;
 		if (currentActiveRowId === null || currentOriginalRow === null || isSaving) return;
 		setStoredRows((current) => (current ?? rows).map((row) =>
 			row.id === currentActiveRowId ? currentOriginalRow : row,
@@ -155,7 +160,7 @@ export default function useT5RowsByRefSocial<T extends T5Row>(
 		setOriginalRow(null);
 		setActiveIsNew(false);
 		setSaveError(null);
-	}, [currentActiveRowId, currentOriginalRow, isSaving, rows]);
+	}, [canEditRows, currentActiveRowId, currentOriginalRow, isSaving, rows]);
 
 	const isReady = Boolean(sourceRows && refSocial);
 	const readyRows = useMemo(() => isReady ? rows : [], [isReady, rows]);

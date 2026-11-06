@@ -21,6 +21,7 @@ export type T5ParSeanceTableProps = {
 	rows: T5ParSeanceRow[];
 	focusRefSocial?: string;
 	activeRowId?: number | null;
+	canEditRows?: boolean;
 	onCellChange: (
 		rowId: number,
 		key: Extract<T5ParSeanceColumnKey, "dateActe" | "libelle" | "montantActe">,
