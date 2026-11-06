@@ -1,4 +1,4 @@
-import type { FactureGlobaleColumn } from "../types/invoiceTable";
+import type { FactureGlobaleColumn, FactureGlobaleColumnKey } from "../types/invoiceTable";
 import type { T5ParAnColumn } from "../types/t5ParAn";
 import type { T5ParAnParActeColumn } from "../types/t5ParAnParActe";
 import type { T5ParSeanceColumn } from "../types/t5ParSeance";
@@ -34,6 +34,9 @@ export const factureGlobaleColumns: FactureGlobaleColumn[] = [
     { key: "serviceSortie", label: "Service de sortie", width: "w-32 min-w-32 max-w-32" },
 ];
 
+export const personnelFactureGlobaleEditableColumns = [
+    "refSocial", "dateReception", "numFacture", "dateFacture", "nomEtablissement", "majT5", "montantTotal", "partCem100", "depassement", "partCem80", "partAgent20", "totalPartAgent", "localite", "moisPrestation", "refAgence", "remarques1", "retourPrestataire", "recuApresModification",
+] as const satisfies readonly FactureGlobaleColumnKey[];
 export const t5ParAnColumns: T5ParAnColumn[] = [
 	{ key: "refSocial", label: "Réf. social", width: "w-32 min-w-32 max-w-32" },
 	{ key: "dateActe", label: "Date de l’acte", width: "w-40 min-w-40" },
@@ -67,4 +70,3 @@ export const t5ParSeanceColumns: T5ParSeanceColumn[] = [
 	{ key: "montantDepassement", label: "Montant dépassement", width: "w-44 min-w-44 max-w-44" },
 	{ key: "nomEtablissement", label: "Nom établissement", width: "w-64 min-w-64 max-w-64" },
 ];
-

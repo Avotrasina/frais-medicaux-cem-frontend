@@ -34,10 +34,15 @@ export default function EditableStringCell({
 
   const cancel = () => setEditing(false);
 
+  const closeIfUnchanged = () => {
+    if (draft === value) setEditing(false);
+  };
+
   return (
     <td
       className={`relative h-full max-w-20 truncate px-3 text-xs ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer hover:bg-slate-50"} ${className}`}
       onClick={startEditing}
+      onMouseLeave={closeIfUnchanged}
     >
       {editing ? (
         <>

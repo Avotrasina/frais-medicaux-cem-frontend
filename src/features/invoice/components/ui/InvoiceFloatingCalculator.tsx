@@ -146,7 +146,7 @@ export default function InvoiceFloatingCalculator() {
 			)}
 			<button
 				type="button"
-				className="fixed bottom-12 right-28 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
+				className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300"
 				aria-label={isOpen ? "Fermer la calculatrice" : "Ouvrir la calculatrice"}
 				title="Calculatrice"
 				aria-expanded={isOpen}

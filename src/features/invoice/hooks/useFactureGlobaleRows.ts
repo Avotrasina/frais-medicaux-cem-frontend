@@ -30,6 +30,7 @@ export default function useFactureGlobaleRows() {
 	const reloadRows = factureRowsQuery.reload;
 	const [storedDataRows, setStoredDataRows] = useState<FactureGlobaleRow[] | null>(null);
 	const [storedAddRow, setStoredAddRow] = useState<FactureGlobaleRow | null>(null);
+	const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 	const dataRows = useMemo(
 		() => storedDataRows ?? factureRowsQuery.data ?? [],
 		[storedDataRows, factureRowsQuery.data],
@@ -96,9 +97,14 @@ export default function useFactureGlobaleRows() {
 	}, [reloadRows]);
 
 	const rows = useMemo(() => [...dataRows, addRow], [dataRows, addRow]);
+	const selectRow = useCallback((rowId: number) => {
+		setSelectedRowId((current) => (current === rowId ? rowId : rowId));
+	}, []);
 	return {
 		rows,
 		addRowId: addRow.id,
+		selectedRowId,
+		selectRow,
 		isLoaded: factureRowsQuery.data !== null && !factureRowsQuery.isLoading,
 		loadError: factureRowsQuery.error,
 		reload,

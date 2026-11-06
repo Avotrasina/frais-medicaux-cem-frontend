@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { fetchMe } from "../services/auth";
-import type { User } from "../../../types/auth";
+import type { Role, User } from "../../../types/auth";
 import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [roleOverride, setRoleOverride] = useState<Role | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role: user?.role ?? null, loading }}>
+    <AuthContext.Provider value={{
+      user,
+      role: roleOverride ?? user?.role ?? null,
+      loading,
+      setRole: setRoleOverride,
+    }}>
       {children}
     </AuthContext.Provider>
   );

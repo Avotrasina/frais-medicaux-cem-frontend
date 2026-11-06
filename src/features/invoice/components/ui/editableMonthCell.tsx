@@ -82,6 +82,14 @@ export default function EditableMonthCell({
 		if (event.key === "Escape") cancel();
 	};
 
+	const closeIfUnchanged = () => {
+		const unchanged = supportsMonthInput
+			? draft === toMonthInputValue(value)
+			: year === (isValid(value) ? value.getUTCFullYear() : now.getUTCFullYear())
+				&& month === (isValid(value) ? value.getUTCMonth() : now.getUTCMonth());
+		if (unchanged) setEditing(false);
+	};
+
 	const actionButtons = (
 		<>
 			<button
@@ -107,6 +115,7 @@ export default function EditableMonthCell({
 		<td
 			className={`relative h-full truncate px-3 text-xs ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer hover:bg-slate-50"} ${className}`}
 			onClick={startEditing}
+			onMouseLeave={closeIfUnchanged}
 		>
 			{editing ? (
 				supportsMonthInput ? (

@@ -12,6 +12,8 @@ import {
     dateColumn,
     SaveColumnKey,
 } from "../../types/invoiceTable";
+import { personnelFactureGlobaleEditableColumns } from "../../data/tableColumn";
+import { useAuth } from "../../../auth";
 
 import {
     dateFilterKeys,
@@ -34,7 +36,8 @@ const DropDownMock: dropdownOptionProps[] = [
     { id: 3, label: "séance", typeContrainte: TypeContrainte.PAR_SEANCE }
 ];
 
-const editableUpdateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
+const editableUpdateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
+const updateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
 
 function filterableFiltersActive(
     filters: FactureGlobaleFilters["text"],
@@ -56,10 +59,14 @@ export default function FactureGlobaleTable({
     rows,
     addRowId,
     activeRowId,
+    selectedRowId,
     containerRef,
     addRowRef,
+    onRowSelect,
     onCellChange,
 }: FactureGlobaleTableProps) {
+    const { role } = useAuth();
+    const isRoleY = role === "Y";
 
     const [openFilter, setOpenFilter] = useState<string | null>(null);
     const [pinnedFilter, setPinnedFilter] = useState<DateFilterKey | null>(null);
@@ -88,9 +95,9 @@ export default function FactureGlobaleTable({
     const visibleRows = useMemo(
         () => [
             ...filteredRows,
-            ...(addRow ? [addRow] : [])
+            ...(!isRoleY && addRow ? [addRow] : [])
         ],
-        [filteredRows, addRow]
+        [filteredRows, addRow, isRoleY]
     );
 
     function isTextFilterKey(key: string): key is TextFilterKey {
@@ -279,10 +286,40 @@ export default function FactureGlobaleTable({
                             key={row.id}
                             ref={row.id === addRowId ? addRowRef : undefined}
                             tabIndex={row.id === addRowId ? -1 : undefined}
-                            className={`h-15 bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId ? "focus:bg-yellow-50 focus:outline focus:outline-2 focus:outline-red-400" : ""}`}
+                            onClick={() => onRowSelect(row.id)}
+                            className={`h-15 ${isRoleY ? "" : "cursor-pointer"} bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId ? "focus:bg-yellow-50 focus:outline focus:outline-2 focus:outline-red-400" : ""} ${(activeRowId ?? selectedRowId) === row.id ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2 [&>td:first-child]:border-l-blue-600 [&>td:last-child]:border-r-blue-600" : ""}`}
                         >
 
-                            {row.id !== addRowId ? (
+                            {isRoleY ? (
+                                factureGlobaleColumns.map((column) => {
+                                    const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
+                                    if (column.key === "majT5") {
+                                        return hasInvoiceData(row) && row.refSocial.trim() ? (
+                                            <DropDownCell
+                                                key={column.key}
+                                                options={DropDownMock}
+                                                refSocial={row.refSocial}
+                                                className={`${cellClass} bg-yellow-100 text-red-800`}
+                                            />
+                                        ) : (
+                                            <td key={column.key} className={`${cellClass} bg-yellow-100 text-red-800`} />
+                                        );
+                                    }
+
+                                    const value = row[column.key];
+                                    return (
+                                        <td key={column.key} className={cellClass}>
+                                            {value instanceof Date
+                                                ? value.toLocaleDateString("fr-FR", {
+                                                    month: "short",
+                                                    year: "2-digit",
+                                                    timeZone: "UTC",
+                                                })
+                                                : String(value ?? "")}
+                                        </td>
+                                    );
+                                })
+                            ) : row.id !== addRowId ? (
 
                                 factureGlobaleColumns.map((column) => {
 
@@ -310,12 +347,16 @@ export default function FactureGlobaleTable({
 
                                     const value = row[column.key];
 
-                                    if (column.key === "refSocial" || !editableUpdateKeys.has(column.key)) {
+                                    if (
+                                        column.key === "refSocial"
+                                        || !editableUpdateKeys.has(column.key)
+                                        || !updateKeys.has(column.key)
+                                    ) {
                                         const isLocked = activeRowId !== null && activeRowId !== row.id;
                                         return (
                                             <td
                                                 key={column.key}
-                                                className={`${cellClass} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}
+                                                className={`${cellClass} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
                                             >
                                                 {value instanceof Date
                                                     ? value.toLocaleDateString("fr-FR", {
@@ -404,7 +445,7 @@ export default function FactureGlobaleTable({
                                         return (
                                             <td
                                                 key={column.key}
-                                                className={`${cellClass} ${isAddRowLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}
+                                                className={`${cellClass} ${isAddRowLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
                                             >
                                                 {value instanceof Date
                                                     ? value.toLocaleDateString("fr-FR", {

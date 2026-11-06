@@ -64,6 +64,8 @@ export const FACTURE_GLOBALE_UPDATE_KEYS = [
 	"moisPrestation",
 	"refAgence",
 	"remarques1",
+	"retourPrestataire",
+	"recuApresModification",
 ] as const satisfies readonly (keyof FactureGlobaleRow)[];
 
 export type FactureGlobaleUpdateKey = (typeof FACTURE_GLOBALE_UPDATE_KEYS)[number];
@@ -77,8 +79,10 @@ export type FactureGlobaleTableProps = {
 	rows: FactureGlobaleRow[];
 	addRowId: number;
 	activeRowId: number | null;
+	selectedRowId: number | null;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
+	onRowSelect: (rowId: number) => void;
 	onCellChange: (
 		rowId: number,
 		key: FactureGlobaleColumnKey,
@@ -114,8 +118,6 @@ export type numberColumn =  (typeof numberColumn)[keyof typeof numberColumn];
 export const dateColumn = {
 	dateReception : "dateReception",
 	dateFacture : "dateFacture",
-	retourPrestataire : "retourPrestataire",
-	recuApresModification : "recuApresModification",
 	dateEnregistrement : "dateEnregistrement",
 	dateEnvoiValidation : "dateEnvoiValidation",
 	dateValidation : "dateValidation"

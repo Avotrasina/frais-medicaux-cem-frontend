@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 
 type Props = {
@@ -30,6 +30,7 @@ export default function EditableDateCell({
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
+  const dateInputRef = useRef<HTMLInputElement>(null);
 
   const startEditing = () => {
     if (isLocked || editing) return;
@@ -44,14 +45,21 @@ export default function EditableDateCell({
 
   const cancel = () => setEditing(false);
 
+  const closeIfUnchanged = () => {
+    if (dateInputRef.current === document.activeElement) return;
+    if (toStoredDate(draft) === value) setEditing(false);
+  };
+
   return (
     <td
       className={`relative h-full truncate px-3 text-xs ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer hover:bg-slate-50"} ${className}`}
       onClick={startEditing}
+      onMouseLeave={closeIfUnchanged}
     >
       {editing ? (
         <>
           <input type="date"
+            ref={dateInputRef}
             autoFocus
             className="h-full w-full pr-14"
             placeholder={placeholder}

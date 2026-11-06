@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import useAddFactureRow from "./useAddFactureRow";
 import useUpdateFactureRow from "./useUpdateFactureRow";
+import { personnelFactureGlobaleEditableColumns } from "../data/tableColumn";
 import {
 	FACTURE_GLOBALE_UPDATE_KEYS,
 	SaveColumnKey,
@@ -15,7 +16,7 @@ import {
 type EditingMode = "create" | "update";
 
 const createKeys = new Set<string>(SaveColumnKey);
-const updateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
+const updateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
 
 function getChangedValues(
 	original: FactureGlobaleRow,
@@ -63,6 +64,7 @@ export default function useInvoiceRowEditing(
 	onCellChange: (rowId: number, key: FactureGlobaleColumnKey, value: FactureGlobaleCellValue) => void,
 	onRowCancel: (rowId: number, original: FactureGlobaleRow, wasAddRow: boolean) => void,
 	onMutationSuccess: (created: boolean) => Promise<unknown>,
+	canEditRows: boolean,
 ) {
 	const [activeRowId, setActiveRowId] = useState<number | null>(null);
 	const [originalRow, setOriginalRow] = useState<FactureGlobaleRow | null>(null);
@@ -74,7 +76,8 @@ export default function useInvoiceRowEditing(
 	const { modify: modifyInvoice, isLoading: isUpdating } = useUpdateFactureRow();
 	const isSaving = isCreating || isUpdating || isRefreshing;
 	const activeRow = rows.find((row) => row.id === activeRowId);
-	const canSave = activeRowId !== null
+	const canSave = canEditRows
+		&& activeRowId !== null
 		&& activeMode !== null
 		&& (activeMode !== "create" || (activeWasAddRow && activeRow !== undefined && getCreateInput(activeRow) !== null));
 
@@ -83,6 +86,7 @@ export default function useInvoiceRowEditing(
 		key: FactureGlobaleColumnKey,
 		value: FactureGlobaleCellValue,
 	) => {
+		if (!canEditRows) return;
 		if (key === "refSocial" || key === "majT5") return;
 		if (activeRowId !== null && activeRowId !== rowId) return;
 
@@ -102,9 +106,10 @@ export default function useInvoiceRowEditing(
 
 		setSaveError(null);
 		onCellChange(rowId, key, value);
-	}, [activeRowId, addRowId, onCellChange, rows]);
+	}, [activeRowId, addRowId, canEditRows, onCellChange, rows]);
 
 	const saveActiveRow = useCallback(async () => {
+		if (!canEditRows) return false;
 		if (activeRowId === null || !originalRow || !activeMode || isSaving) return false;
 		const currentRow = rows.find((row) => row.id === activeRowId);
 		if (!currentRow) {
@@ -162,6 +167,7 @@ export default function useInvoiceRowEditing(
 		activeMode,
 		activeRowId,
 		activeWasAddRow,
+		canEditRows,
 		isSaving,
 		modifyInvoice,
 		onMutationSuccess,
