@@ -18,7 +18,7 @@ function canEditNumber(type: string, key: "plafondActe" | "plafondAn" | "nombreS
 	return type === "PAR_SEANCE";
 }
 
-export default function T5XConstraintsTable({ rows, categories, addRowId, containerRef, addRowRef, onCellChange }: T5XConstraintTableProps) {
+export default function T5XActsTable({ rows, categories, addRowId, activeRowId = null, containerRef, addRowRef, onCellChange }: T5XConstraintTableProps) {
 	const [openFilter, setOpenFilter] = useState<FilterKey | null>(null);
 	const [filters, setFilters] = useState<Partial<Record<FilterKey, string>>>({});
 	const dataRows = rows.filter((row) => row.id !== addRowId);
@@ -28,10 +28,12 @@ export default function T5XConstraintsTable({ rows, categories, addRowId, contai
 		const nameFilter = (filters.nom ?? "").trim().toLocaleLowerCase();
 		const categoryFilter = filters.nomCategorie ?? "";
 		const typeFilter = filters.typeContrainte ?? "";
-		return row.nom.toLocaleLowerCase().includes(nameFilter)
+		return row.id === activeRowId || (
+			row.nom.toLocaleLowerCase().includes(nameFilter)
 			&& (!categoryFilter || String(row.categorieId) === categoryFilter)
-			&& (!typeFilter || row.typeContrainte === typeFilter);
-	}), [dataRows, filters]);
+			&& (!typeFilter || row.typeContrainte === typeFilter)
+		);
+	}), [activeRowId, dataRows, filters]);
 
 	function clearFilter(key: FilterKey) {
 		setFilters((current) => {
@@ -68,42 +70,43 @@ export default function T5XConstraintsTable({ rows, categories, addRowId, contai
 				</thead>
 				<tbody>
 					{visibleRows.length === 0 && dataRows.length > 0 && (
-						<tr key="no-results"><td colSpan={t5xConstraintColumns.length} className="border-b border-slate-200 px-4 py-6 text-center text-sm text-slate-500">Aucune contrainte ne correspond aux filtres.</td></tr>
+						<tr key="no-results"><td colSpan={t5xConstraintColumns.length} className="border-b border-slate-200 px-4 py-6 text-center text-sm text-slate-500">Aucun acte ou prestation ne correspond aux filtres.</td></tr>
 					)}
 					{[...visibleRows, ...(addRow ? [addRow] : [])].map((row) => (
 						<tr
 							key={row.id}
 							ref={row.id === addRowId ? addRowRef : undefined}
 							tabIndex={row.id === addRowId ? -1 : undefined}
-							className={`h-12 bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId ? "focus:bg-yellow-50 focus:outline focus:outline-2 focus:outline-red-400" : ""}`}
+							className={`h-12 bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId && activeRowId === null ? "focus:relative focus:z-[1] focus:bg-blue-50 focus:[&>td]:border-y-2 focus:[&>td]:border-blue-600 focus:[&>td:first-child]:border-l-2 focus:[&>td:last-child]:border-r-2 focus:[&>td:first-child]:border-l-blue-600 focus:[&>td:last-child]:border-r-blue-600" : ""} ${row.id === activeRowId ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2" : ""}`}
 						>
 							{t5xConstraintColumns.map((column) => {
 								const className = `${cellClass} ${column.width}`;
+								const isLocked = activeRowId !== null && activeRowId !== row.id;
 								if (column.key === "typeContrainte") {
 									if (row.id === addRowId && !addRowHasValues) {
-										return <td key={column.key} className={`${className} text-center align-middle`}>—</td>;
+										return <td key={column.key} className={`${className} text-center align-middle ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>—</td>;
 										}
-										return <T5XConstraintCell key={column.key} value={row.typeContrainte || "SANS_CONTRAINTE"} className={className} onSave={(value) => onCellChange(row.id, "typeContrainte", value)} />;
+										return <T5XConstraintCell key={column.key} value={row.typeContrainte || "SANS_CONTRAINTE"} className={className} isLocked={isLocked} onSave={(value) => onCellChange(row.id, "typeContrainte", value)} />;
 								}
 								if (column.key === "nomCategorie") {
 									if (row.id === addRowId && !addRowHasValues) {
-										return <td key={column.key} className={`${className} text-center align-middle`}>—</td>;
+										return <td key={column.key} className={`${className} text-center align-middle ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>—</td>;
 										}
 										if (categories.length === 0) {
-											return <td key={column.key} className={`${className} text-center align-middle`}>—</td>;
+											return <td key={column.key} className={`${className} text-center align-middle ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>—</td>;
 										}
-										return <T5XCategoryCell key={column.key} value={row.categorieId || categories[0].id} categories={categories} className={className} onSave={(value) => onCellChange(row.id, "categorieId", value)} />;
+										return <T5XCategoryCell key={column.key} value={row.categorieId || categories[0].id} categories={categories} className={className} isLocked={isLocked} onSave={(value) => onCellChange(row.id, "categorieId", value)} />;
 								}
 								if (column.key === "plafondActe" || column.key === "plafondAn" || column.key === "nombreSeances") {
 									const value = row[column.key];
 									if (canEditNumber(row.typeContrainte, column.key)) {
-										return <EditableNumberCell key={column.key} value={value ?? 0} className={`${className} text-left`} onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)} />;
+										return <EditableNumberCell key={column.key} value={value ?? 0} className={`${className} text-left`} isLocked={isLocked} onSave={(nextValue) => onCellChange(row.id, column.key, nextValue)} />;
 									}
 									const isEmpty = value === null || !Number.isFinite(value);
-									return <td key={column.key} className={`${className} ${isEmpty ? "text-center align-middle" : "text-left"}`}>{isEmpty ? "—" : numberFormatter.format(value)}</td>;
+									return <td key={column.key} className={`${className} ${isEmpty ? "text-center align-middle" : "text-left"} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>{isEmpty ? "—" : numberFormatter.format(value)}</td>;
 								}
 								const key = column.key as "code" | "nom" | "libelle";
-									return <EditableStringCell key={key} value={row[key]} emptyValue="—" className={className} onSave={(value) => onCellChange(row.id, key as T5XConstraintEditableKey, value)} />;
+									return <EditableStringCell key={key} value={row[key]} emptyValue="—" className={className} isLocked={isLocked} onSave={(value) => onCellChange(row.id, key as T5XConstraintEditableKey, value)} />;
 							})}
 						</tr>
 					))}

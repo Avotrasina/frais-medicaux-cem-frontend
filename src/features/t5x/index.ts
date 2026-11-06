@@ -1,5 +1,5 @@
-export { default as T5XTypesTable } from "./components/T5XTypesTable";
-export { default as T5XConstraintsTable } from "./components/T5XConstraintsTable";
+export { default as T5XTypesTable } from "./components/T5XCategoriesTable";
+export { default as T5XActsTable } from "./components/T5XActsTable";
 export { default as useT5XCategories } from "./hooks/useT5XCategories";
 export { default as useT5XActs } from "./hooks/useT5XActs";
 export { fetchT5XTable1Mock, fetchT5XTable2Mock, initialT5XTable1Mock, initialT5XTable2Mock } from "./mocks/t5xTypes";

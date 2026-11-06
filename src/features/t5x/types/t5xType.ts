@@ -44,6 +44,7 @@ export type T5XCategoryOption = {
 export type T5XTypeTableProps = {
 	rows: T5XTypeRow[];
 	addRowId: number;
+	activeRowId?: number | null;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (rowId: number, key: T5XTypeEditableKey, value: string | number | null) => void;
@@ -53,6 +54,7 @@ export type T5XConstraintTableProps = {
 	rows: T5XConstraintRow[];
 	categories: T5XCategoryOption[];
 	addRowId: number;
+	activeRowId?: number | null;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (rowId: number, key: T5XConstraintEditableKey, value: string | number | null) => void;
@@ -64,4 +66,3 @@ export type T5XColumn<Key extends string = string> = {
 	width: string;
 	filterMode?: "text" | "constraint" | "category";
 };
-

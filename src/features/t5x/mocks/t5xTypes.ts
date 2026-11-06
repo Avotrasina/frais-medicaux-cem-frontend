@@ -19,12 +19,61 @@ export const initialT5XTable2Mock: T5XConstraintRow[] = [
 
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 1200));
 
+let t5xTable1Rows: T5XTypeRow[] | null = null;
+let t5xTable2Rows: T5XConstraintRow[] | null = null;
+
+function getT5XTable1Rows() {
+	t5xTable1Rows ??= initialT5XTable1Mock.map((row) => ({ ...row }));
+	return t5xTable1Rows;
+}
+
+function getT5XTable2Rows() {
+	t5xTable2Rows ??= initialT5XTable2Mock.map((row) => ({ ...row }));
+	return t5xTable2Rows;
+}
+
 export async function fetchT5XTable1Mock(): Promise<T5XTypeRow[]> {
 	await mockDelay();
-	return initialT5XTable1Mock.map((row) => ({ ...row }));
+	return getT5XTable1Rows().map((row) => ({ ...row }));
 }
 
 export async function fetchT5XTable2Mock(): Promise<T5XConstraintRow[]> {
 	await mockDelay();
-	return initialT5XTable2Mock.map((row) => ({ ...row }));
+	return getT5XTable2Rows().map((row) => ({ ...row }));
+}
+
+export async function createT5XCategoryMock(row: Omit<T5XTypeRow, "id">): Promise<T5XTypeRow> {
+	await mockDelay();
+	const rows = getT5XTable1Rows();
+	const createdRow = { ...row, id: Math.max(0, ...rows.map((item) => item.id)) + 1 };
+	t5xTable1Rows = [...rows, createdRow];
+	return { ...createdRow };
+}
+
+export async function updateT5XCategoryMock(row: T5XTypeRow): Promise<T5XTypeRow> {
+	await mockDelay();
+	const rows = getT5XTable1Rows();
+	if (!rows.some((item) => item.id === row.id)) {
+		throw new Error(`Catégorie ${row.id} introuvable.`);
+	}
+	t5xTable1Rows = rows.map((item) => item.id === row.id ? { ...row } : item);
+	return { ...row };
+}
+
+export async function createT5XActMock(row: Omit<T5XConstraintRow, "id">): Promise<T5XConstraintRow> {
+	await mockDelay();
+	const rows = getT5XTable2Rows();
+	const createdRow = { ...row, id: Math.max(0, ...rows.map((item) => item.id)) + 1 };
+	t5xTable2Rows = [...rows, createdRow];
+	return { ...createdRow };
+}
+
+export async function updateT5XActMock(row: T5XConstraintRow): Promise<T5XConstraintRow> {
+	await mockDelay();
+	const rows = getT5XTable2Rows();
+	if (!rows.some((item) => item.id === row.id)) {
+		throw new Error(`Acte ${row.id} introuvable.`);
+	}
+	t5xTable2Rows = rows.map((item) => item.id === row.id ? { ...row } : item);
+	return { ...row };
 }

@@ -1,16 +1,25 @@
-import { useState } from "react";
-import { AddRowButton, LoadingState, PageHeader, SaveRowButton } from "../components/ui";
-import T5XConstraintsTable from "../features/t5x/components/T5XConstraintsTable";
-import T5XTypesTable from "../features/t5x/components/T5XTypesTable";
+import { useMemo, useState } from "react";
+import { AddRowButton, CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState, PageHeader, SaveRowButton } from "../components/ui";
+import T5XActsTable from "../features/t5x/components/T5XActsTable";
+import T5XTypesTable from "../features/t5x/components/T5XCategoriesTable";
 import useT5XActs from "../features/t5x/hooks/useT5XActs";
 import useT5XCategories from "../features/t5x/hooks/useT5XCategories";
 import useScrollToT5XAddRow, { type T5XTableKey } from "../features/t5x/hooks/useScrollToT5XAddRow";
 
 export default function T5XConfigurationPage() {
 	const [activeTable, setActiveTable] = useState<"categories" | "actes">("categories");
+	const [isSaveConfirmationOpen, setIsSaveConfirmationOpen] = useState(false);
 	const categoryTable = useT5XCategories();
-	const actTable = useT5XActs();
+	const categories = useMemo(
+		() => categoryTable.rows
+			.filter((row) => row.id !== categoryTable.addRowId && row.nom.trim())
+			.map(({ id, nom }) => ({ id, nom })),
+		[categoryTable.addRowId, categoryTable.rows],
+	);
+	const actTable = useT5XActs(categories);
 	const isLoading = categoryTable.isLoading || actTable.isLoading;
+	const activeEditor = activeTable === "categories" ? categoryTable : actTable;
+	const hasActiveRow = categoryTable.activeRowId !== null || actTable.activeRowId !== null;
 	const tableKey: T5XTableKey = activeTable === "categories" ? "categories" : "acts";
 	const activeAddRowId = activeTable === "categories" ? categoryTable.addRowId : actTable.addRowId;
 	const {
@@ -23,6 +32,21 @@ export default function T5XConfigurationPage() {
 
 	return (
 		<>
+		<ConfirmDialog
+			open={isSaveConfirmationOpen}
+			title="Confirmer l’enregistrement"
+			confirmLabel="Enregistrer"
+			confirmDisabled={activeEditor.isSaving}
+			variant="primary"
+			message={activeEditor.activeRowId === activeAddRowId
+				? "Voulez-vous vraiment ajouter cette ligne ?"
+				: "Voulez-vous vraiment enregistrer les modifications de cette ligne ?"}
+			onCancel={() => setIsSaveConfirmationOpen(false)}
+			onConfirm={async () => {
+				const saved = await activeEditor.saveActiveRow();
+				if (saved) setIsSaveConfirmationOpen(false);
+			}}
+		/>
 		<div className="flex h-[calc(100dvh-10rem)] min-h-[24rem] flex-col">
 			<PageHeader
 				title="Gestion des prestations/actes"
@@ -33,6 +57,7 @@ export default function T5XConfigurationPage() {
 					type="button"
 					role="tab"
 					aria-selected={activeTable === "categories"}
+					disabled={hasActiveRow && activeTable !== "categories"}
 					className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${activeTable === "categories" ? "bg-red-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-100"}`}
 					onClick={() => setActiveTable("categories")}
 				>
@@ -42,6 +67,7 @@ export default function T5XConfigurationPage() {
 					type="button"
 					role="tab"
 					aria-selected={activeTable === "actes"}
+					disabled={hasActiveRow && activeTable !== "actes"}
 					className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${activeTable === "actes" ? "bg-red-600 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-100"}`}
 					onClick={() => setActiveTable("actes")}
 				>
@@ -52,32 +78,46 @@ export default function T5XConfigurationPage() {
 				{isLoading ? (
 					<LoadingState message="Chargement des données..." />
 				) : activeTable === "categories" ? (
-					<T5XTypesTable
-						rows={categoryTable.rows}
-						addRowId={categoryTable.addRowId}
-						containerRef={categoriesContainerRef}
-						addRowRef={categoriesAddRowRef}
-						onCellChange={categoryTable.updateCell}
-					/>
+					<>
+						{categoryTable.saveError && <ErrorBlock message={categoryTable.saveError} />}
+						<T5XTypesTable
+							rows={categoryTable.rows}
+							addRowId={categoryTable.addRowId}
+							activeRowId={categoryTable.activeRowId}
+							containerRef={categoriesContainerRef}
+							addRowRef={categoriesAddRowRef}
+							onCellChange={categoryTable.updateCell}
+						/>
+					</>
 				) : (
-					<T5XConstraintsTable
-						rows={actTable.rows}
-						categories={actTable.categories}
-						addRowId={actTable.addRowId}
-						containerRef={actsContainerRef}
-						addRowRef={actsAddRowRef}
-						onCellChange={actTable.updateCell}
-					/>
+					<>
+						{actTable.saveError && <ErrorBlock message={actTable.saveError} />}
+						<T5XActsTable
+							rows={actTable.rows}
+							categories={actTable.categories}
+							addRowId={actTable.addRowId}
+							activeRowId={actTable.activeRowId}
+							containerRef={actsContainerRef}
+							addRowRef={actsAddRowRef}
+							onCellChange={actTable.updateCell}
+						/>
+					</>
 				)}
 			</section>
 		</div>
 		{!isLoading && (
 			<div className="fixed bottom-12 right-8 z-20 flex items-center gap-3">
 				<SaveRowButton
-					disabled={activeTable === "categories" ? !categoryTable.canSaveRow : !actTable.canSaveRow}
-					onClick={activeTable === "categories" ? categoryTable.saveAddRow : actTable.saveAddRow}
+					disabled={!activeEditor.canSaveRow || activeEditor.isSaving}
+					onClick={() => setIsSaveConfirmationOpen(true)}
 				/>
-				<AddRowButton onClick={() => focusAddRow(tableKey)} />
+				<CancelRowButton
+					ariaLabel="Annuler les modifications de la ligne active"
+					title="Annuler les modifications de la ligne active"
+					disabled={activeEditor.activeRowId === null || activeEditor.isSaving}
+					onClick={activeEditor.cancelActiveRow}
+				/>
+				<AddRowButton disabled={activeEditor.activeRowId !== null} onClick={() => focusAddRow(tableKey)} />
 			</div>
 		)}
 		</>

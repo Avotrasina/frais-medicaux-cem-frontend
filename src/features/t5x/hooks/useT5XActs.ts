@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchT5XTable2Mock } from "../mocks/t5xTypes";
+import {
+	createT5XActMock,
+	fetchT5XTable2Mock,
+	updateT5XActMock,
+} from "../mocks/t5xTypes";
 import type { T5XCategoryOption, T5XConstraintEditableKey, T5XConstraintRow, T5XConstraintType } from "../types/t5xType";
 import { applyT5XConstraintType, createEmptyActRow, hasT5XRowData } from "../utils/t5xRowUtils";
+import useSaveT5XRow from "./useSaveT5XRow";
+import useT5XRowEditing from "./useT5XRowEditing";
 
-export default function useT5XActs() {
+export default function useT5XActs(categories: T5XCategoryOption[]) {
 	const [rows, setRows] = useState<T5XConstraintRow[]>([]);
-	const [categories, setCategories] = useState<T5XCategoryOption[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
@@ -13,13 +18,12 @@ export default function useT5XActs() {
 		fetchT5XTable2Mock().then((loadedRows) => {
 			if (!isActive) return;
 			setRows([...loadedRows, createEmptyActRow(Math.max(0, ...loadedRows.map((row) => row.id)) + 1)]);
-			setCategories(Array.from(new Map(loadedRows.map((row) => [row.categorieId, row.nomCategorie])), ([id, nom]) => ({ id, nom })));
 			setIsLoading(false);
 		});
 		return () => { isActive = false; };
 	}, []);
 
-	const updateCell = useCallback((rowId: number, key: T5XConstraintEditableKey, value: string | number | null) => {
+	const updateRowCell = useCallback((rowId: number, key: T5XConstraintEditableKey, value: string | number | null) => {
 		setRows((currentRows) => currentRows.map((current) => {
 			if (current.id !== rowId) return current;
 			let updated: T5XConstraintRow;
@@ -45,15 +49,45 @@ export default function useT5XActs() {
 		}));
 	}, [categories]);
 
-	const saveAddRow = useCallback(() => {
-		setRows((currentRows) => {
-			const addRow = currentRows.at(-1);
-			if (!addRow || !hasT5XRowData(addRow)) return currentRows;
-			return [...currentRows, createEmptyActRow(addRow.id + 1)];
-		});
-	}, []);
+	const createRow = useCallback((row: T5XConstraintRow) => createT5XActMock(row), []);
+	const updateRow = useCallback((row: T5XConstraintRow) => updateT5XActMock(row), []);
+	const saveRow = useSaveT5XRow(createRow, updateRow);
 
+	const persistRow = useCallback(async (row: T5XConstraintRow, isNew: boolean) => {
+		const savedRow = await saveRow(row, isNew);
+		setRows((currentRows) => {
+			if (!isNew) return currentRows.map((item) => item.id === row.id ? savedRow : item);
+			const persistedRows = [...currentRows.filter((item) => item.id !== row.id), savedRow];
+			const nextId = Math.max(0, ...persistedRows.map((item) => item.id)) + 1;
+			return [...persistedRows, createEmptyActRow(nextId)];
+		});
+		return savedRow;
+	}, [saveRow]);
+
+	const restoreRow = useCallback((rowId: number, originalRow: T5XConstraintRow) => {
+		setRows((currentRows) => currentRows.map((item) => item.id === rowId ? originalRow : item));
+	}, []);
 	const addRowId = rows.at(-1)?.id ?? 0;
-	const canSaveRow = Boolean(rows.at(-1) && hasT5XRowData(rows.at(-1)!));
-	return { rows, addRowId, categories, isLoading, canSaveRow, updateCell, saveAddRow };
+	const editing = useT5XRowEditing({
+		rows,
+		addRowId,
+		onCellChange: updateRowCell,
+		onRowRestore: restoreRow,
+		onRowSave: persistRow,
+		isValidNewRow: hasT5XRowData,
+	});
+
+	return {
+		rows,
+		addRowId,
+		categories,
+		isLoading,
+		activeRowId: editing.activeRowId,
+		canSaveRow: editing.canSave,
+		isSaving: editing.isSaving,
+		saveError: editing.saveError,
+		updateCell: editing.updateCell,
+		saveActiveRow: editing.saveActiveRow,
+		cancelActiveRow: editing.cancelActiveRow,
+	};
 }
