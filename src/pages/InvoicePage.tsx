@@ -5,6 +5,7 @@ import { FactureGlobaleTable } from "../features/invoice";
 import { AddRowButton, CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState, PageHeader, SaveRowButton, ToastViewport } from "../components/ui";
 import InvoiceFloatingCalculator from "../features/invoice/components/ui/InvoiceFloatingCalculator";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
+import useFactureGlobaleRowActions from "../features/invoice/hooks/useFactureGlobaleRowActions";
 import useInvoiceRowEditing from "../features/invoice/hooks/useInvoiceRowEditing";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
 import { useAuth } from "../features/auth";
@@ -49,6 +50,7 @@ export default function FactureGlobalePage() {
 	const { role } = useAuth();
 	const canEditRows = role !== "Y";
 	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, refreshRows, restoreRow } = useFactureGlobaleRows();
+	const rowActions = useFactureGlobaleRowActions(rows, updateCell);
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
 	const { containerRef, addRowRef, focusAddRow } = useScrollToAddInvoiceRow(isLoaded);
 	const activeRow = useMemo(
@@ -72,33 +74,25 @@ export default function FactureGlobalePage() {
 	}
 
 	function applyValidationToRow() {
-		if (!activeRow || !validationDate) return;
-		updateCell(activeRow.id, "dateValidation", validationDate);
-		updateCell(activeRow.id, "pourQuiValidation", validationRole);
-		updateCell(activeRow.id, "parQuiValidationFinale", "Validation manuelle");
+		if (!activeRow || !rowActions.requestValidation(activeRow.id, validationDate, validationRole)) return;
 		resetValidationForm();
 		setOpenRowAction(null);
 	}
 
 	function applyReviewDecision() {
-		if (!activeRow || reviewAction !== "correct" || !correctionComment.trim()) return;
-		updateCell(activeRow.id, "remarques2", correctionComment.trim());
+		if (!activeRow || reviewAction !== "correct" || !rowActions.rejectReviewedInvoice(activeRow.id, correctionComment)) return;
 		resetReviewForm();
 		setReviewAction(null);
 		setOpenRowAction(null);
 	}
 
 	function validateReviewedRow() {
-		if (!activeRow) return;
-		updateCell(activeRow.id, "dateValidation", new Date().toISOString().slice(0, 10));
-		updateCell(activeRow.id, "pourQuiValidation", "Chef");
+		if (!activeRow || !rowActions.validateReviewedInvoice(activeRow.id)) return;
 		setOpenRowAction(null);
 	}
 
 	function applySortieDecision() {
-		if (!activeRow || !sortieDate || !serviceSortie.trim()) return;
-		updateCell(activeRow.id, "dateSortie", sortieDate);
-		updateCell(activeRow.id, "serviceSortie", serviceSortie.trim());
+		if (!activeRow || !rowActions.registerInvoiceExit(activeRow.id, sortieDate, serviceSortie)) return;
 		resetSortieForm();
 		setOpenRowAction(null);
 	}

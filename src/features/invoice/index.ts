@@ -28,6 +28,7 @@ export type {
 	FactureGlobaleUpdateKey,
 	FactureT5X,
 } from "./types/invoiceTable";
+export type { UpdateFactureGlobaleCell, ValidationRole } from "./types/invoiceRowActions";
 export type {
 	T5ParAnColumn,
 	T5ParAnColumnKey,
