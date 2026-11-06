@@ -25,7 +25,6 @@ type NavLinkEntry = { to: string; label: string; icon: LucideIcon };
 type NavSectionEntry = { section: string };
 type NavEntry = NavLinkEntry | NavSectionEntry;
 
-/** Only routes that actually exist are listed: no dead navigation entry. */
 const nav: NavEntry[] = [
   { section: "Gestion" },
   { to: "/agents", label: "Agents", icon: Users },
