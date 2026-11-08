@@ -15,6 +15,7 @@ export type { FactureGlobaleFilters, InvoiceDateRange } from "./services/filterF
 export { initialT5ParAnRowsMock } from "./mocks/t5ParAn";
 export { initialT5ParAnParActeRowsMock } from "./mocks/t5ParAnParActe";
 export { initialT5ParSeanceRowsMock } from "./mocks/t5ParSeance";
+export { prestatairesMock } from "./mocks/prestataires";
 export { ContrainteType } from "./types/invoiceTable";
 export type {
 	ContarinteType,
@@ -48,3 +49,4 @@ export type {
 	T5ParSeanceTableProps,
 } from "./types/t5ParSeance";
 export type { dropdownOptionProps } from "./components/ui/dropDownCell";
+export type { Prestataire } from "./types/prestataire";

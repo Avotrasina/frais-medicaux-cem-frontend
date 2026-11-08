@@ -46,15 +46,17 @@ export default function useFactureGlobaleRows() {
 			? value instanceof Date ? value : null
 			: numericKeys.has(key) ? (value === "" ? 0 : Number(value)) : typeof value === "string" ? value : "";
 		if (rowId === addRow.id) {
-			const updated = {
-				...addRow,
-				[key]: nextValue,
-				...((key === "depassement" || key === "partAgent20") && {
-					totalPartAgent: (key === "depassement" ? Number(nextValue) : addRow.depassement)
-						+ (key === "partAgent20" ? Number(nextValue) : addRow.partAgent20),
-				}),
-			} as FactureGlobaleRow;
-			setStoredAddRow(updated);
+			setStoredAddRow((current) => {
+				const row = current ?? addRow;
+				return {
+					...row,
+					[key]: nextValue,
+					...((key === "depassement" || key === "partAgent20") && {
+						totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
+							+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
+					}),
+				} as FactureGlobaleRow;
+			});
 			return;
 		}
 		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])

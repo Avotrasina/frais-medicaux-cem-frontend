@@ -15,7 +15,7 @@ import {
 
 type EditingMode = "create" | "update";
 
-const createKeys = new Set<string>(SaveColumnKey);
+const createKeys = new Set<string>([...SaveColumnKey, "localite"]);
 const updateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
 
 function getChangedValues(
@@ -44,6 +44,7 @@ function getCreateInput(row: FactureGlobaleRow): FactureGlobaleCreateInput | nul
 		|| !row.numFacture.trim()
 		|| !row.dateFacture.trim()
 		|| !row.nomEtablissement.trim()
+		|| !row.localite.trim()
 		|| !Number.isFinite(row.montantTotal)
 	) {
 		return null;
@@ -54,6 +55,7 @@ function getCreateInput(row: FactureGlobaleRow): FactureGlobaleCreateInput | nul
 		numFacture: row.numFacture.trim(),
 		dateFacture: row.dateFacture,
 		nomEtablissement: row.nomEtablissement.trim(),
+		localite: row.localite,
 		montantTotal: row.montantTotal,
 	};
 }
@@ -126,7 +128,7 @@ export default function useInvoiceRowEditing(
 
 				const input = getCreateInput(currentRow);
 				if (!input) {
-					setSaveError("Complétez la date de réception, le numéro, la date de facture, l’établissement et le montant total.");
+					setSaveError("Complétez la date de réception, le numéro, la date de facture, l’établissement, sa localité et le montant total.");
 					return false;
 				}
 				await saveNewInvoice(input);

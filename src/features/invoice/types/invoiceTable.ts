@@ -46,7 +46,7 @@ export type FactureGlobaleChanges = Partial<{
 
 export type FactureGlobaleCreateInput = Pick<
 	FactureGlobaleRow,
-	"dateReception" | "numFacture" | "dateFacture" | "nomEtablissement" | "montantTotal"
+	"dateReception" | "numFacture" | "dateFacture" | "nomEtablissement" | "localite" | "montantTotal"
 >;
 
 export const FACTURE_GLOBALE_UPDATE_KEYS = [

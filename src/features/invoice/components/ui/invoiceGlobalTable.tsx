@@ -14,6 +14,8 @@ import {
 } from "../../types/invoiceTable";
 import { personnelFactureGlobaleEditableColumns } from "../../data/tableColumn";
 import { useAuth } from "../../../auth";
+import PrestataireDropdownCell from "./prestataireDropdownCell";
+import { prestatairesMock } from "../../mocks/prestataires";
 
 import {
     dateFilterKeys,
@@ -412,7 +414,35 @@ export default function FactureGlobaleTable({
                                         );
                                     }
 
+                                    if (column.key === "nomEtablissement") {
+                                        return (
+                                            <PrestataireDropdownCell
+                                                key={column.key}
+                                                options={prestatairesMock}
+                                                value={row.nomEtablissement}
+                                                className={cellClass}
+                                                isLocked={activeRowId !== null && activeRowId !== row.id}
+                                                onSelect={(prestataire) => {
+                                                    onCellChange(row.id, "nomEtablissement", prestataire.nomEtablissement);
+                                                    onCellChange(row.id, "localite", prestataire.localite);
+                                                }}
+                                            />
+                                        );
+                                    }
+
                                     const value = row[column.key];
+
+                                    if (column.key === "localite") {
+                                        return (
+                                            <td
+                                                key={column.key}
+                                                className={`${cellClass} cursor-default text-slate-600`}
+                                                title="La localité est définie par le prestataire sélectionné."
+                                            >
+                                                {String(row.localite || "—")}
+                                            </td>
+                                        );
+                                    }
 
                                     if (
                                         column.key === "refSocial"
@@ -503,6 +533,34 @@ export default function FactureGlobaleTable({
                                                 key={column.key}
                                                 className={`${cellClass} bg-yellow-100 text-red-800 ${isAddRowLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}
                                             />
+                                        );
+                                    }
+
+                                    if (column.key === "nomEtablissement") {
+                                        return (
+                                            <PrestataireDropdownCell
+                                                key={column.key}
+                                                options={prestatairesMock}
+                                                value={row.nomEtablissement}
+                                                className={cellClass}
+                                                isLocked={isAddRowLocked}
+                                                onSelect={(prestataire) => {
+                                                    onCellChange(row.id, "nomEtablissement", prestataire.nomEtablissement);
+                                                    onCellChange(row.id, "localite", prestataire.localite);
+                                                }}
+                                            />
+                                        );
+                                    }
+
+                                    if (column.key === "localite") {
+                                        return (
+                                            <td
+                                                key={column.key}
+                                                className={`${cellClass} cursor-default text-slate-600`}
+                                                title="La localité est définie par le prestataire sélectionné."
+                                            >
+                                                {String(row.localite || "—")}
+                                            </td>
                                         );
                                     }
 
