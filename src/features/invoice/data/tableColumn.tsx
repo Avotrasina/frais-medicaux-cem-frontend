@@ -22,6 +22,7 @@ export const factureGlobaleColumns: FactureGlobaleColumn[] = [
     { key: "remarques1", label: "Remarques 1", width: "w-48 min-w-48 max-w-48" },
     { key: "retourPrestataire", label: "Retour vers prestataire", width: "w-45 min-w-45 max-w-45" },
     { key: "recuApresModification", label: "Reçu après modification", width: "w-45 min-w-45 max-w-45" },
+    { key: "piecesJointes", label: "Pièces jointes", width: "w-36 min-w-36 max-w-36" },
     { key: "dateEnregistrement", label: "Date enregistrement", width: "w-36 min-w-36" },
     { key: "parQuiEnregistrement", label: "Enregistré par", width: "w-32 min-w-32 max-w-32" },
     { key: "dateEnvoiValidation", label: "Date envoi pour validation", width: "w-40 min-w-40" },

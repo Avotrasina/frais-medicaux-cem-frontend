@@ -10,6 +10,7 @@ export type ContarinteType = (typeof ContrainteType) [keyof typeof ContrainteTyp
 
 export type FactureGlobaleRow = {
 	id: number;
+	piecesJointes: FactureGlobaleAttachment[];
 	refSocial: string;
 	dateReception: string;
 	numFacture: string;
@@ -37,6 +38,11 @@ export type FactureGlobaleRow = {
 	parQuiValidationFinale: string;
 	dateSortie: string;
 	serviceSortie: string;
+};
+
+export type FactureGlobaleAttachment = {
+	id: string;
+	file: File;
 };
 
 
@@ -73,7 +79,7 @@ export type FactureGlobaleUpdateChanges = Partial<
 	Pick<FactureGlobaleRow, FactureGlobaleUpdateKey>
 >;
 
-export type FactureGlobaleCellValue = string | number | Date | null;
+export type FactureGlobaleCellValue = string | number | Date | FactureGlobaleAttachment[] | null;
 
 export type FactureGlobaleTableProps = {
 	rows: FactureGlobaleRow[];
@@ -85,15 +91,19 @@ export type FactureGlobaleTableProps = {
 	onRowSelect: (rowId: number) => void;
 	onCellChange: (
 		rowId: number,
-		key: FactureGlobaleColumnKey,
+		key: FactureGlobaleEditKey,
 		value: FactureGlobaleCellValue,
 	) => void;
+	onSaveAttachments: (rowId: number, attachments: FactureGlobaleAttachment[]) => Promise<void>;
 }
 
-export type FactureGlobaleColumnKey = Exclude<keyof FactureGlobaleRow, "id">|"majT5";
+export type FactureGlobaleColumnKey = Exclude<keyof FactureGlobaleRow, "id" | "piecesJointes">|"majT5";
+export type FactureGlobaleEditKey = FactureGlobaleColumnKey | "piecesJointes";
+
+export type FactureGlobaleTableColumnKey = FactureGlobaleColumnKey | "piecesJointes";
 
 export type FactureGlobaleColumn = {
-	key: FactureGlobaleColumnKey;
+	key: FactureGlobaleTableColumnKey;
 	label: string;
 	width: string;
 };

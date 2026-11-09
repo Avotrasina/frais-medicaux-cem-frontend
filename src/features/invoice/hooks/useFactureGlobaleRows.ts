@@ -1,6 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import useGetFactureGlobaleRows from "./useGetFactureGlobaleRows";
-import type { FactureGlobaleCellValue, FactureGlobaleColumnKey, FactureGlobaleRow } from "../types/invoiceTable";
+import { saveFactureAttachmentsMock } from "../services/factureAttachmentMock";
+import type {
+	FactureGlobaleCellValue,
+	FactureGlobaleAttachment,
+	FactureGlobaleColumnKey,
+	FactureGlobaleEditKey,
+	FactureGlobaleRow,
+} from "../types/invoiceTable";
 
 
 const numericKeys = new Set<FactureGlobaleColumnKey>([
@@ -9,7 +16,7 @@ const numericKeys = new Set<FactureGlobaleColumnKey>([
 
 function createEmptyInvoice(id: number): FactureGlobaleRow {
 	return {
-		id, refSocial: "", dateReception: "", numFacture: "", dateFacture: "", nomEtablissement: "",
+		id, piecesJointes: [], refSocial: "", dateReception: "", numFacture: "", dateFacture: "", nomEtablissement: "",
 		montantTotal: 0, partCem100: 0, depassement: 0, partCem80: 0, partAgent20: 0, totalPartAgent: 0,
 		localite: "", moisPrestation: null, refAgence: "", remarques1: "", retourPrestataire: "",
 		recuApresModification: "", dateEnregistrement: "", parQuiEnregistrement: "", dateEnvoiValidation: "",
@@ -41,7 +48,18 @@ export default function useFactureGlobaleRows() {
 		[storedAddRow, nextId],
 	);
 
-	const updateCell = useCallback((rowId: number, key: FactureGlobaleColumnKey, value: FactureGlobaleCellValue) => {
+	const updateCell = useCallback((rowId: number, key: FactureGlobaleEditKey, value: FactureGlobaleCellValue) => {
+		if (key === "piecesJointes") {
+			if (!Array.isArray(value)) return;
+			if (rowId === addRow.id) {
+				setStoredAddRow((current) => ({ ...(current ?? addRow), piecesJointes: value }));
+				return;
+			}
+			setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
+				.map((row) => row.id === rowId ? { ...row, piecesJointes: value } : row));
+			return;
+		}
+
 		const nextValue: string | number | Date | null = key === "moisPrestation"
 			? value instanceof Date ? value : null
 			: numericKeys.has(key) ? (value === "" ? 0 : Number(value)) : typeof value === "string" ? value : "";
@@ -77,9 +95,25 @@ export default function useFactureGlobaleRows() {
 			return;
 		}
 		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
-			.map((row) => row.id === rowId ? originalRow : row)
+			.map((row) => row.id === rowId
+				? { ...originalRow, piecesJointes: row.piecesJointes }
+				: row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
 	}, [addRow, factureRowsQuery.data]);
+
+	const saveAttachments = useCallback(async (rowId: number, attachments: FactureGlobaleAttachment[]) => {
+		if (rowId === addRow.id) {
+			throw new Error("Créez d’abord la facture avant d’enregistrer ses pièces jointes.");
+		}
+		const rowExists = dataRows.some((row) => row.id === rowId);
+		if (!rowExists) {
+			throw new Error("La facture associée aux pièces jointes est introuvable.");
+		}
+
+		await saveFactureAttachmentsMock(rowId, attachments);
+		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
+			.map((row) => row.id === rowId ? { ...row, piecesJointes: [...attachments] } : row));
+	}, [addRow.id, dataRows, factureRowsQuery.data]);
 
 	const refreshRows = useCallback(async (created = false) => {
 		if (created) setStoredAddRow(null);
@@ -111,6 +145,7 @@ export default function useFactureGlobaleRows() {
 		loadError: factureRowsQuery.error,
 		reload,
 		updateCell,
+		saveAttachments,
 		refreshRows,
 		restoreRow,
 	};

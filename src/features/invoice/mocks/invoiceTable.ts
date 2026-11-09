@@ -8,6 +8,7 @@ import type {
 export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 	{
 		id: 1,
+		piecesJointes: [],
 		refSocial: "25/001",
 		dateReception: "10/02/2026",
 		numFacture: "1321/F/26",
@@ -38,6 +39,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 	},
 	{
 		id: 2,
+		piecesJointes: [],
 		refSocial: "25/002",
 		dateReception: "15/03/2026",
 		numFacture: "HLA/FPC/24/199",
@@ -68,6 +70,7 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 	},
 	{
 		id: 3,
+		piecesJointes: [],
 		refSocial: "25/003",
 		dateReception: "15/03/2026",
 		numFacture: "CMA/26/03",
@@ -99,45 +102,19 @@ export const initialFactureGlobaleRowsMock: FactureGlobaleRow[] = [
 
 ];
 
-const formatMockDate = (date: Date) =>
-	`${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
-
-function createInitialRows(): FactureGlobaleRow[] {
-	const rows = Array.from({ length: 60 }, (_, index) => {
-		const template = initialFactureGlobaleRowsMock[index % initialFactureGlobaleRowsMock.length];
-		const receptionDate = new Date(2026, 0, 5 + index * 2);
-		return {
-			...template,
-			id: index + 1,
-			refSocial: index < initialFactureGlobaleRowsMock.length
-				? template.refSocial
-				: `26/${String(index + 1).padStart(3, "0")}`,
-			dateReception: formatMockDate(receptionDate),
-			numFacture: `${template.numFacture}-${String(index + 1).padStart(3, "0")}`,
-		};
-	});
-
-	return rows.sort((a, b) => {
-		const [dayA, monthA, yearA] = a.dateReception.split("/").map(Number);
-		const [dayB, monthB, yearB] = b.dateReception.split("/").map(Number);
-		return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
-	});
-}
-
 let factureGlobaleRows: FactureGlobaleRow[] | null = null;
 
 function getFactureGlobaleRows(): FactureGlobaleRow[] {
-	factureGlobaleRows ??= createInitialRows();
+	factureGlobaleRows ??= initialFactureGlobaleRowsMock.map(cloneFactureGlobaleRow);
 	return factureGlobaleRows;
 }
 
 function cloneFactureGlobaleRow(row: FactureGlobaleRow): FactureGlobaleRow {
-	return { ...row, moisPrestation: row.moisPrestation ? new Date(row.moisPrestation) : null };
-}
-
-export async function fetchFactureGlobaleMock(): Promise<FactureGlobaleRow[]> {
-	await new Promise((resolve) => setTimeout(resolve, 2000));
-	return getFactureGlobaleRows().map(cloneFactureGlobaleRow);
+	return {
+		...row,
+		piecesJointes: [...row.piecesJointes],
+		moisPrestation: row.moisPrestation ? new Date(row.moisPrestation) : null,
+	};
 }
 
 export async function createFactureGlobaleMock(
@@ -148,6 +125,7 @@ export async function createFactureGlobaleMock(
 	const id = Math.max(0, ...rows.map((row) => row.id)) + 1;
 	const createdRow: FactureGlobaleRow = {
 		id,
+		piecesJointes: [],
 		refSocial: `26/${String(id).padStart(3, "0")}`,
 		dateReception: input.dateReception,
 		numFacture: input.numFacture,

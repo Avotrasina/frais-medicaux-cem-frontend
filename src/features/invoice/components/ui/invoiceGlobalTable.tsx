@@ -15,6 +15,7 @@ import {
 import { personnelFactureGlobaleEditableColumns } from "../../data/tableColumn";
 import { useAuth } from "../../../auth";
 import PrestataireDropdownCell from "./prestataireDropdownCell";
+import InvoiceAttachmentsCell from "./invoiceAttachmentsCell";
 import { prestatairesMock } from "../../mocks/prestataires";
 
 import {
@@ -63,7 +64,10 @@ const monthOptions = Array.from({ length: 12 }, (_, index) => {
 
 function hasInvoiceData(row: FactureGlobaleRow): boolean {
     return factureGlobaleColumns.some(
-        (column) => column.key !== "majT5" && row[column.key] !== "" && row[column.key] !== 0,
+        (column) => column.key !== "majT5"
+            && column.key !== "piecesJointes"
+            && row[column.key] !== ""
+            && row[column.key] !== 0,
     );
 }
 
@@ -76,6 +80,7 @@ export default function FactureGlobaleTable({
     addRowRef,
     onRowSelect,
     onCellChange,
+    onSaveAttachments,
 }: FactureGlobaleTableProps) {
     const { role } = useAuth();
     const isRoleY = role === "Y";
@@ -362,6 +367,16 @@ export default function FactureGlobaleTable({
                             {isRoleY ? (
                                 factureGlobaleColumns.map((column) => {
                                     const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
+                                    if (column.key === "piecesJointes") {
+                                        return (
+                                            <InvoiceAttachmentsCell
+                                                key={column.key}
+                                                attachments={row.piecesJointes}
+                                                readOnly
+                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                            />
+                                        );
+                                    }
                                     if (column.key === "majT5") {
                                         return hasInvoiceData(row) && row.refSocial.trim() ? (
                                             <DropDownCell
@@ -397,6 +412,17 @@ export default function FactureGlobaleTable({
                                         onCellChange(row.id, column.key, nextValue);
 
                                     const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
+
+                                    if (column.key === "piecesJointes") {
+                                        return (
+                                            <InvoiceAttachmentsCell
+                                                key={column.key}
+                                                attachments={row.piecesJointes}
+                                                readOnly={activeRowId !== null && activeRowId !== row.id}
+                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                            />
+                                        );
+                                    }
 
                                     if (column.key === "majT5") {
                                         return activeRowId === null && hasInvoiceData(row) && row.refSocial.trim() ? (
@@ -526,6 +552,19 @@ export default function FactureGlobaleTable({
 
                                     const cellClass = `border border-slate-200 px-2 py-2 ${column.width}`;
                                     const isAddRowLocked = activeRowId !== null && activeRowId !== row.id;
+
+                                    if (column.key === "piecesJointes") {
+                                        return (
+                                            <InvoiceAttachmentsCell
+                                                key={column.key}
+                                                attachments={row.piecesJointes}
+                                                disabledMessage={isAddRowLocked
+                                                    ? "Une autre ligne est en cours de modification."
+                                                    : "Enregistrez d’abord la facture pour gérer ses pièces jointes."}
+                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                            />
+                                        );
+                                    }
 
                                     if (column.key === "majT5") {
                                         return (

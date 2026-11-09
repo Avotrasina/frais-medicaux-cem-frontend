@@ -1,9 +1,9 @@
-import type { FactureGlobaleRow } from "./invoiceTable";
+import type { FactureGlobaleCellValue, FactureGlobaleEditKey } from "./invoiceTable";
 
 export type ValidationRole = "Adjoint" | "Chef";
 
-export type UpdateFactureGlobaleCell = <K extends Exclude<keyof FactureGlobaleRow, "id">>(
+export type UpdateFactureGlobaleCell = (
 	rowId: number,
-	key: K,
-	value: FactureGlobaleRow[K],
+	key: FactureGlobaleEditKey,
+	value: FactureGlobaleCellValue,
 ) => void;

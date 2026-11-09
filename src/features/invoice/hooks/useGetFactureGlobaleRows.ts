@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
-import { fetchFactureGlobaleMock } from "../mocks/invoiceTable";
+import { getFactures } from "../services/serviceAPI";
+import { mapFacturesGlobalesResponse } from "../services/mapFactureGlobaleResponse";
 import type { FactureGlobaleRow } from "../types/invoiceTable";
 
 export default function useGetFactureGlobaleRows() {
@@ -10,7 +11,8 @@ export default function useGetFactureGlobaleRows() {
 
 	const getRows = useCallback(async (isStale: () => boolean) => {
 		try {
-			const rows = await fetchFactureGlobaleMock();
+			const response = await getFactures();
+			const rows = mapFacturesGlobalesResponse(response);
 			if (isStale()) return;
 			setData(rows);
 			setError(null);
@@ -28,7 +30,8 @@ export default function useGetFactureGlobaleRows() {
 		setIsLoading(true);
 		setError(null);
 		try {
-			const rows = await fetchFactureGlobaleMock();
+			const response = await getFactures();
+			const rows = mapFacturesGlobalesResponse(response);
 			setData(rows);
 			return rows;
 		} catch (reason) {

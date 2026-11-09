@@ -6,8 +6,8 @@ import {
 	FACTURE_GLOBALE_UPDATE_KEYS,
 	SaveColumnKey,
 	type FactureGlobaleCellValue,
-	type FactureGlobaleColumnKey,
 	type FactureGlobaleCreateInput,
+	type FactureGlobaleEditKey,
 	type FactureGlobaleRow,
 	type FactureGlobaleUpdateChanges,
 	type FactureGlobaleUpdateKey,
@@ -63,7 +63,7 @@ function getCreateInput(row: FactureGlobaleRow): FactureGlobaleCreateInput | nul
 export default function useInvoiceRowEditing(
 	rows: FactureGlobaleRow[],
 	addRowId: number,
-	onCellChange: (rowId: number, key: FactureGlobaleColumnKey, value: FactureGlobaleCellValue) => void,
+	onCellChange: (rowId: number, key: FactureGlobaleEditKey, value: FactureGlobaleCellValue) => void,
 	onRowCancel: (rowId: number, original: FactureGlobaleRow, wasAddRow: boolean) => void,
 	onMutationSuccess: (created: boolean) => Promise<unknown>,
 	canEditRows: boolean,
@@ -85,7 +85,7 @@ export default function useInvoiceRowEditing(
 
 	const updateCell = useCallback((
 		rowId: number,
-		key: FactureGlobaleColumnKey,
+		key: FactureGlobaleEditKey,
 		value: FactureGlobaleCellValue,
 	) => {
 		if (!canEditRows) return;

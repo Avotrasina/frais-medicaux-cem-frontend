@@ -9,7 +9,6 @@ export {
 	t5ParAnParActeColumns,
 	t5ParSeanceColumns,
 } from "./data/tableColumn";
-export { initialFactureGlobaleRowsMock as initialFactureGlobaleRows } from "./mocks/invoiceTable";
 export { filterFactureGlobaleRows } from "./services/filterFactureGlobaleRows";
 export type { FactureGlobaleFilters, InvoiceDateRange } from "./services/filterFactureGlobaleRows";
 export { initialT5ParAnRowsMock } from "./mocks/t5ParAn";
@@ -23,6 +22,8 @@ export type {
 	FactureGlobaleColumnKey,
 	FactureGlobaleChanges,
 	FactureGlobaleCreateInput,
+	FactureGlobaleAttachment,
+	FactureGlobaleEditKey,
 	FactureGlobaleRow,
 	FactureGlobaleTableProps,
 	FactureGlobaleUpdateChanges,
