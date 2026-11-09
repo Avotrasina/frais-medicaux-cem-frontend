@@ -1236,6 +1236,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/regles-prise-en-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RegleController_lister"];
+        put?: never;
+        post: operations["RegleController_creer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/regles-prise-en-charge/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RegleController_obtenirParId"];
+        put?: never;
+        post?: never;
+        delete: operations["RegleController_supprimer"];
+        options?: never;
+        head?: never;
+        patch: operations["RegleController_modifier"];
+        trace?: never;
+    };
     "/factures": {
         parameters: {
             query?: never;
@@ -1245,7 +1277,7 @@ export interface paths {
         };
         /**
          * Lister les factures
-         * @description Retourne les factures, avec un filtrage optionnel par statut.
+         * @description Retourne les factures, filtrables par statut, clôture et rapprochement.
          */
         get: operations["FactureGlobaleController_lister"];
         put?: never;
@@ -1472,6 +1504,111 @@ export interface paths {
         patch: operations["FactureWorkflowController_modifierMontants"];
         trace?: never;
     };
+    "/paies/{mois}/cloture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Clôturer plusieurs factures pour un mois de paie
+         * @description Vérifie le rapprochement de toutes les factures puis affecte le mois de paie, clôture les factures et leurs lignes.
+         */
+        post: operations["CloturePaieController_cloturer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les mois de paie clôturés */
+        get: operations["PaieEtatController_listerPaies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paies/{mois}/lignes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister les lignes d’un mois de paie */
+        get: operations["PaieEtatController_listerLignes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paies/{mois}/consommation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter la consommation par agent et prestataire */
+        get: operations["PaieEtatController_consommation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paies/{mois}/etat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter l’état mensuel de paie par agent */
+        get: operations["PaieEtatController_etat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paies/{mois}/agents/{im}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulter l’état individuel d’un agent */
+        get: operations["PaieEtatController_etatIndividuel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/factures/{id}/suivis": {
         parameters: {
             query?: never;
@@ -1556,6 +1693,54 @@ export interface paths {
         patch: operations["SuiviController_modifier"];
         trace?: never;
     };
+    "/factures/{id}/pieces-jointes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lister les pièces jointes d’une facture
+         * @description Retourne les métadonnées des fichiers associés à la facture.
+         */
+        get: operations["PieceJointeFactureController_lister"];
+        put?: never;
+        /**
+         * Ajouter une pièce jointe à une facture
+         * @description Le contenu PDF/JPEG/PNG est vérifié par signature. Maximum 20 pièces jointes par facture.
+         */
+        post: operations["PieceJointeFactureController_ajouter"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/factures/{id}/pieces-jointes/{pieceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ouvrir une pièce jointe de la facture
+         * @description Diffuse le fichier PDF, JPEG ou PNG demandé.
+         */
+        get: operations["PieceJointeFactureController_ouvrir"];
+        put?: never;
+        post?: never;
+        /**
+         * Supprimer une pièce jointe modifiable
+         * @description Supprime un fichier lorsque le statut de la facture l’autorise.
+         */
+        delete: operations["PieceJointeFactureController_supprimer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/utilisateurs": {
         parameters: {
             query?: never;
@@ -1608,91 +1793,15 @@ export interface paths {
         patch: operations["UtilisateurController_modifier"];
         trace?: never;
     };
-    "/factures/{id}/pieces-jointes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Lister les pièces jointes d’une facture
-         * @description Retourne les métadonnées des fichiers associés à la facture.
-         */
-        get: operations["PieceJointeFactureController_lister"];
-        put?: never;
-        /**
-         * Ajouter une pièce jointe à une facture
-         * @description Le contenu PDF/JPEG/PNG est vérifié par signature. Maximum 20 pièces jointes par facture.
-         */
-        post: operations["PieceJointeFactureController_ajouter"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/factures/{id}/pieces-jointes/{pieceId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Ouvrir une pièce jointe de la facture
-         * @description Diffuse le fichier PDF, JPEG ou PNG demandé.
-         */
-        get: operations["PieceJointeFactureController_ouvrir"];
-        put?: never;
-        post?: never;
-        /**
-         * Supprimer une pièce jointe modifiable
-         * @description Supprime un fichier lorsque le statut de la facture l’autorise.
-         */
-        delete: operations["PieceJointeFactureController_supprimer"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/regles-prise-en-charge": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["RegleController_lister"];
-        put?: never;
-        post: operations["RegleController_creer"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/regles-prise-en-charge/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["RegleController_obtenirParId"];
-        put?: never;
-        post?: never;
-        delete: operations["RegleController_supprimer"];
-        options?: never;
-        head?: never;
-        patch: operations["RegleController_modifier"];
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         CreateAgentCategoryDto: {
+            codeCategory: string;
+        };
+        AgentCategoryResponseDto: {
+            id: number;
             codeCategory: string;
         };
         UpdateAgentCategoryDto: {
@@ -1743,7 +1852,60 @@ export interface components {
             /** Format: binary */
             image: string;
         };
+        AgentResponseDto: {
+            matricule: number;
+            nom: string;
+            prenom: string;
+            /** @enum {string} */
+            statutPEC: "AGENT" | "DIRECTEUR" | "CHEF_SERVICE" | "CHEF_AGENCE";
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            /** @enum {string} */
+            backOfficeFrontOffice: "RETRAITE" | "AGENCE" | "DIRECTION";
+            observationMatricule?: string | null;
+            carteProfessionnellePath: string;
+            /** Format: date-time */
+            dateEntree: string;
+            fonction?: string | null;
+            categorieID?: string | null;
+            structureID?: string | null;
+            codeService?: string | null;
+        };
+        AgentDetailResponseDto: {
+            id: number;
+            matricule: number;
+            fonction?: string | null;
+            /** @enum {string} */
+            statutPEC: "AGENT" | "DIRECTEUR" | "CHEF_SERVICE" | "CHEF_AGENCE";
+            observationMatricule?: string | null;
+            carteProfessionnellePath: string;
+            /** Format: date-time */
+            dateEntree: string;
+            /** @enum {string} */
+            agentType: "AGENT_ACTIF" | "AGENT_RETRAITE";
+            structureID?: string | null;
+            codeDirection?: string | null;
+            codeService?: string | null;
+            codeAgence?: string | null;
+            categorieID?: string | null;
+        };
+        AgentDeletionRequestResponseDto: {
+            id: number;
+            nom: string;
+            prenom: string;
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            agent: components["schemas"]["AgentDetailResponseDto"];
+        };
         CreateAgenceDto: {
+            codeAgence: string;
+            nomAgence: string;
+        };
+        AgenceResponseDto: {
             codeAgence: string;
             nomAgence: string;
         };
@@ -1753,6 +1915,16 @@ export interface components {
         CreateDirectionDto: {
             codeDirection: string;
             nomDirection: string;
+        };
+        ServiceResponseDto: {
+            codeService: string;
+            nom: string;
+            codeDirection: string;
+        };
+        DirectionAvecServicesResponseDto: {
+            codeDirection: string;
+            nom: string;
+            services: components["schemas"]["ServiceResponseDto"][];
         };
         UpdateDirectionDto: {
             nomDirection: string;
@@ -1768,8 +1940,47 @@ export interface components {
         UpdateServiceCodeDirectionDto: {
             codeDirection: string;
         };
+        BeneficiaryResponseDto: {
+            nom: string;
+            prenom: string;
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            idp: string;
+            observationIDP: string | null;
+            matricule: number;
+            /** @enum {string} */
+            codeFamille: "AGENT" | "CONJOINT" | "ENFANT";
+            carteSocialePath: string | null;
+            carteProfessionnellePath: string | null;
+        };
         UpdateObservationBeneficiaryDto: {
             observationIDP: string | null;
+        };
+        ConjointResponseDto: {
+            id: number;
+            nom: string;
+            prenom: string;
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            numConjoint: number;
+            agentMatricule: number;
+            carteSocialePath: string;
+        };
+        EnfantResponseDto: {
+            id: number;
+            nom: string;
+            prenom: string;
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            numEnfant: number;
+            agentMatricule: number;
+            carteSocialePath: string;
         };
         AgentFamilyCreateMultipartDto: {
             /** Format: binary */
@@ -1794,13 +2005,66 @@ export interface components {
             /** Format: binary */
             image: string;
         };
-        CreateActeDto: {
+        AgentFamilyResponseDto: {
+            id: number;
+            nom: string;
+            prenom: string;
+            /** Format: date-time */
+            dateNaissance: string;
+            /** @enum {string} */
+            sexe: "MASCULIN" | "FEMININ";
+            numConjoint?: number | null;
+            numEnfant?: number | null;
+            carteSocialPath: string;
+            agentMatricule: number;
+        };
+        ActeResponseDto: {
+            id: number;
             code: string;
             nomActe: string;
             listeLibelle: string;
             /** @enum {string} */
-            regime?: "NORMAL" | "EXCLU" | "SUR_DECISION_DG";
+            regime: "NORMAL" | "EXCLU" | "SUR_DECISION_DG";
             categorieActeId: number;
+        };
+        PlafondResoluResponseDto: {
+            id: number;
+            /** @enum {string} */
+            unite: "MONTANT" | "SEANCES";
+            valeur: string | number;
+            /** @enum {string} */
+            source: "ACTE" | "CATEGORIE";
+        };
+        VersionPlafondResponseDto: {
+            id: number;
+            /** @enum {string} */
+            unite: "MONTANT" | "SEANCES";
+            valeur: string | number;
+            /** @enum {string} */
+            source: "ACTE" | "CATEGORIE";
+            /** @enum {string} */
+            porteePlafond: "PAR_ACTE" | "PAR_AN";
+            /** Format: date */
+            dateEffet: string;
+            /** Format: date */
+            dateFin: string | null;
+        };
+        PlafondsActeResponseDto: {
+            parActe: components["schemas"]["PlafondResoluResponseDto"] | null;
+            parAn: components["schemas"]["PlafondResoluResponseDto"] | null;
+            historique?: components["schemas"]["VersionPlafondResponseDto"][];
+        };
+        ActeAvecPlafondsResponseDto: {
+            id: number;
+            code: string;
+            nomActe: string;
+            listeLibelle: string;
+            /** @enum {string} */
+            regime: "NORMAL" | "EXCLU" | "SUR_DECISION_DG";
+            categorieActeId: number;
+            plafonds: components["schemas"]["PlafondsActeResponseDto"];
+            /** @enum {string|null} */
+            modeleSuivi: "PLAFOND_ANNUEL" | "SEANCES" | "PLAFOND_ACTE_ET_ANNUEL" | null;
         };
         UpdateActeDto: {
             code?: string;
@@ -1825,6 +2089,21 @@ export interface components {
             nbSeances?: number | null;
             acteID?: number | null;
             categorieActeID?: number | null;
+        };
+        PlafondResponseDto: {
+            /** Format: date */
+            dateEffet: string;
+            /** Format: date */
+            dateFin: string | null;
+            id: number;
+            /** @enum {string} */
+            porteePlafond: "PAR_ACTE" | "PAR_AN";
+            /** @enum {string} */
+            unite: "MONTANT" | "SEANCES";
+            montant: string | null;
+            nbSeances: number | null;
+            acteID: number | null;
+            categorieActeID: number | null;
         };
         UpdatePlafondDto: {
             /**
@@ -1859,6 +2138,24 @@ export interface components {
             prestataireID?: number | null;
             idpBeneficiaire?: string | null;
         };
+        AttestationResponseDto: {
+            id: number;
+            attestationPath: string | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            naturePrestation: string;
+            servicePrestataire: string | null;
+            /** @enum {string} */
+            statut: "EN_ATTENTE" | "VALIDEE" | "REFUSEE";
+            prestataireID: number;
+            idpBeneficiaire: string;
+            /** Format: date-time */
+            datePEC: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** @enum {string} */
+            attestationStatut: "EN_ATTENTE" | "VALIDEE" | "REFUSEE";
+        };
         CreateProviderDto: {
             nom: string;
             adresse: string;
@@ -1883,6 +2180,25 @@ export interface components {
             lieuID: number;
             categorieID: number;
         };
+        ProviderResponseDto: {
+            id: number;
+            nom: string;
+            adresse: string;
+            /** @enum {string} */
+            statut: "PRIVE" | "PUBLIC";
+            nif: string;
+            stat: string;
+            /** Format: date-time */
+            dateDebutConvention: string;
+            /** Format: date-time */
+            dateFinConvention: string;
+            listePrestation: string;
+            echeanceRenouvellement: string | null;
+            echeanceResiliation: string | null;
+            observation: string | null;
+            lieuID: number;
+            categorieID: number;
+        };
         UpdateProviderDto: {
             nom?: string;
             adresse?: string;
@@ -1904,11 +2220,86 @@ export interface components {
         CreateLieuDto: {
             nom: string;
         };
+        LocationResponseDto: {
+            id: number;
+            nom: string;
+        };
         UpdateLieuDto: {
             nom?: string;
         };
-        CreateCategorieActeDto: {
+        CategorieActeResponseDto: {
+            id: number;
             nomCategorie: string;
+        };
+        PlafondsCategorieResponseDto: {
+            parActe: components["schemas"]["PlafondResoluResponseDto"] | null;
+            parAn: components["schemas"]["PlafondResoluResponseDto"] | null;
+            historique?: components["schemas"]["VersionPlafondResponseDto"][];
+        };
+        CategorieActeAvecPlafondsResponseDto: {
+            id: number;
+            nomCategorie: string;
+            plafonds: components["schemas"]["PlafondsCategorieResponseDto"];
+            /** @enum {string|null} */
+            modeleSuivi: "PLAFOND_ANNUEL" | "SEANCES" | "PLAFOND_ACTE_ET_ANNUEL" | null;
+        };
+        CategorieActeAvecActesResponseDto: {
+            id: number;
+            nomCategorie: string;
+            actes: components["schemas"]["ActeAvecPlafondsResponseDto"][];
+        };
+        CategorieActeAvecPlafondsEtActesResponseDto: {
+            id: number;
+            nomCategorie: string;
+            plafonds: components["schemas"]["PlafondsCategorieResponseDto"];
+            /** @enum {string|null} */
+            modeleSuivi: "PLAFOND_ANNUEL" | "SEANCES" | "PLAFOND_ACTE_ET_ANNUEL" | null;
+            actes: components["schemas"]["ActeAvecPlafondsResponseDto"][];
+        };
+        PlafondParActeDto: {
+            /** @example 100000 */
+            montant: number;
+        };
+        PlafondParAnDto: {
+            /**
+             * @example MONTANT
+             * @enum {string}
+             */
+            unite: "MONTANT" | "SEANCES";
+            montant?: number;
+            nbSeances?: number;
+        };
+        PlafondsCreationDto: {
+            parActe?: components["schemas"]["PlafondParActeDto"];
+            parAn?: components["schemas"]["PlafondParAnDto"] & (components["schemas"]["PlafondParAnMontantDto"] | components["schemas"]["PlafondParAnSeancesDto"]);
+        };
+        CreateCategorieWithCeilingsDto: {
+            /** @example Soins dentaires */
+            nomCategorie: string;
+            plafonds?: components["schemas"]["PlafondsCreationDto"];
+            /**
+             * Format: date
+             * @example 2026-01-01
+             */
+            dateEffet?: string;
+        };
+        PlafondParAnMontantDto: {
+            /**
+             * @example MONTANT
+             * @enum {string}
+             */
+            unite: "MONTANT" | "SEANCES";
+            /** @example 500000 */
+            montant: number;
+        };
+        PlafondParAnSeancesDto: {
+            /**
+             * @example MONTANT
+             * @enum {string}
+             */
+            unite: "MONTANT" | "SEANCES";
+            /** @example 12 */
+            nbSeances: number;
         };
         UpdateCategorieActeDto: {
             nomCategorie?: string;
@@ -1916,8 +2307,208 @@ export interface components {
         CreateProviderCategoryDto: {
             nom: string;
         };
+        ProviderCategoryResponseDto: {
+            id: number;
+            nom: string;
+        };
         UpdateProviderCategoryDto: {
             nom?: string;
+        };
+        CreerRegleDto: {
+            /** @enum {string} */
+            type: "CHARGE_TOTALE_CEM" | "REPARTITION_AGENT_CEM";
+            /** @enum {string} */
+            agentConcerne: "ACTIF" | "NON_ACTIF";
+            tauxCem: number;
+            dateEffet: string;
+            dateFin?: string | null;
+        };
+        RegleResponseDto: {
+            id: number;
+            /** @enum {string} */
+            type: "CHARGE_TOTALE_CEM" | "REPARTITION_AGENT_CEM";
+            /** @enum {string} */
+            agentConcerne: "ACTIF" | "NON_ACTIF";
+            /** @example 80.50 */
+            tauxCem: string;
+            /** Format: date-time */
+            dateEffet: string;
+            /** Format: date-time */
+            dateFin: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        RegleResponseEnveloppeDto: {
+            message: string;
+            donnees: components["schemas"]["RegleResponseDto"] | null;
+        };
+        ReglesResponseEnveloppeDto: {
+            message: string;
+            donnees: components["schemas"]["RegleResponseDto"][];
+        };
+        ModifierRegleDto: {
+            /** @enum {string} */
+            type?: "CHARGE_TOTALE_CEM" | "REPARTITION_AGENT_CEM";
+            /** @enum {string} */
+            agentConcerne?: "ACTIF" | "NON_ACTIF";
+            tauxCem?: number;
+            dateEffet?: string;
+            dateFin?: string | null;
+        };
+        PrestataireFactureResponseDto: {
+            id: number;
+            nom: string;
+        };
+        PieceJointeListeFactureResponseDto: {
+            id: number;
+            nomFichier: string | null;
+            typeFichier: string;
+            tailleOctets: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FactureGlobaleListeeResponseDto: {
+            id: number;
+            refSociale: string;
+            annee: number;
+            /** Format: date-time */
+            dateReception: string;
+            numFacture: string;
+            /** Format: date-time */
+            dateFacture: string;
+            /** Format: date-time */
+            moisPrestation: string;
+            refAgence: string | null;
+            remarque: string | null;
+            montantTotal: string | null;
+            total100Cem: string;
+            totalDepassement: string;
+            tauxCem: string;
+            /** @enum {string} */
+            statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            /** @enum {string|null} */
+            statutAvantSuppression: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE" | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            /** Format: date-time */
+            moisPaie: string | null;
+            /** Format: date-time */
+            dateCloture: string | null;
+            prestataireId: number;
+            enregistreParId: number;
+            valideParId: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            prestataire: components["schemas"]["PrestataireFactureResponseDto"];
+            piecesJointes: components["schemas"]["PieceJointeListeFactureResponseDto"][];
+        };
+        FactureGlobaleDetailResponseDto: {
+            id: number;
+            refSociale: string;
+            annee: number;
+            /** Format: date-time */
+            dateReception: string;
+            numFacture: string;
+            /** Format: date-time */
+            dateFacture: string;
+            /** Format: date-time */
+            moisPrestation: string;
+            refAgence: string | null;
+            remarque: string | null;
+            montantTotal: string | null;
+            total100Cem: string;
+            totalDepassement: string;
+            tauxCem: string;
+            /** @enum {string} */
+            statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            /** @enum {string|null} */
+            statutAvantSuppression: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE" | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            /** Format: date-time */
+            moisPaie: string | null;
+            /** Format: date-time */
+            dateCloture: string | null;
+            prestataireId: number;
+            enregistreParId: number;
+            valideParId: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            prestataire: components["schemas"]["PrestataireFactureResponseDto"];
+            nombrePiecesJointes: number;
+        };
+        FactureGlobaleCreeeResponseDto: {
+            id: number;
+            refSociale: string;
+            annee: number;
+            /** Format: date-time */
+            dateReception: string;
+            numFacture: string;
+            /** Format: date-time */
+            dateFacture: string;
+            /** Format: date-time */
+            moisPrestation: string;
+            refAgence: string | null;
+            remarque: string | null;
+            montantTotal: string | null;
+            total100Cem: string;
+            totalDepassement: string;
+            tauxCem: string;
+            /** @enum {string} */
+            statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            /** @enum {string|null} */
+            statutAvantSuppression: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE" | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            /** Format: date-time */
+            moisPaie: string | null;
+            /** Format: date-time */
+            dateCloture: string | null;
+            prestataireId: number;
+            enregistreParId: number;
+            valideParId: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            prestataire: components["schemas"]["PrestataireFactureResponseDto"];
+            avertissements: string[];
+        };
+        UtilisateurMouvementResponseDto: {
+            id: number;
+            nom: string;
+            /** @enum {string} */
+            role: "OPERATEUR" | "ADJOINT" | "CHEF";
+        };
+        MouvementFactureResponseDto: {
+            id: number;
+            factureGlobaleId: number;
+            /** @enum {string} */
+            type: "ENREGISTREMENT" | "ENVOI_VALIDATION" | "RETOUR_POUR_CORRECTION" | "RETOUR_PRESTATAIRE" | "RECEPTION_APRES_MODIFICATION" | "MODIFICATION" | "VALIDATION" | "SORTIE" | "SUPPRESSION" | "REOUVERTURE" | "DEMANDE_SUPPRESSION" | "REFUS_SUPPRESSION" | "CLOTURE";
+            /** Format: date-time */
+            date: string;
+            /** Format: date-time */
+            createdAt: string;
+            remarque: string | null;
+            /** @enum {string|null} */
+            service: "AUTHENTIFICATION" | "CONTROLE" | null;
+            effectueParId: number;
+            adresseAId: number | null;
+            effectuePar: components["schemas"]["UtilisateurMouvementResponseDto"];
+            adresseA: components["schemas"]["UtilisateurMouvementResponseDto"] | null;
+        };
+        TransitionFactureResponseDto: {
+            /** @enum {string} */
+            type: "ENREGISTREMENT" | "ENVOI_VALIDATION" | "RETOUR_POUR_CORRECTION" | "RETOUR_PRESTATAIRE" | "RECEPTION_APRES_MODIFICATION" | "MODIFICATION" | "VALIDATION" | "SORTIE" | "SUPPRESSION" | "REOUVERTURE" | "DEMANDE_SUPPRESSION" | "REFUS_SUPPRESSION" | "CLOTURE";
+            /** @enum {string} */
+            statutResultat: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            champsRequis: string[];
         };
         CreerFactureGlobaleDto: {
             prestataireId: number;
@@ -1926,6 +2517,10 @@ export interface components {
             dateReception: string;
             moisPrestation: string;
             refAgence?: string;
+        };
+        PropositionDepassementResponseDto: {
+            montantDepassementActe: string;
+            montantDepassementPlafond: string;
         };
         CreerFactureIndividuelleDto: {
             libelle: string;
@@ -1948,6 +2543,35 @@ export interface components {
             montantCemIntegral?: number;
             observationDepassement?: string;
         };
+        LigneActeResponseDto: {
+            id: number;
+            code: string;
+            nom: string;
+        };
+        LigneFactureResponseDto: {
+            id: number;
+            numLigne: number;
+            libelle: string;
+            /** Format: date */
+            dateActe: string;
+            idp: string;
+            acte: components["schemas"]["LigneActeResponseDto"];
+            montantActe: string;
+            montantDepassementActe: string;
+            montantDepassementPlafond: string;
+            observationDepassement: string | null;
+            tauxCem: string;
+            montantCemIntegral: string;
+            montantCem: string;
+            montantAgent: string;
+            montantDepassement: string;
+            totalChargeAgent: string;
+            numPec: number | null;
+            refPaie: string | null;
+            /** Format: date */
+            moisAffectation: string | null;
+            avertissements: string[];
+        };
         ModifierFactureIndividuelleDto: {
             libelle?: string;
             /** Format: date */
@@ -1962,14 +2586,133 @@ export interface components {
             montantCemIntegral?: number;
             observationDepassement?: string | null;
         };
+        TotauxLignesFactureResponseDto: {
+            montantActe: string;
+            montantCemIntegral: string;
+            montantCem: string;
+            montantAgent: string;
+            montantDepassement: string;
+            totalChargeAgent: string;
+        };
+        LignesFactureResponseDto: {
+            lignes: components["schemas"]["LigneFactureResponseDto"][];
+            totaux: components["schemas"]["TotauxLignesFactureResponseDto"];
+        };
         AffecterRetenueDto: {
             ligneIds: number[];
             refPaie: string;
-            /**
-             * Format: month
-             * @example 2026-01
-             */
+        };
+        AffectationRetenueResponseDto: {
+            ligneIds: number[];
+            refPaie: string;
+            /** Format: date */
             moisAffectation?: string;
+        };
+        ControleTotauxMontantsResponseDto: {
+            montantActe: string;
+            montantCemIntegral: string;
+            depassement: string;
+        };
+        ControleTotauxFactureResponseDto: {
+            montantTotal: string;
+            total100Cem: string;
+            totalDepassement: string;
+        };
+        ControleTotauxResponseDto: {
+            nombreLignes: number;
+            concordant: boolean;
+            sommes: components["schemas"]["ControleTotauxMontantsResponseDto"];
+            facture: components["schemas"]["ControleTotauxFactureResponseDto"];
+            ecarts: components["schemas"]["ControleTotauxMontantsResponseDto"];
+        };
+        MouvementFactureActionResponseDto: {
+            id: number;
+            factureGlobaleId: number;
+            /** @enum {string} */
+            type: "ENREGISTREMENT" | "ENVOI_VALIDATION" | "RETOUR_POUR_CORRECTION" | "RETOUR_PRESTATAIRE" | "RECEPTION_APRES_MODIFICATION" | "MODIFICATION" | "VALIDATION" | "SORTIE" | "SUPPRESSION" | "REOUVERTURE" | "DEMANDE_SUPPRESSION" | "REFUS_SUPPRESSION" | "CLOTURE";
+            /** Format: date-time */
+            date: string;
+            /** Format: date-time */
+            createdAt: string;
+            remarque: string | null;
+            /** @enum {string|null} */
+            service: "AUTHENTIFICATION" | "CONTROLE" | null;
+            effectueParId: number;
+            adresseAId: number | null;
+        };
+        FactureWorkflowResponseDto: {
+            id: number;
+            refSociale: string;
+            annee: number;
+            /** Format: date-time */
+            dateReception: string;
+            numFacture: string;
+            /** Format: date-time */
+            dateFacture: string;
+            /** Format: date-time */
+            moisPrestation: string;
+            refAgence: string | null;
+            remarque: string | null;
+            montantTotal: string | null;
+            total100Cem: string;
+            totalDepassement: string;
+            tauxCem: string;
+            /** @enum {string} */
+            statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            /** @enum {string|null} */
+            statutAvantSuppression: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE" | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            /** Format: date-time */
+            moisPaie: string | null;
+            /** Format: date-time */
+            dateCloture: string | null;
+            prestataireId: number;
+            enregistreParId: number;
+            valideParId: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            prestataire: components["schemas"]["PrestataireFactureResponseDto"];
+            mouvement: components["schemas"]["MouvementFactureActionResponseDto"];
+        };
+        FactureGlobaleModificationResponseDto: {
+            id: number;
+            refSociale: string;
+            annee: number;
+            /** Format: date-time */
+            dateReception: string;
+            numFacture: string;
+            /** Format: date-time */
+            dateFacture: string;
+            /** Format: date-time */
+            moisPrestation: string;
+            refAgence: string | null;
+            remarque: string | null;
+            montantTotal: string | null;
+            total100Cem: string;
+            totalDepassement: string;
+            tauxCem: string;
+            /** @enum {string} */
+            statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
+            /** @enum {string|null} */
+            statutAvantSuppression: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE" | null;
+            /** Format: date-time */
+            dateValidation: string | null;
+            /** Format: date-time */
+            moisPaie: string | null;
+            /** Format: date-time */
+            dateCloture: string | null;
+            prestataireId: number;
+            enregistreParId: number;
+            valideParId: number | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            prestataire: components["schemas"]["PrestataireFactureResponseDto"];
+            message: string;
         };
         ActionFactureDto: {
             /** @enum {string} */
@@ -1997,6 +2740,269 @@ export interface components {
             totalDepassement?: number;
             motif?: string;
         };
+        RefusClotureDetailResponseDto: {
+            /** @enum {string} */
+            champ: "montantTotal" | "total100Cem" | "totalDepassement";
+            valeurFacture: string;
+            totalLignes: string;
+            ecart: string;
+        };
+        RefusClotureResponseDto: {
+            factureId: number;
+            refSociale: string | null;
+            /** @enum {string} */
+            raison: "INTROUVABLE" | "SUPPRIMEE" | "DEJA_CLOTUREE" | "INCOMPLET" | "ECART";
+            detail?: components["schemas"]["RefusClotureDetailResponseDto"];
+        };
+        CloturerPaieDto: {
+            /**
+             * Format: date
+             * @example 2026-03-25
+             */
+            dateCloture: string;
+            factureIds: number[];
+        };
+        FactureClotureeResponseDto: {
+            id: number;
+            refSociale: string;
+            nombreLignes: number;
+            /** @example 125000.00 */
+            totalAgent: string;
+        };
+        CloturePaieResponseDto: {
+            /** @example 2026-03 */
+            moisPaie: string;
+            /**
+             * Format: date
+             * @example 2026-03-25
+             */
+            dateCloture: string;
+            factures: components["schemas"]["FactureClotureeResponseDto"][];
+        };
+        PaieMoisResponseDto: {
+            /** @example 2026-03 */
+            moisPaie: string;
+            nombreFactures: number;
+            nombreLignes: number;
+            /** @example 125000.00 */
+            totalAgent: string;
+        };
+        LignePaieResponseDto: {
+            /** @example 150000.00 */
+            montantActe: string;
+            /** @example 100000.00 */
+            cem100: string;
+            /** @example 0.00 */
+            depassement: string;
+            /** @example 40000.00 */
+            cem80: string;
+            /** @example 10000.00 */
+            agent20: string;
+            /** @example 10000.00 */
+            totalAgent: string;
+            numLigne: number;
+            /** Format: date */
+            moisAffectation: string;
+            refPaie: string | null;
+            /** Format: date */
+            dateSaisie: string;
+            refSociale: string;
+            numFacture: string;
+            /** Format: date */
+            dateFacture: string;
+            nomEtablissement: string;
+            idp: string;
+            nomPrenomBeneficiaire: string;
+            /** @enum {string|null} */
+            codeFam: "AGT" | "CJT" | "EFT" | null;
+            obsIdp: string | null;
+            im: number;
+            nomPrenomAgent: string;
+            direction: string | null;
+            serviceAgence: string | null;
+            codeActe: string;
+            acte: string;
+            categorie: string;
+            /** Format: date */
+            dateActe: string;
+            numPec: string | null;
+            obsDepassement: string | null;
+        };
+        LignesPaiePagineesResponseDto: {
+            total: number;
+            page: number;
+            limite: number;
+            lignes: components["schemas"]["LignePaieResponseDto"][];
+        };
+        TotauxPaieResponseDto: {
+            /** @example 150000.00 */
+            montantActe: string;
+            /** @example 100000.00 */
+            cem100: string;
+            /** @example 0.00 */
+            depassement: string;
+            /** @example 40000.00 */
+            cem80: string;
+            /** @example 10000.00 */
+            agent20: string;
+            /** @example 10000.00 */
+            totalAgent: string;
+        };
+        PrestataireConsommationPaieResponseDto: {
+            nomEtablissement: string;
+            nombreLignes: number;
+            lignes: components["schemas"]["LignePaieResponseDto"][];
+            sousTotal: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        AgentConsommationPaieResponseDto: {
+            im: number;
+            prestataires: components["schemas"]["PrestataireConsommationPaieResponseDto"][];
+            sousTotalAgent: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        ConsommationPaieResponseDto: {
+            agents: components["schemas"]["AgentConsommationPaieResponseDto"][];
+            totalGeneral: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        EtatAgentPaieResponseDto: {
+            /** @example 150000.00 */
+            montantActe: string;
+            /** @example 100000.00 */
+            cem100: string;
+            /** @example 0.00 */
+            depassement: string;
+            /** @example 40000.00 */
+            cem80: string;
+            /** @example 10000.00 */
+            agent20: string;
+            /** @example 10000.00 */
+            totalAgent: string;
+            im: number;
+            nomPrenom: string;
+            direction: string | null;
+            serviceAgence: string | null;
+        };
+        EtatPaieResponseDto: {
+            agents: components["schemas"]["EtatAgentPaieResponseDto"][];
+            total: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        GroupePrestataireEtatIndividuelResponseDto: {
+            nomEtablissement: string;
+            nombreLignes: number;
+            lignes: components["schemas"]["LignePaieResponseDto"][];
+            totalEtablissement: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        EtatIndividuelPaieResponseDto: {
+            im: number;
+            nomPrenom: string;
+            groupes: components["schemas"]["GroupePrestataireEtatIndividuelResponseDto"][];
+            totalGeneral: components["schemas"]["TotauxPaieResponseDto"];
+        };
+        PlafondsCibleSuiviResponseDto: {
+            parAn: components["schemas"]["PlafondResoluResponseDto"] | null;
+            parActe: components["schemas"]["PlafondResoluResponseDto"] | null;
+        };
+        CibleSuiviResponseDto: {
+            /** @enum {string} */
+            type: "ACTE" | "CATEGORIE";
+            id: number;
+            nom: string;
+            code?: string;
+            categorieActeId?: number;
+            categorieActe?: string;
+            plafonds: components["schemas"]["PlafondsCibleSuiviResponseDto"];
+            /** @enum {string} */
+            modeleSuivi: "PLAFOND_ANNUEL" | "SEANCES" | "PLAFOND_ACTE_ET_ANNUEL";
+        };
+        EnteteFeuilleSuiviResponseDto: {
+            idp: string;
+            im: number | null;
+            nomPrenomBeneficiaire: string;
+            nomPrenomAgent: string | null;
+            /** @enum {string|null} */
+            codeFam: "Agent" | "Conjoint" | "Enfant" | null;
+            direction: string | null;
+            serviceAgence: string | null;
+            observationIdp: string | null;
+        };
+        ColonneSuiviResponseDto: {
+            cle: string;
+            libelle: string;
+        };
+        CibleFeuilleSuiviResponseDto: {
+            /** @enum {string} */
+            type: "acte" | "categorie";
+            id: number;
+            nom: string;
+        };
+        PlafondFeuilleSuiviResponseDto: {
+            /** @enum {string} */
+            unite: "MONTANT" | "SEANCES";
+            valeur: string;
+            /** Format: date */
+            dateEffet?: string;
+        };
+        PlafondAnnuelFeuilleSuiviResponseDto: {
+            /** @enum {string} */
+            unite: "MONTANT" | "SEANCES";
+            valeur: string;
+            /** Format: date */
+            dateEffet?: string;
+            modifieEnCoursDAnnee: boolean;
+        };
+        PlafondsFeuilleSuiviResponseDto: {
+            parActe: components["schemas"]["PlafondFeuilleSuiviResponseDto"] | null;
+            parAn: components["schemas"]["PlafondAnnuelFeuilleSuiviResponseDto"];
+            historique?: components["schemas"]["VersionPlafondResponseDto"][];
+        };
+        ActeLigneSuiviResponseDto: {
+            code: string;
+            nom: string;
+        };
+        LigneFeuilleSuiviResponseDto: {
+            id: number;
+            refSociale: string;
+            /** Format: date */
+            dateActe: string;
+            libelle: string;
+            acte: components["schemas"]["ActeLigneSuiviResponseDto"];
+            montantActe: string;
+            depassementActe: string | null;
+            cumulActeConsomme: string | null;
+            soldePlafond: string | null;
+            depassementPlafond: string | null;
+            totalDepassement: string;
+            nomEtablissement: string;
+            libelleSeance: string | null;
+            numeroSeance: number | null;
+            plafondAnnuelApplique: string;
+            capaciteRestante: string | null;
+            seancesRestantes: string | null;
+            verrouillee: boolean;
+        };
+        TotauxFeuilleSuiviResponseDto: {
+            montantActe: string;
+            totalDepassement: string;
+            depassementActe?: string;
+            depassementPlafond?: string;
+            cumulActeConsomme?: string | null;
+            soldePlafond?: string | null;
+            seancesUtilisees?: number;
+        };
+        FeuilleSuiviResponseDto: {
+            entete: components["schemas"]["EnteteFeuilleSuiviResponseDto"];
+            /** @enum {string} */
+            modele: "PLAFOND_ANNUEL" | "SEANCES" | "PLAFOND_ACTE_ET_ANNUEL";
+            colonnes: components["schemas"]["ColonneSuiviResponseDto"][];
+            cible: components["schemas"]["CibleFeuilleSuiviResponseDto"];
+            annee: number;
+            plafonds: components["schemas"]["PlafondsFeuilleSuiviResponseDto"];
+            lignes: components["schemas"]["LigneFeuilleSuiviResponseDto"][];
+            totaux: components["schemas"]["TotauxFeuilleSuiviResponseDto"];
+        };
+        FeuilleSuiviModifieeResponseDto: {
+            ancienne: components["schemas"]["FeuilleSuiviResponseDto"];
+            nouvelle: components["schemas"]["FeuilleSuiviResponseDto"];
+        };
         CreerLigneSuiviDto: {
             idp: string;
             acteId: number;
@@ -2010,33 +3016,41 @@ export interface components {
             montantActe?: number;
             libelle?: string;
         };
+        AuteurPieceJointeResponseDto: {
+            id: number;
+            nom: string;
+        };
+        PieceJointeFactureResponseDto: {
+            id: number;
+            nomFichier: string | null;
+            typeFichier: string;
+            tailleOctets: number;
+            /** Format: date-time */
+            createdAt: string;
+            ajoutePar: components["schemas"]["AuteurPieceJointeResponseDto"] | null;
+        };
+        UtilisateurResponseDto: {
+            id: number;
+            nom: string;
+            /** @enum {string} */
+            role: "OPERATEUR" | "ADJOINT" | "CHEF";
+        };
         CreerUtilisateurDto: {
             nom: string;
             /** @enum {string} */
             role: "OPERATEUR" | "ADJOINT" | "CHEF";
+        };
+        UtilisateurReponseAvecMessageDto: {
+            message: string;
+            utilisateur: components["schemas"]["UtilisateurResponseDto"];
         };
         ModifierUtilisateurDto: {
             nom?: string;
             /** @enum {string} */
             role?: "OPERATEUR" | "ADJOINT" | "CHEF";
         };
-        CreerRegleDto: {
-            /** @enum {string} */
-            type: "CHARGE_TOTALE_CEM" | "REPARTITION_AGENT_CEM";
-            /** @enum {string} */
-            agentConcerne: "ACTIF" | "NON_ACTIF";
-            tauxCem: number;
-            dateEffet: string;
-            dateFin?: string | null;
-        };
-        ModifierRegleDto: {
-            /** @enum {string} */
-            type?: "CHARGE_TOTALE_CEM" | "REPARTITION_AGENT_CEM";
-            /** @enum {string} */
-            agentConcerne?: "ACTIF" | "NON_ACTIF";
-            tauxCem?: number;
-            dateEffet?: string;
-            dateFin?: string | null;
+        MessageResponseDto: {
+            message: string;
         };
     };
     responses: never;
@@ -2063,7 +3077,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["AgentCategoryResponseDto"];
                 };
             };
         };
@@ -2079,6 +3093,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2107,7 +3122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["AgentCategoryResponseDto"];
                 };
             };
         };
@@ -2123,6 +3138,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2142,6 +3158,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2164,7 +3181,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentCategoryResponseDto"][];
                 };
             };
         };
@@ -2187,7 +3204,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["AgentCategoryResponseDto"];
                 };
             };
         };
@@ -2206,7 +3223,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentCategoryResponseDto"][];
                 };
             };
         };
@@ -2225,7 +3242,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentResponseDto"][];
                 };
             };
         };
@@ -2243,6 +3260,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Agent créé. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -2262,6 +3280,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2285,6 +3304,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Agent mis à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2304,11 +3324,16 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Carte professionnelle diffusée en tant que fichier image. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/webp": string;
+                };
             };
         };
     };
@@ -2327,6 +3352,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Carte professionnelle mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2346,6 +3372,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2365,6 +3392,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2387,7 +3415,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentDeletionRequestResponseDto"][];
                 };
             };
         };
@@ -2411,7 +3439,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentResponseDto"][];
                 };
             };
         };
@@ -2433,7 +3461,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentResponseDto"][];
                 };
             };
         };
@@ -2455,7 +3483,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentResponseDto"][];
                 };
             };
         };
@@ -2471,6 +3499,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2494,6 +3523,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Agence mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2513,6 +3543,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2532,6 +3563,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2551,6 +3583,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2574,6 +3607,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Direction mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2593,6 +3627,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2612,6 +3647,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2631,6 +3667,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2650,6 +3687,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2669,6 +3707,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2691,7 +3730,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgenceResponseDto"][];
                 };
             };
         };
@@ -2709,6 +3748,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Agence créée. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -2731,7 +3771,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgenceResponseDto"][];
                 };
             };
         };
@@ -2750,7 +3790,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["DirectionAvecServicesResponseDto"][];
                 };
             };
         };
@@ -2768,6 +3808,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Direction créée. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -2790,7 +3831,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["DirectionAvecServicesResponseDto"][];
                 };
             };
         };
@@ -2811,7 +3852,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ServiceResponseDto"][];
                 };
             };
         };
@@ -2830,7 +3871,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ServiceResponseDto"][];
                 };
             };
         };
@@ -2848,6 +3889,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Service créé. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -2870,7 +3912,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ServiceResponseDto"][];
                 };
             };
         };
@@ -2890,6 +3932,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Nom du service mis à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2913,6 +3956,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Direction du service mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -2937,7 +3981,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["BeneficiaryResponseDto"][];
                 };
             };
         };
@@ -2958,7 +4002,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["BeneficiaryResponseDto"];
                 };
             };
         };
@@ -2983,7 +4027,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["BeneficiaryResponseDto"];
                 };
             };
         };
@@ -3000,6 +4044,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3020,6 +4065,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3040,6 +4086,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3062,7 +4109,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ConjointResponseDto"][];
                 };
             };
         };
@@ -3081,7 +4128,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["EnfantResponseDto"][];
                 };
             };
         };
@@ -3099,6 +4146,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Conjoint créé. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -3122,6 +4170,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Conjoint mis à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3145,6 +4194,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Carte sociale mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3166,6 +4216,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Enfant créé. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -3189,6 +4240,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Enfant mis à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3212,6 +4264,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Carte sociale mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3236,7 +4289,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AgentFamilyResponseDto"][];
                 };
             };
         };
@@ -3252,11 +4305,16 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Carte sociale diffusée en tant que fichier image. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/webp": string;
+                };
             };
         };
     };
@@ -3281,7 +4339,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": (components["schemas"]["ActeResponseDto"] | components["schemas"]["ActeAvecPlafondsResponseDto"])[];
                 };
             };
         };
@@ -3295,17 +4353,71 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateActeDto"];
+                "application/json": {
+                    /** @enum {string} */
+                    type: "ACTE";
+                    code: string;
+                    nomActe: string;
+                    listeLibelle: string;
+                    /** @enum {string} */
+                    regime?: "NORMAL" | "EXCLU" | "SUR_DECISION_DG";
+                    categorieActeId: number;
+                    plafonds?: {
+                        parActe?: {
+                            montant: number;
+                        };
+                        parAn?: {
+                            /** @enum {string} */
+                            unite: "MONTANT";
+                            montant: number;
+                        } | {
+                            /** @enum {string} */
+                            unite: "SEANCES";
+                            nbSeances: number;
+                        };
+                    };
+                    /** Format: date */
+                    dateEffet?: string;
+                } | {
+                    code: string;
+                    nomActe: string;
+                    listeLibelle: string;
+                    /** @enum {string} */
+                    regime?: "NORMAL" | "EXCLU" | "SUR_DECISION_DG";
+                    categorieActeId: number;
+                };
             };
         };
         responses: {
+            /** @description Acte créé. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ActeResponseDto"] | components["schemas"]["ActeAvecPlafondsResponseDto"];
                 };
+            };
+            /** @description Payload invalide ou incompatible. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Catégorie d’acte introuvable. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Code, nom ou plafond incompatible. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3325,7 +4437,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ActeResponseDto"];
                 };
             };
         };
@@ -3341,6 +4453,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Acte supprimé. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3369,7 +4482,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ActeResponseDto"];
                 };
             };
         };
@@ -3395,7 +4508,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["PlafondResponseDto"][];
                 };
             };
         };
@@ -3418,7 +4531,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PlafondResponseDto"];
                 };
             };
         };
@@ -3439,7 +4552,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PlafondResponseDto"];
                 };
             };
         };
@@ -3455,6 +4568,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Plafond supprimé. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3483,7 +4597,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PlafondResponseDto"];
                 };
             };
         };
@@ -3502,7 +4616,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AttestationResponseDto"][];
                 };
             };
         };
@@ -3520,6 +4634,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Attestation créée. */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -3539,6 +4654,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Attestation supprimée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3562,6 +4678,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Attestation mise à jour. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3581,6 +4698,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Attestation approuvée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3600,6 +4718,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Attestation rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3624,7 +4743,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["AttestationResponseDto"][];
                 };
             };
         };
@@ -3640,11 +4759,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Aperçu de l’attestation au format PNG. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "image/png": string;
+                };
             };
         };
     };
@@ -3659,6 +4781,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3687,7 +4810,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ProviderResponseDto"];
                 };
             };
         };
@@ -3703,6 +4826,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3722,6 +4846,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3744,7 +4869,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ProviderResponseDto"][];
                 };
             };
         };
@@ -3770,7 +4895,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ProviderResponseDto"];
                 };
             };
         };
@@ -3789,7 +4914,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ProviderResponseDto"][];
                 };
             };
         };
@@ -3811,7 +4936,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ProviderResponseDto"][];
                 };
             };
         };
@@ -3827,11 +4952,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Convention PDF diffusée en ligne. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                };
             };
         };
     };
@@ -3858,7 +4986,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ProviderResponseDto"];
                 };
             };
         };
@@ -3874,6 +5002,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3902,7 +5031,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["LocationResponseDto"];
                 };
             };
         };
@@ -3918,6 +5047,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3937,6 +5067,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -3959,7 +5090,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["LocationResponseDto"][];
                 };
             };
         };
@@ -3982,7 +5113,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["LocationResponseDto"];
                 };
             };
         };
@@ -4001,7 +5132,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["LocationResponseDto"][];
                 };
             };
         };
@@ -4029,7 +5160,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": (components["schemas"]["CategorieActeResponseDto"] | components["schemas"]["CategorieActeAvecPlafondsResponseDto"] | components["schemas"]["CategorieActeAvecActesResponseDto"] | components["schemas"]["CategorieActeAvecPlafondsEtActesResponseDto"])[];
                 };
             };
         };
@@ -4043,17 +5174,32 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateCategorieActeDto"];
+                "application/json": components["schemas"]["CreateCategorieWithCeilingsDto"];
             };
         };
         responses: {
+            /** @description Catégorie créée, avec plafonds résolus si demandés. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["CategorieActeResponseDto"] | components["schemas"]["CategorieActeAvecPlafondsResponseDto"];
                 };
+            };
+            /** @description Payload invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Nom ou plafond incompatible. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -4073,7 +5219,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["CategorieActeResponseDto"];
                 };
             };
         };
@@ -4089,6 +5235,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Catégorie d’acte supprimée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -4117,7 +5264,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["CategorieActeResponseDto"];
                 };
             };
         };
@@ -4133,6 +5280,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression enregistrée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -4161,7 +5309,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ProviderCategoryResponseDto"];
                 };
             };
         };
@@ -4177,6 +5325,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Suppression validée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -4196,6 +5345,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Demande de suppression rejetée. */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -4218,7 +5368,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ProviderCategoryResponseDto"][];
                 };
             };
         };
@@ -4241,7 +5391,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ProviderCategoryResponseDto"];
                 };
             };
         };
@@ -4260,7 +5410,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["ProviderCategoryResponseDto"][];
+                };
+            };
+        };
+    };
+    RegleController_lister: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReglesResponseEnveloppeDto"];
+                };
+            };
+        };
+    };
+    RegleController_creer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreerRegleDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegleResponseEnveloppeDto"];
+                };
+            };
+        };
+    };
+    RegleController_obtenirParId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegleResponseEnveloppeDto"];
+                };
+            };
+        };
+    };
+    RegleController_supprimer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegleResponseEnveloppeDto"];
+                };
+            };
+        };
+    };
+    RegleController_modifier: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModifierRegleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegleResponseEnveloppeDto"];
                 };
             };
         };
@@ -4269,6 +5528,8 @@ export interface operations {
         parameters: {
             query?: {
                 statut?: string;
+                cloturee?: "true" | "false";
+                rapprochement?: "CONFORME" | "ECART" | "INCOMPLET";
             };
             header?: never;
             path?: never;
@@ -4280,7 +5541,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FactureGlobaleListeeResponseDto"][];
+                };
             };
         };
     };
@@ -4301,7 +5564,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FactureGlobaleCreeeResponseDto"];
+                };
             };
         };
     };
@@ -4323,7 +5588,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["MouvementFactureResponseDto"][];
                 };
             };
         };
@@ -4344,7 +5609,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["TransitionFactureResponseDto"][];
                 };
             };
         };
@@ -4364,7 +5629,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FactureGlobaleDetailResponseDto"];
+                };
             };
         };
     };
@@ -4387,7 +5654,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FactureGlobaleModificationResponseDto"];
+                };
             };
         };
     };
@@ -4406,7 +5675,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["LignesFactureResponseDto"];
+                };
             };
         };
     };
@@ -4431,7 +5702,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["LigneFactureResponseDto"];
                 };
             };
         };
@@ -4457,7 +5728,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["LigneFactureResponseDto"];
                 };
             };
         };
@@ -4474,6 +5745,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Ligne de facture supprimée. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4502,7 +5774,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["PropositionDepassementResponseDto"] | null;
                 };
             };
         };
@@ -4526,7 +5798,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AffectationRetenueResponseDto"];
+                };
             };
         };
     };
@@ -4546,7 +5820,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["ControleTotauxResponseDto"];
                 };
             };
         };
@@ -4570,7 +5844,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FactureWorkflowResponseDto"];
+                };
             };
         };
     };
@@ -4590,6 +5866,213 @@ export interface operations {
         };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FactureGlobaleModificationResponseDto"];
+                };
+            };
+        };
+    };
+    CloturePaieController_cloturer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Mois au format AAAA-MM */
+                mois: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloturerPaieDto"];
+            };
+        };
+        responses: {
+            /** @description Factures clôturées. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CloturePaieResponseDto"];
+                };
+            };
+            /** @description Mois ou corps de requête invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Une ou plusieurs factures ne peuvent pas être clôturées. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefusClotureResponseDto"][] | {
+                        /** @example 409 */
+                        statusCode: number;
+                        message: string;
+                        /** @example Conflict */
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    PaieEtatController_listerPaies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Mois clôturés, nombre de factures et lignes, total agent. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaieMoisResponseDto"][];
+                };
+            };
+        };
+    };
+    PaieEtatController_listerLignes: {
+        parameters: {
+            query?: {
+                page?: string;
+                limite?: string;
+                im?: string;
+                prestataireId?: string;
+                factureId?: string;
+                direction?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Format AAAA-MM */
+                mois: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lignes paginées et total. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LignesPaiePagineesResponseDto"];
+                };
+            };
+            /** @description Mois ou pagination invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PaieEtatController_consommation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Format AAAA-MM */
+                mois: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Consommation et total général. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsommationPaieResponseDto"];
+                };
+            };
+            /** @description Mois invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PaieEtatController_etat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Format AAAA-MM */
+                mois: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description État par agent et total général. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPaieResponseDto"];
+                };
+            };
+            /** @description Mois invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PaieEtatController_etatIndividuel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Format AAAA-MM */
+                mois: string;
+                /** @description Matricule de l’agent */
+                im: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description État individuel par établissement. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatIndividuelPaieResponseDto"];
+                };
+            };
+            /** @description Mois ou matricule invalide. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Agent introuvable. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4617,7 +6100,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["FeuilleSuiviResponseDto"];
                 };
             };
         };
@@ -4639,7 +6122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["CibleSuiviResponseDto"][];
                 };
             };
         };
@@ -4665,7 +6148,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["FeuilleSuiviResponseDto"];
                 };
             };
         };
@@ -4686,7 +6169,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["FeuilleSuiviResponseDto"];
                 };
             };
         };
@@ -4711,111 +6194,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["FeuilleSuiviResponseDto"] | components["schemas"]["FeuilleSuiviModifieeResponseDto"];
                 };
-            };
-        };
-    };
-    UtilisateurController_lister: {
-        parameters: {
-            query?: {
-                role?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    UtilisateurController_creer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreerUtilisateurDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UtilisateurController_obtenir: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UtilisateurController_supprimer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UtilisateurController_modifier: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ModifierUtilisateurDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -4835,7 +6215,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>[];
+                    "application/json": components["schemas"]["PieceJointeFactureResponseDto"][];
                 };
             };
         };
@@ -4861,25 +6241,12 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Pièce jointe créée. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        id?: number;
-                        nomFichier?: string | null;
-                        /** @example application/pdf */
-                        typeFichier?: string;
-                        tailleOctets?: number;
-                        /** Format: date-time */
-                        createdAt?: string;
-                        ajoutePar?: {
-                            id?: number;
-                            nom?: string;
-                        } | null;
-                    };
+                    "application/json": components["schemas"]["PieceJointeFactureResponseDto"];
                 };
             };
             /** @description Fichier manquant ou multipart invalide. */
@@ -4924,11 +6291,16 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Fichier PDF, JPEG ou PNG diffusé en ligne. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/pdf": string;
+                    "image/jpeg": string;
+                    "image/png": string;
+                };
             };
             /** @description Pièce jointe introuvable. */
             404: {
@@ -4974,9 +6346,11 @@ export interface operations {
             };
         };
     };
-    RegleController_lister: {
+    UtilisateurController_lister: {
         parameters: {
-            query?: never;
+            query?: {
+                role?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4987,11 +6361,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UtilisateurResponseDto"][];
+                };
             };
         };
     };
-    RegleController_creer: {
+    UtilisateurController_creer: {
         parameters: {
             query?: never;
             header?: never;
@@ -5000,7 +6376,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreerRegleDto"];
+                "application/json": components["schemas"]["CreerUtilisateurDto"];
             };
         };
         responses: {
@@ -5008,11 +6384,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UtilisateurReponseAvecMessageDto"];
+                };
             };
         };
     };
-    RegleController_obtenirParId: {
+    UtilisateurController_obtenir: {
         parameters: {
             query?: never;
             header?: never;
@@ -5027,11 +6405,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UtilisateurResponseDto"];
+                };
             };
         };
     };
-    RegleController_supprimer: {
+    UtilisateurController_supprimer: {
         parameters: {
             query?: never;
             header?: never;
@@ -5046,11 +6426,13 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
             };
         };
     };
-    RegleController_modifier: {
+    UtilisateurController_modifier: {
         parameters: {
             query?: never;
             header?: never;
@@ -5061,7 +6443,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ModifierRegleDto"];
+                "application/json": components["schemas"]["ModifierUtilisateurDto"];
             };
         };
         responses: {
@@ -5069,7 +6451,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UtilisateurReponseAvecMessageDto"];
+                };
             };
         };
     };
