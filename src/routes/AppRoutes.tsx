@@ -13,6 +13,7 @@ import T5ParAnPage from "../pages/T5ParAn";
 import T5ParAnParActePage from "../pages/T5ParAnParActe";
 import T5ParSeancePage from "../pages/T5ParSeance";
 import T5XConfigurationPage from "../pages/T5XConfiguration";
+import T6Page from "../pages/T6Page";
 import { fetchIdpLookupMock } from "../features/invoice/mocks/idpLookup";
 import { ROUTES } from "../constants/routes";
 
@@ -31,6 +32,7 @@ export default function AppRoutes() {
       <Route path={ROUTES.referentials} element={<AppShell><ReferentielsPage /></AppShell>} />
       <Route path={ROUTES.deletionRequests} element={<AppShell><DeletionRequestsPage /></AppShell>} />
       <Route path={ROUTES.invoice} element={<AppShell><InvoicePage></InvoicePage></AppShell>} />
+      <Route path={ROUTES.T6} element={<AppShell><T6Page /></AppShell>} />
       <Route path={ROUTES.T5X} element={<AppShell><T5XConfigurationPage /></AppShell>} />
       <Route path={ROUTES.T5ParAn} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnPage /></LookupLayout>} />
       <Route path={ROUTES.T5ParAnParActe} element={<LookupLayout onSearchIdp={fetchIdpLookupMock}><T5ParAnParActePage /></LookupLayout>} />

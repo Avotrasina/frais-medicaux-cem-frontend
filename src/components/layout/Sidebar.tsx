@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Bell,
+  Banknote,
   ChevronDown,
   ClipboardCheck,
   LogOut,
@@ -32,6 +33,7 @@ const nav: NavEntry[] = [
   { to: "/prestataires", label: "Prestataires", icon: Stethoscope },
   { to: "/pec", label: "Prises en charge", icon: ShieldCheck },
   { to: "/factures", label:"Factures", icon:Receipt},
+  { to: "/retenue-salaire", label: "Retenues sur salaire", icon: Banknote },
   { to: "/T5X", label: "Acte et prestation", icon: ClipboardPlus },
   { section: "Paramétrage" },
   { to: "/referentiels", label: "Référentiels", icon: Settings },

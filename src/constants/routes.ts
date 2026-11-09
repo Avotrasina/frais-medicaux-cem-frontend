@@ -7,6 +7,7 @@ export const ROUTES = {
   referentials: "/referentiels",
   deletionRequests: "/demandes-suppression",
   invoice: "/factures",
+  T6: "/retenue-salaire",
   T5ParAn: "/ParAn/:id/:label/:refSocial",
   T5Parseance: "/ParSeance/:id/:label/:refSocial",
   T5ParAnParActe: "/ParAnParActe/:id/:label/:refSocial",

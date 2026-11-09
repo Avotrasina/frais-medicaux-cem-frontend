@@ -123,7 +123,7 @@ export default function EditableMonthCell({
 						<input
 							autoFocus
 							type="month"
-							className="h-full w-full pr-14 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
+							className="box-border h-full w-full min-w-0 max-w-full pr-14 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
 							value={draft}
 							onChange={(event) => setDraft(event.target.value)}
 							onKeyDown={handleKeyDown}
