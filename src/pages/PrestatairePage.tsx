@@ -15,7 +15,7 @@ import {
 	listProviders,
 	updateProvider,
 	updateProviderConvention,
-} from "../features/providers/services/providers";
+} from "../services/prestataire-api";
 import { resolveProviderConventionUrl } from "../services/api";
 import { requestDeletion } from "../features/deletions/services/deletions";
 import type { CreateProviderInput, Provider } from "../types/api";

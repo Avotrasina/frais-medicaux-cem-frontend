@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
-import { listProviderCategories } from "../../providers/services/providers";
+import { listProviderCategories } from "../../../services/categorie-prestataire-api";
+import { listLieux } from "../../../services/lieu-api";
 import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
 import {
 	listAgences,
 	listAgentCategories,
 	listDirections,
-	listLieux,
 } from "../services/referentials";
 import type {
 	Agence,

@@ -15,10 +15,12 @@ import type {
 } from "../api/domains/famille-agent";
 import type {
 	CreateLieuDto,
+	LocationResponseDto,
 	UpdateLieuDto,
 } from "../api/domains/lieu";
 import type {
 	CreateProviderDto,
+	ProviderResponseDto,
 	UpdateProviderDto,
 } from "../api/domains/prestataire";
 import type {
@@ -27,6 +29,7 @@ import type {
 } from "../api/domains/categorie-agent";
 import type {
 	CreateProviderCategoryDto,
+	ProviderCategoryResponseDto,
 	UpdateProviderCategoryDto,
 } from "../api/domains/categorie-prestataire";
 import type {
@@ -189,15 +192,9 @@ export interface Direction {
 
 // --- Referentials -----------------------------------------------------------
 
-export interface Lieu {
-	id: number;
-	nom: string;
-}
+export type Lieu = LocationResponseDto;
 
-export interface ProviderCategory {
-	id: number;
-	nom: string;
-}
+export type ProviderCategory = ProviderCategoryResponseDto;
 
 export interface AgentCategory {
 	id: number;
@@ -206,22 +203,7 @@ export interface AgentCategory {
 
 // --- Providers --------------------------------------------------------------
 
-export interface Provider {
-	id: number;
-	nom: string;
-	adresse: string;
-	statut: ProviderStatus;
-	nif: string;
-	stat: string;
-	dateDebutConvention: string;
-	dateFinConvention: string;
-	listePrestation: string;
-	echeanceRenouvellement: string | null;
-	echeanceResiliation: string | null;
-	observation: string | null;
-	lieuID: number;
-	categorieID: number;
-}
+export type Provider = ProviderResponseDto;
 
 /** Body of `POST /providers`; every field is optional on `PATCH`. */
 export type CreateProviderInput = CreateProviderDto;

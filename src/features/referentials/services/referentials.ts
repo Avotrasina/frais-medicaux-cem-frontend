@@ -13,14 +13,9 @@ import type {
 	UpdateAgentCategoryDto,
 } from "../../../api/domains/categorie-agent";
 import type {
-	CreateLieuDto,
-	UpdateLieuDto,
-} from "../../../api/domains/lieu";
-import type {
 	Agence,
 	AgentCategory,
 	Direction,
-	Lieu,
 	Service,
 } from "../../../types/api";
 
@@ -31,23 +26,6 @@ import type {
  * `nomDirection` / `nomService`, while responses answer with `nom`.
  * The wrappers below hide that difference from the UI.
  */
-
-// --- Locations --------------------------------------------------------------
-
-/** There is no `GET /locations/:id`: only the full listing is available. */
-export function listLieux(): Promise<Lieu[]> {
-	return apiService.get<Lieu[]>(apiRoutes.lieux);
-}
-
-export function createLieu(nom: string): Promise<Lieu> {
-	const body: CreateLieuDto = { nom };
-	return apiService.post<Lieu>(apiRoutes.lieux, body);
-}
-
-export function updateLieu(id: number, nom: string): Promise<Lieu> {
-	const body: UpdateLieuDto = { nom };
-	return apiService.patch<Lieu>(apiRoutes.lieu(id), body);
-}
 
 // --- Agent categories -------------------------------------------------------
 

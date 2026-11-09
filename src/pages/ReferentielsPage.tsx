@@ -9,21 +9,20 @@ import { useReferentials } from "../features/referentials/hooks/useReferentials"
 import {
 	createProviderCategory,
 	updateProviderCategory,
-} from "../features/providers/services/providers";
+} from "../services/categorie-prestataire-api";
 import { requestDeletion, type DeletionResource } from "../features/deletions/services/deletions";
 import {
 	createAgence,
 	createAgentCategory,
 	createDirection,
-	createLieu,
 	createService,
 	moveService,
 	updateAgence,
 	updateAgentCategory,
 	updateDirection,
-	updateLieu,
 	updateServiceName,
 } from "../features/referentials/services/referentials";
+import { createLieu, updateLieu } from "../services/lieu-api";
 import { errorMessage } from "../utils/errors";
 import { notify } from "../utils/notify";
 

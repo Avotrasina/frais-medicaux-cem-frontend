@@ -25,12 +25,12 @@ import {
 	rejectAttestation,
 } from "../features/pec/services/attestations";
 import { getBeneficiaryByIdp } from "../features/beneficiaries/services/beneficiaries";
-import { listProviders } from "../features/providers/services/providers";
+import { listProviders } from "../services/prestataire-api";
 import {
 	listDirections,
-	listLieux,
 	listServices,
 } from "../features/referentials/services/referentials";
+import { listLieux } from "../services/lieu-api";
 import type {
 	AgentItem,
 	Beneficiary,
