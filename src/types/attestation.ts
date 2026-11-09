@@ -6,6 +6,7 @@ import type {
 	Provider,
 	Service,
 } from "./api";
+import type { CreateAttestationDto } from "../api/domains/attestation";
 
 export const ATTESTATION_STATUTS = [
 	"EN_ATTENTE",
@@ -30,13 +31,7 @@ export interface Attestation {
 }
 
 /** Body of `POST /attestations`; the endpoint returns no body. */
-export interface CreateAttestationInput {
-	idpBeneficiaire: string;
-	providerID: number;
-	naturePrestation: string;
-	datePEC: string;
-	servicePrestataire?: string;
-}
+export type CreateAttestationInput = CreateAttestationDto;
 
 export type AttestationFormValues = CreateAttestationInput;
 

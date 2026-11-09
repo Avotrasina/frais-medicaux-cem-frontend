@@ -1,4 +1,5 @@
 import { api, apiRoutes, apiService } from "../../../services/api";
+import type { CreateAttestationDto } from "../../../api/domains/attestation";
 import type { Attestation, CreateAttestationInput } from "../../../types/attestation";
 
 /** `GET /attestations` — all attestations. */
@@ -18,7 +19,8 @@ export async function getAttestationPreview(id: number): Promise<Blob> {
 export async function createAttestation(
 	input: CreateAttestationInput,
 ): Promise<void> {
-	await apiService.post<void>(apiRoutes.attestationCreate, input);
+	const body: CreateAttestationDto = input;
+	await apiService.post<void>(apiRoutes.attestationCreate, body);
 }
 
 /** `PATCH /attestations/:id/approval` — marks a pending attestation as approved. */

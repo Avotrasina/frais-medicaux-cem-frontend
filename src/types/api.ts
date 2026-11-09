@@ -1,13 +1,49 @@
 /**
- * Data contracts of the FM-CEM backend (see `API.md`).
- * Enums are declared as union types plus a `const` tuple so forms can iterate
- * over them without duplicating the literals.
+ * UI-facing API contracts. Request DTOs and query shapes come from the
+ * generated OpenAPI views below; response models stay local where Swagger
+ * currently emits `Record<string, never>` instead of response DTOs.
  */
+
+import type {
+	AgentCreateMultipartDto,
+	AgentUpdateDto,
+} from "../api/domains/agent";
+import type { UpdateObservationBeneficiaryDto } from "../api/domains/beneficiaire";
+import type {
+	AgentFamilyCreateMultipartDto,
+	UpdatePartialFamilleAgentDto,
+} from "../api/domains/famille-agent";
+import type {
+	CreateLieuDto,
+	UpdateLieuDto,
+} from "../api/domains/lieu";
+import type {
+	CreateProviderDto,
+	UpdateProviderDto,
+} from "../api/domains/prestataire";
+import type {
+	CreateAgentCategoryDto,
+	UpdateAgentCategoryDto,
+} from "../api/domains/categorie-agent";
+import type {
+	CreateProviderCategoryDto,
+	UpdateProviderCategoryDto,
+} from "../api/domains/categorie-prestataire";
+import type {
+	CreateAgenceDto,
+	CreateDirectionDto,
+	CreateServiceDto,
+	UpdateAgenceDto,
+	UpdateDirectionDto,
+	UpdateServiceCodeDirectionDto,
+	UpdateServiceNomDto,
+} from "../api/domains/structure-organisationnelle";
+import type { PrestatairePaths } from "../api/domains/prestataire";
 
 // --- Enums ------------------------------------------------------------------
 
 export const SEXES = ["MASCULIN", "FEMININ"] as const;
-export type Sexe = (typeof SEXES)[number];
+export type Sexe = AgentCreateMultipartDto["sexe"];
 
 export const STATUTS_PEC = [
 	"AGENT",
@@ -15,13 +51,13 @@ export const STATUTS_PEC = [
 	"CHEF_AGENCE",
 	"DIRECTEUR",
 ] as const;
-export type StatutPEC = (typeof STATUTS_PEC)[number];
+export type StatutPEC = AgentCreateMultipartDto["statutPEC"];
 
 export const AFFECTATIONS = ["RETRAITE", "AGENCE", "DIRECTION"] as const;
-export type BackOfficeFrontOffice = (typeof AFFECTATIONS)[number];
+export type BackOfficeFrontOffice = AgentCreateMultipartDto["backOfficeFrontOffice"];
 
 export const PROVIDER_STATUSES = ["PRIVE", "PUBLIC"] as const;
-export type ProviderStatus = (typeof PROVIDER_STATUSES)[number];
+export type ProviderStatus = CreateProviderDto["statut"];
 
 export const CODES_FAMILLE = ["AGENT", "CONJOINT", "ENFANT"] as const;
 export type CodeFamille = (typeof CODES_FAMILLE)[number];
@@ -54,32 +90,29 @@ export interface AgentItem {
 }
 
 /** Body of `POST /agents` (multipart, `image` is required). */
-export interface CreateAgentInput {
+export type CreateAgentInput = Omit<
+	AgentCreateMultipartDto,
+	"image" | "matricule"
+> & {
 	matricule: string;
-	nom: string;
-	prenom: string;
-	statutPEC: StatutPEC;
-	dateNaissance: string;
-	sexe: Sexe;
-	backOfficeFrontOffice: BackOfficeFrontOffice;
-	dateEntree: string;
-	observationMatricule?: string | null;
-	fonction?: string | null;
-	categorieID?: string | null;
-	structureID?: string | null;
 	codeDirection?: string | null;
 	codeAgence?: string | null;
-	codeService?: string | null;
-}
+};
 
 /**
  * Body of `PATCH /agents/:matricule`.
  * `matricule` and `image` are not updatable. `null`/missing values are ignored
  * by the backend, so a field can never be cleared through this route.
  */
-export type UpdateAgentInput = Partial<Omit<CreateAgentInput, "matricule">>;
+export type UpdateAgentInput = AgentUpdateDto & {
+	codeDirection?: string | null;
+	codeAgence?: string | null;
+};
 
-/** Nested `filter` object accepted by `GET /agents/search`. */
+/**
+ * Runtime's nested `filter` query shape for `GET /agents/search`.
+ * Kept local because the current Swagger schema describes the query flatly.
+ */
 export interface AgentStructureFilter {
 	backOfficeFrontOffice?: BackOfficeFrontOffice;
 	codeAgence?: string;
@@ -103,21 +136,16 @@ export interface FamilyMember {
 }
 
 /** Body of `POST /agent-families/spouses|children` (multipart, `image` required). */
-export interface CreateFamilyMemberInput {
-	agentMatricule: string;
-	nom: string;
-	prenom: string;
-	dateNaissance: string;
-	sexe: Sexe;
-}
+export type CreateFamilyMemberInput = Omit<
+	AgentFamilyCreateMultipartDto,
+	"image" | "agentMatricule"
+> & { agentMatricule: string };
 
 /** Body of `PATCH /agent-families/<kind>/:id`. */
-export interface UpdateFamilyMemberInput {
-	nom?: string;
-	prenom?: string;
-	dateNaissance?: string;
-	sexe?: Sexe;
-}
+export type UpdateFamilyMemberInput = UpdatePartialFamilleAgentDto;
+
+export type UpdateBeneficiaryObservationInput =
+	UpdateObservationBeneficiaryDto["observationIDP"];
 
 export type FamilyKind = "conjoint" | "enfant";
 
@@ -196,26 +224,24 @@ export interface Provider {
 }
 
 /** Body of `POST /providers`; every field is optional on `PATCH`. */
-export interface CreateProviderInput {
-	nom: string;
-	adresse: string;
-	statut: ProviderStatus;
-	nif: string;
-	stat: string;
-	dateDebutConvention: string;
-	dateFinConvention: string;
-	listePrestation: string;
-	echeanceRenouvellement?: string | null;
-	echeanceResiliation?: string | null;
-	observation?: string | null;
-	lieuID: number;
-	categorieID: number;
-}
-
-export type UpdateProviderInput = Partial<CreateProviderInput>;
+export type CreateProviderInput = CreateProviderDto;
+export type UpdateProviderInput = UpdateProviderDto;
 
 /** Query of `GET /providers/search`. */
-export interface ProviderFilter {
-	lieuID?: number;
-	categorieID?: number;
-}
+export type ProviderFilter = NonNullable<
+	NonNullable<PrestatairePaths["/providers/search"]["get"]>["parameters"]["query"]
+>;
+
+export type CreateLieuInput = CreateLieuDto;
+export type UpdateLieuInput = UpdateLieuDto;
+export type CreateAgentCategoryInput = CreateAgentCategoryDto;
+export type UpdateAgentCategoryInput = UpdateAgentCategoryDto;
+export type CreateProviderCategoryInput = CreateProviderCategoryDto;
+export type UpdateProviderCategoryInput = UpdateProviderCategoryDto;
+export type CreateAgenceInput = CreateAgenceDto;
+export type UpdateAgenceInput = UpdateAgenceDto;
+export type CreateDirectionInput = CreateDirectionDto;
+export type UpdateDirectionInput = UpdateDirectionDto;
+export type CreateServiceInput = CreateServiceDto;
+export type UpdateServiceNameInput = UpdateServiceNomDto;
+export type UpdateServiceDirectionInput = UpdateServiceCodeDirectionDto;

@@ -1,5 +1,22 @@
 import { apiRoutes, apiService } from "../../../services/api";
 import type {
+	CreateAgenceDto,
+	CreateDirectionDto,
+	CreateServiceDto,
+	UpdateAgenceDto,
+	UpdateDirectionDto,
+	UpdateServiceCodeDirectionDto,
+	UpdateServiceNomDto,
+} from "../../../api/domains/structure-organisationnelle";
+import type {
+	CreateAgentCategoryDto,
+	UpdateAgentCategoryDto,
+} from "../../../api/domains/categorie-agent";
+import type {
+	CreateLieuDto,
+	UpdateLieuDto,
+} from "../../../api/domains/lieu";
+import type {
 	Agence,
 	AgentCategory,
 	Direction,
@@ -23,11 +40,13 @@ export function listLieux(): Promise<Lieu[]> {
 }
 
 export function createLieu(nom: string): Promise<Lieu> {
-	return apiService.post<Lieu>(apiRoutes.lieux, { nom });
+	const body: CreateLieuDto = { nom };
+	return apiService.post<Lieu>(apiRoutes.lieux, body);
 }
 
 export function updateLieu(id: number, nom: string): Promise<Lieu> {
-	return apiService.patch<Lieu>(apiRoutes.lieu(id), { nom });
+	const body: UpdateLieuDto = { nom };
+	return apiService.patch<Lieu>(apiRoutes.lieu(id), body);
 }
 
 // --- Agent categories -------------------------------------------------------
@@ -43,18 +62,16 @@ export function listAgentCategories(): Promise<AgentCategory[]> {
 export function createAgentCategory(
 	codeCategory: string,
 ): Promise<AgentCategory> {
-	return apiService.post<AgentCategory>(apiRoutes.agentCategories, {
-		codeCategory,
-	});
+	const body: CreateAgentCategoryDto = { codeCategory };
+	return apiService.post<AgentCategory>(apiRoutes.agentCategories, body);
 }
 
 export function updateAgentCategory(
 	id: number,
 	codeCategory: string,
 ): Promise<AgentCategory> {
-	return apiService.patch<AgentCategory>(apiRoutes.agentCategory(id), {
-		codeCategory,
-	});
+	const body: UpdateAgentCategoryDto = { codeCategory };
+	return apiService.patch<AgentCategory>(apiRoutes.agentCategory(id), body);
 }
 
 // --- Organisational structure ----------------------------------------------
@@ -67,14 +84,16 @@ export function createAgence(
 	codeAgence: string,
 	nomAgence: string,
 ): Promise<void> {
-	return apiService.post<void>(apiRoutes.agences, { codeAgence, nomAgence });
+	const body: CreateAgenceDto = { codeAgence, nomAgence };
+	return apiService.post<void>(apiRoutes.agences, body);
 }
 
 export function updateAgence(
 	codeAgence: string,
 	nomAgence: string,
 ): Promise<void> {
-	return apiService.patch<void>(apiRoutes.agence(codeAgence), { nomAgence });
+	const body: UpdateAgenceDto = { nomAgence };
+	return apiService.patch<void>(apiRoutes.agence(codeAgence), body);
 }
 
 /** Directions come back with their services nested, sorted by name. */
@@ -86,19 +105,19 @@ export function createDirection(
 	codeDirection: string,
 	nomDirection: string,
 ): Promise<void> {
-	return apiService.post<void>(apiRoutes.directions, {
+	const body: CreateDirectionDto = {
 		codeDirection,
 		nomDirection,
-	});
+	};
+	return apiService.post<void>(apiRoutes.directions, body);
 }
 
 export function updateDirection(
 	codeDirection: string,
 	nomDirection: string,
 ): Promise<void> {
-	return apiService.patch<void>(apiRoutes.direction(codeDirection), {
-		nomDirection,
-	});
+	const body: UpdateDirectionDto = { nomDirection };
+	return apiService.patch<void>(apiRoutes.direction(codeDirection), body);
 }
 
 export function listServices(): Promise<Service[]> {
@@ -116,20 +135,20 @@ export function createService(
 	nomService: string,
 	codeDirection: string,
 ): Promise<void> {
-	return apiService.post<void>(apiRoutes.services, {
+	const body: CreateServiceDto = {
 		codeService,
 		nomService,
 		codeDirection,
-	});
+	};
+	return apiService.post<void>(apiRoutes.services, body);
 }
 
 export function updateServiceName(
 	codeService: string,
 	nomService: string,
 ): Promise<void> {
-	return apiService.patch<void>(apiRoutes.serviceNom(codeService), {
-		nomService,
-	});
+	const body: UpdateServiceNomDto = { nomService };
+	return apiService.patch<void>(apiRoutes.serviceNom(codeService), body);
 }
 
 /**
@@ -140,7 +159,6 @@ export function moveService(
 	codeService: string,
 	codeDirection: string,
 ): Promise<void> {
-	return apiService.patch<void>(apiRoutes.serviceDirection(codeService), {
-		codeDirection,
-	});
+	const body: UpdateServiceCodeDirectionDto = { codeDirection };
+	return apiService.patch<void>(apiRoutes.serviceDirection(codeService), body);
 }

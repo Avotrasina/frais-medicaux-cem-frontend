@@ -1,5 +1,12 @@
 import { apiRoutes, apiService, imageFormData } from "../../../services/api";
 import type {
+	UpdateProviderDto,
+} from "../../../api/domains/prestataire";
+import type {
+	CreateProviderCategoryDto,
+	UpdateProviderCategoryDto,
+} from "../../../api/domains/categorie-prestataire";
+import type {
 	CreateProviderInput,
 	Provider,
 	ProviderCategory,
@@ -34,11 +41,7 @@ export function createProvider(
 ): Promise<Provider> {
 	return apiService.post<Provider>(
 		apiRoutes.providers,
-		imageFormData(
-			input as unknown as Record<string, unknown>,
-			convention,
-			"convention",
-		),
+		imageFormData(input, convention, "convention"),
 	);
 }
 
@@ -47,7 +50,8 @@ export function updateProvider(
 	id: number,
 	input: UpdateProviderInput,
 ): Promise<Provider> {
-	return apiService.patch<Provider>(apiRoutes.provider(id), input);
+	const body: UpdateProviderDto = input;
+	return apiService.patch<Provider>(apiRoutes.provider(id), body);
 }
 
 /** `PATCH /providers/:id-provider/convention` — replaces the agreement PDF. */
@@ -68,16 +72,14 @@ export function listProviderCategories(): Promise<ProviderCategory[]> {
 }
 
 export function createProviderCategory(nom: string): Promise<ProviderCategory> {
-	return apiService.post<ProviderCategory>(apiRoutes.providerCategories, {
-		nom,
-	});
+	const body: CreateProviderCategoryDto = { nom };
+	return apiService.post<ProviderCategory>(apiRoutes.providerCategories, body);
 }
 
 export function updateProviderCategory(
 	id: number,
 	nom: string,
 ): Promise<ProviderCategory> {
-	return apiService.patch<ProviderCategory>(apiRoutes.providerCategory(id), {
-		nom,
-	});
+	const body: UpdateProviderCategoryDto = { nom };
+	return apiService.patch<ProviderCategory>(apiRoutes.providerCategory(id), body);
 }

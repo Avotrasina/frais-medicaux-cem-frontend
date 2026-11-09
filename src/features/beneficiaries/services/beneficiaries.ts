@@ -1,4 +1,5 @@
 import { apiRoutes, apiService } from "../../../services/api";
+import type { UpdateObservationBeneficiaryDto } from "../../../api/domains/beneficiaire";
 import type { Beneficiary } from "../../../types/api";
 
 /** `GET /beneficiaries/by-matricule/:matricule` — agent + spouse + children. */
@@ -23,9 +24,10 @@ export function updateBeneficiaryObservation(
 	idp: string,
 	observationIDP: string | null,
 ): Promise<Beneficiary> {
+	const body: UpdateObservationBeneficiaryDto = { observationIDP };
 	return apiService.patch<Beneficiary>(
 		apiRoutes.beneficiaryObservation(idp),
-		{ observationIDP },
+		body,
 	);
 }
 

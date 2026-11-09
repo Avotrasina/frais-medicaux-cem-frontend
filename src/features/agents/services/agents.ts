@@ -1,4 +1,5 @@
 import { apiRoutes, apiService, imageFormData } from "../../../services/api";
+import type { AgentUpdateDto } from "../../../api/domains/agent";
 import type {
 	AgentItem,
 	AgentStructureFilter,
@@ -56,12 +57,13 @@ export function createAgent(
 ): Promise<void> {
 	const { codeAgence, codeDirection, ...fields } = input;
 	const structureID = codeAgence || codeDirection;
+	const multipartFields = {
+		...fields,
+		...(structureID ? { structureID } : {}),
+	};
 	return apiService.post<void>(
 		apiRoutes.agentCreate,
-		imageFormData(
-			{ ...fields, ...(structureID ? { structureID } : {}) },
-			image,
-		),
+		imageFormData(multipartFields, image),
 	);
 }
 
@@ -72,10 +74,11 @@ export function updateAgentInformation(
 ): Promise<void> {
 	const { codeAgence, codeDirection, ...fields } = input;
 	const structureID = codeAgence || codeDirection;
-	return apiService.patch<void>(apiRoutes.agentInformation(matricule), {
+	const body = {
 		...fields,
 		...(structureID ? { structureID } : {}),
-	});
+	} satisfies AgentUpdateDto;
+	return apiService.patch<void>(apiRoutes.agentInformation(matricule), body);
 }
 
 /** `PATCH /agents/:matricule/card` — replaces the professional card, `204`. */

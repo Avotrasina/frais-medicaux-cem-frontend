@@ -335,7 +335,7 @@ export const apiService = {
  * The file is attached under the documented field name `image`.
  */
 export function imageFormData(
-	fields: Record<string, unknown> = {},
+	fields: object = {},
 	image?: File | null,
 	fieldName = "image",
 ): FormData {

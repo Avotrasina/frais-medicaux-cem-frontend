@@ -1,4 +1,5 @@
 import { apiRoutes, apiService, imageFormData } from "../../../services/api";
+import type { UpdatePartialFamilleAgentDto } from "../../../api/domains/famille-agent";
 import type {
 	Beneficiary,
 	CreateFamilyMemberInput,
@@ -50,7 +51,7 @@ export async function createFamilyMember(
 ): Promise<void> {
 	await apiService.post<void>(
 		createRoute(kind),
-		imageFormData(input as unknown as Record<string, unknown>, image),
+		imageFormData(input, image),
 	);
 	familyCardMembersByMatricule.delete(input.agentMatricule);
 }
@@ -61,7 +62,8 @@ export async function updateFamilyMemberInformation(
 	id: number,
 	input: UpdateFamilyMemberInput,
 ): Promise<void> {
-	await apiService.patch<void>(informationsRoute(kind, id), input);
+	const body: UpdatePartialFamilleAgentDto = input;
+	await apiService.patch<void>(informationsRoute(kind, id), body);
 	familyCardMembersByMatricule.clear();
 }
 
