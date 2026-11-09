@@ -8,6 +8,7 @@ import type {
 	FactureGlobaleEditKey,
 	FactureGlobaleRow,
 } from "../types/invoiceTable";
+import type { Prestataire } from "../types/prestataire";
 
 
 const numericKeys = new Set<FactureGlobaleColumnKey>([
@@ -25,6 +26,31 @@ function createEmptyInvoice(id: number): FactureGlobaleRow {
 	};
 }
 
+/**
+ * The invoice API only exposes `prestataireId`. The locality comes from the
+ * provider list (provider → `lieuID` → location name), so resolve it lazily:
+ * this also covers the case where providers finish loading after the invoices.
+ */
+function resolveLocalite(
+	row: FactureGlobaleRow,
+	prestataires: Prestataire[],
+): FactureGlobaleRow {
+	if (row.localite.trim()) return row;
+	const localite = prestataires.find(
+		(prestataire) => prestataire.id === row.prestataireId,
+	)?.localite;
+	return localite ? { ...row, localite } : row;
+}
+
+function findPrestataireId(
+	nomEtablissement: string,
+	prestataires: Prestataire[],
+): number | null {
+	return prestataires.find(
+		(prestataire) => prestataire.nomEtablissement === nomEtablissement,
+	)?.id ?? null;
+}
+
 function receptionTimestamp(value: string) {
 	if (!value) return Number.POSITIVE_INFINITY;
 	const [day, month, year] = value.split("/").map(Number);
@@ -32,15 +58,16 @@ function receptionTimestamp(value: string) {
 	return new Date(year || 0, (month || 1) - 1, day || 1).getTime();
 }
 
-export default function useFactureGlobaleRows() {
+export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 	const factureRowsQuery = useGetFactureGlobaleRows();
 	const reloadRows = factureRowsQuery.reload;
 	const [storedDataRows, setStoredDataRows] = useState<FactureGlobaleRow[] | null>(null);
 	const [storedAddRow, setStoredAddRow] = useState<FactureGlobaleRow | null>(null);
 	const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 	const dataRows = useMemo(
-		() => storedDataRows ?? factureRowsQuery.data ?? [],
-		[storedDataRows, factureRowsQuery.data],
+		() => (storedDataRows ?? factureRowsQuery.data ?? [])
+			.map((row) => resolveLocalite(row, prestataires)),
+		[storedDataRows, factureRowsQuery.data, prestataires],
 	);
 	const nextId = Math.max(0, ...dataRows.map((row) => row.id)) + 1;
 	const addRow = useMemo(
@@ -63,12 +90,16 @@ export default function useFactureGlobaleRows() {
 		const nextValue: string | number | Date | null = key === "moisPrestation"
 			? value instanceof Date ? value : null
 			: numericKeys.has(key) ? (value === "" ? 0 : Number(value)) : typeof value === "string" ? value : "";
+		const nextPrestataireId = key === "nomEtablissement" && typeof nextValue === "string"
+			? findPrestataireId(nextValue, prestataires)
+			: undefined;
 		if (rowId === addRow.id) {
 			setStoredAddRow((current) => {
 				const row = current ?? addRow;
 				return {
 					...row,
 					[key]: nextValue,
+					...(nextPrestataireId !== undefined && { prestataireId: nextPrestataireId }),
 					...((key === "depassement" || key === "partAgent20") && {
 						totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
 							+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
@@ -81,13 +112,14 @@ export default function useFactureGlobaleRows() {
 			.map((row) => row.id === rowId ? {
 				...row,
 				[key]: nextValue,
+				...(nextPrestataireId !== undefined && { prestataireId: nextPrestataireId }),
 				...((key === "depassement" || key === "partAgent20") && {
 					totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
 						+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
 				}),
 			} as FactureGlobaleRow : row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
-	}, [addRow, factureRowsQuery.data]);
+	}, [addRow, factureRowsQuery.data, prestataires]);
 
 	const restoreRow = useCallback((rowId: number, originalRow: FactureGlobaleRow, wasAddRow: boolean) => {
 		if (wasAddRow) {

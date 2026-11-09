@@ -34,6 +34,7 @@ export function mapFactureGlobaleResponse(
 ): FactureGlobaleRow {
 	return {
 		id: facture.id,
+		prestataireId: facture.prestataireId,
 		piecesJointes: getFactureAttachmentsMock(facture.id),
 		refSocial: facture.refSociale,
 		dateReception: toDisplayDate(facture.dateReception, "date de réception", facture.id),

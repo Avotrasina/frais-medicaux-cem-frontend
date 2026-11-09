@@ -11,6 +11,8 @@ export type ContarinteType = (typeof ContrainteType) [keyof typeof ContrainteTyp
 
 export type FactureGlobaleRow = {
 	id: number;
+	/** Provider referenced by the API; used to resolve `localite`. */
+	prestataireId?: number | null;
 	piecesJointes: FactureGlobaleAttachment[];
 	refSocial: string;
 	dateReception: string;

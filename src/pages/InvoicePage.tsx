@@ -51,7 +51,7 @@ export default function FactureGlobalePage() {
 	const { role } = useAuth();
 	const canEditRows = role !== "Y";
 	const { prestataires, error: prestatairesError, reload: reloadPrestataires } = usePrestataires();
-	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, saveAttachments, refreshRows, restoreRow } = useFactureGlobaleRows();
+	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, saveAttachments, refreshRows, restoreRow } = useFactureGlobaleRows(prestataires);
 	const rowActions = useFactureGlobaleRowActions(rows, updateCell);
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
 	const { containerRef, addRowRef, focusAddRow } = useScrollToAddInvoiceRow(isLoaded);
