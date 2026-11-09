@@ -1,4 +1,5 @@
 import type { RefObject } from "react";
+import type { Prestataire } from "./prestataire";
 
 export const ContrainteType = {
 	PAR_AN : "PAR_AN",
@@ -83,6 +84,7 @@ export type FactureGlobaleCellValue = string | number | Date | FactureGlobaleAtt
 
 export type FactureGlobaleTableProps = {
 	rows: FactureGlobaleRow[];
+	prestataires: Prestataire[];
 	addRowId: number;
 	activeRowId: number | null;
 	selectedRowId: number | null;

@@ -5,6 +5,7 @@ import { FactureGlobaleTable } from "../features/invoice";
 import { AddRowButton, CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState, PageHeader, SaveRowButton, ToastViewport } from "../components/ui";
 import InvoiceFloatingCalculator from "../features/invoice/components/ui/InvoiceFloatingCalculator";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
+import usePrestataires from "../features/invoice/hooks/usePrestataires";
 import useFactureGlobaleRowActions from "../features/invoice/hooks/useFactureGlobaleRowActions";
 import useInvoiceRowEditing from "../features/invoice/hooks/useInvoiceRowEditing";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
@@ -49,6 +50,7 @@ export default function FactureGlobalePage() {
 	const [serviceSortie, setServiceSortie] = useState("");
 	const { role } = useAuth();
 	const canEditRows = role !== "Y";
+	const { prestataires, error: prestatairesError, reload: reloadPrestataires } = usePrestataires();
 	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, saveAttachments, refreshRows, restoreRow } = useFactureGlobaleRows();
 	const rowActions = useFactureGlobaleRowActions(rows, updateCell);
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
@@ -162,6 +164,14 @@ export default function FactureGlobalePage() {
 					</p>
 				)}
 				<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
+					{prestatairesError && (
+						<div className="p-3 pb-0">
+							<ErrorBlock
+								message={prestatairesError}
+								onRetry={() => void reloadPrestataires()}
+							/>
+						</div>
+					)}
 					{loadError ? (
 						<ErrorBlock
 							message={loadError}
@@ -172,6 +182,7 @@ export default function FactureGlobalePage() {
 					) : isLoaded ? (
 						<FactureGlobaleTable
 							rows={rows}
+							prestataires={prestataires}
 							addRowId={addRowId}
 							activeRowId={rowEditing.activeRowId}
 							selectedRowId={selectedRowId}

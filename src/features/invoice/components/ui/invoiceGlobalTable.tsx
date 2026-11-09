@@ -16,7 +16,6 @@ import { personnelFactureGlobaleEditableColumns } from "../../data/tableColumn";
 import { useAuth } from "../../../auth";
 import PrestataireDropdownCell from "./prestataireDropdownCell";
 import InvoiceAttachmentsCell from "./invoiceAttachmentsCell";
-import { prestatairesMock } from "../../mocks/prestataires";
 
 import {
     dateFilterKeys,
@@ -73,6 +72,7 @@ function hasInvoiceData(row: FactureGlobaleRow): boolean {
 
 export default function FactureGlobaleTable({
     rows,
+    prestataires,
     addRowId,
     activeRowId,
     selectedRowId,
@@ -444,7 +444,7 @@ export default function FactureGlobaleTable({
                                         return (
                                             <PrestataireDropdownCell
                                                 key={column.key}
-                                                options={prestatairesMock}
+                                                options={prestataires}
                                                 value={row.nomEtablissement}
                                                 className={cellClass}
                                                 isLocked={activeRowId !== null && activeRowId !== row.id}
@@ -579,7 +579,7 @@ export default function FactureGlobaleTable({
                                         return (
                                             <PrestataireDropdownCell
                                                 key={column.key}
-                                                options={prestatairesMock}
+                                                options={prestataires}
                                                 value={row.nomEtablissement}
                                                 className={cellClass}
                                                 isLocked={isAddRowLocked}
