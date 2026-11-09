@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
 import {
 	createT5XActMock,
 	fetchT5XTable2Mock,
@@ -12,16 +13,37 @@ import useT5XRowEditing from "./useT5XRowEditing";
 export default function useT5XActs(categories: T5XCategoryOption[]) {
 	const [rows, setRows] = useState<T5XConstraintRow[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [loadError, setLoadError] = useState<string | null>(null);
 
-	useEffect(() => {
-		let isActive = true;
-		fetchT5XTable2Mock().then((loadedRows) => {
-			if (!isActive) return;
-			setRows([...loadedRows, createEmptyActRow(Math.max(0, ...loadedRows.map((row) => row.id)) + 1)]);
-			setIsLoading(false);
-		});
-		return () => { isActive = false; };
+	const load = useCallback(async (isStale: () => boolean) => {
+		try {
+			const loadedRows = await fetchT5XTable2Mock();
+			if (isStale()) return;
+			setRows([
+				...loadedRows,
+				createEmptyActRow(Math.max(0, ...loadedRows.map((row) => row.id)) + 1),
+			]);
+			setLoadError(null);
+		} catch (error) {
+			if (isStale()) return;
+			setRows([]);
+			setLoadError(
+				error instanceof Error
+					? error.message
+					: "Impossible de charger les actes et prestations T5.",
+			);
+		} finally {
+			if (!isStale()) setIsLoading(false);
+		}
 	}, []);
+
+	useAsyncLoader(load);
+
+	const reload = useCallback(async () => {
+		setIsLoading(true);
+		setLoadError(null);
+		await load(() => false);
+	}, [load]);
 
 	const updateRowCell = useCallback((rowId: number, key: T5XConstraintEditableKey, value: string | number | null) => {
 		setRows((currentRows) => currentRows.map((current) => {
@@ -82,6 +104,8 @@ export default function useT5XActs(categories: T5XCategoryOption[]) {
 		addRowId,
 		categories,
 		isLoading,
+		loadError,
+		reload,
 		activeRowId: editing.activeRowId,
 		canSaveRow: editing.canSave,
 		isSaving: editing.isSaving,

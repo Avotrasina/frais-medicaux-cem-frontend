@@ -18,6 +18,10 @@ export default function T5XConfigurationPage() {
 	);
 	const actTable = useT5XActs(categories);
 	const isLoading = categoryTable.isLoading || actTable.isLoading;
+	const loadError = categoryTable.loadError ?? actTable.loadError;
+	const reloadTables = async () => {
+		await Promise.all([categoryTable.reload(), actTable.reload()]);
+	};
 	const activeEditor = activeTable === "categories" ? categoryTable : actTable;
 	const hasActiveRow = categoryTable.activeRowId !== null || actTable.activeRowId !== null;
 	const tableKey: T5XTableKey = activeTable === "categories" ? "categories" : "acts";
@@ -75,6 +79,14 @@ export default function T5XConfigurationPage() {
 				</button>
 			</div>
 			<section className="panel flex min-h-0 flex-1 flex-col overflow-hidden">
+				{loadError && (
+					<div className="p-3 pb-0">
+						<ErrorBlock
+							message={loadError}
+							onRetry={() => void reloadTables()}
+						/>
+					</div>
+				)}
 				{isLoading ? (
 					<LoadingState message="Chargement des données..." />
 				) : activeTable === "categories" ? (
