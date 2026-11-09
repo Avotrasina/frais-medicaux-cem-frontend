@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
 import { fetchT5ConfigurationMock } from "../mocks/t5Configuration";
 import type { T5Configuration } from "../types/t5Configuration";
 
@@ -14,33 +15,42 @@ export default function useT5Configuration(id: string | undefined) {
 		configuration: null,
 		error: null,
 	});
+	const requestRef = useRef(0);
 
-	useEffect(() => {
-		let isCurrent = true;
+	const load = useCallback(
+		async (isStale: () => boolean) => {
+			const request = ++requestRef.current;
+			try {
+				const result = await fetchT5ConfigurationMock(id);
+				if (isStale() || request !== requestRef.current) return;
+				setState({ requestId: id, configuration: result, error: null });
+			} catch (cause) {
+				if (isStale() || request !== requestRef.current) return;
+				setState({
+					requestId: id,
+					configuration: null,
+					error:
+						cause instanceof Error
+							? cause.message
+							: "Impossible de charger la configuration T5.",
+				});
+			}
+		},
+		[id],
+	);
 
-		fetchT5ConfigurationMock(id)
-			.then((result) => {
-				if (isCurrent) setState({ requestId: id, configuration: result, error: null });
-			})
-			.catch((cause: unknown) => {
-				if (isCurrent) {
-					setState({
-						requestId: id,
-						configuration: null,
-						error: cause instanceof Error ? cause.message : "Impossible de charger la configuration T5.",
-					});
-				}
-			});
+	useAsyncLoader(load);
 
-		return () => {
-			isCurrent = false;
-		};
-	}, [id]);
+	const reload = useCallback(async () => {
+		setState({ requestId: null, configuration: null, error: null });
+		await load(() => false);
+	}, [load]);
 
 	const isCurrentRequest = state.requestId === id;
 	return {
 		configuration: isCurrentRequest ? state.configuration : null,
 		isLoading: !isCurrentRequest,
 		error: isCurrentRequest ? state.error : null,
+		reload,
 	};
 }

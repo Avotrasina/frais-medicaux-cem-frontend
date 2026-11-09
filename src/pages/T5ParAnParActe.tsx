@@ -25,7 +25,7 @@ const amountFormatter = new Intl.NumberFormat("fr-FR", {
 
 export default function T5ParAnParActe() {
 	const { id, label, refSocial } = useParams();
-	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError, reload: reloadConfiguration } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
 	const { role } = useAuth();
@@ -49,9 +49,9 @@ export default function T5ParAnParActe() {
 	);
 	const navigate = useNavigate();
 	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
-	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configurationError) return <ErrorBlock message={configurationError} onRetry={() => void reloadConfiguration()} />;
 	if (configuration?.kind !== "parAnParActe") {
-		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an et par acte." />;
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an et par acte." onRetry={() => void reloadConfiguration()} />;
 	}
 	const pageTitle = label ?? configuration.title;
 

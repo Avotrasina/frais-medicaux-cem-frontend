@@ -22,7 +22,7 @@ function createEmptyParAnRow(id: number, refSocial: string): T5ParAnRow {
 
 export default function T5ParAn() {
 	const { id, label, refSocial } = useParams();
-	const { configuration, isLoading: isConfigurationLoading, error: configurationError } = useT5Configuration(id);
+	const { configuration, isLoading: isConfigurationLoading, error: configurationError, reload: reloadConfiguration } = useT5Configuration(id);
 	const lookupResult = useLookupResult();
 	const isLookupLoading = useLookupLoading();
 	const { role } = useAuth();
@@ -46,9 +46,9 @@ export default function T5ParAn() {
 	);
 	const navigate = useNavigate();
 	if (isConfigurationLoading) return <LoadingState message="Chargement de la configuration T5…" />;
-	if (configurationError) return <ErrorBlock message={configurationError} />;
+	if (configurationError) return <ErrorBlock message={configurationError} onRetry={() => void reloadConfiguration()} />;
 	if (configuration?.kind !== "parAn") {
-		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an." />;
+		return <ErrorBlock message="La configuration chargée ne correspond pas à un T5 par an." onRetry={() => void reloadConfiguration()} />;
 	}
 	const pageTitle = label ?? configuration.title;
 
