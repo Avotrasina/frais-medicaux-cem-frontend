@@ -267,13 +267,13 @@ export const apiRoutes = {
 	// --- Providers ----------------------------------------------------------
 	providers: "/providers",
 	providersFilter: "/providers/search",
-	provider: (id: number) => `/providers/${id}-provider`,
+	provider: (id: number) => `/providers/${id}`,
 	providerConvention: (id: number) => `/providers/${id}/convention`,
 	providerDeletionRequests: "/providers/deletion-requests",
 	providerDeletionValidation: (id: number) =>
-		`/providers/${id}-provider/deletion-validation`,
+		`/providers/${id}/deletion-validation`,
 	providerDeletionRejection: (id: number) =>
-		`/providers/${id}-provider/deletion-rejection`,
+		`/providers/${id}/deletion-rejection`,
 	providerCategories: "/provider-categories",
 	providerCategory: (id: number) => `/provider-categories/${id}`,
 	providerCategoryDeletionRequests: "/provider-categories/deletion-requests",
