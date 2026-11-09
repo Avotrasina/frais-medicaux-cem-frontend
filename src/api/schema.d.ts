@@ -2379,7 +2379,7 @@ export interface components {
             /** Format: date-time */
             dateFacture: string;
             /** Format: date-time */
-            moisPrestation: string;
+            moisPrestation: string | null;
             refAgence: string | null;
             remarque: string | null;
             montantTotal: string | null;
@@ -2416,7 +2416,7 @@ export interface components {
             /** Format: date-time */
             dateFacture: string;
             /** Format: date-time */
-            moisPrestation: string;
+            moisPrestation: string | null;
             refAgence: string | null;
             remarque: string | null;
             montantTotal: string | null;
@@ -2453,7 +2453,7 @@ export interface components {
             /** Format: date-time */
             dateFacture: string;
             /** Format: date-time */
-            moisPrestation: string;
+            moisPrestation: string | null;
             refAgence: string | null;
             remarque: string | null;
             montantTotal: string | null;
@@ -2511,12 +2511,17 @@ export interface components {
             champsRequis: string[];
         };
         CreerFactureGlobaleDto: {
+            /**
+             * Format: date
+             * @example 2026-03-01
+             */
+            moisPrestation?: string;
+            /** @example AG-01 */
+            refAgence?: string;
             prestataireId: number;
             numFacture: string;
             dateFacture: string;
             dateReception: string;
-            moisPrestation: string;
-            refAgence?: string;
         };
         PropositionDepassementResponseDto: {
             montantDepassementActe: string;
@@ -2650,7 +2655,7 @@ export interface components {
             /** Format: date-time */
             dateFacture: string;
             /** Format: date-time */
-            moisPrestation: string;
+            moisPrestation: string | null;
             refAgence: string | null;
             remarque: string | null;
             montantTotal: string | null;
@@ -2687,7 +2692,7 @@ export interface components {
             /** Format: date-time */
             dateFacture: string;
             /** Format: date-time */
-            moisPrestation: string;
+            moisPrestation: string | null;
             refAgence: string | null;
             remarque: string | null;
             montantTotal: string | null;
