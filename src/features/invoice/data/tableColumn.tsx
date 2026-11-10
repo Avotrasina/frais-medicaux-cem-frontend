@@ -35,8 +35,10 @@ export const factureGlobaleColumns: FactureGlobaleColumn[] = [
     { key: "serviceSortie", label: "Service de sortie", width: "w-32 min-w-32 max-w-32" },
 ];
 
+// `partCem80`, `partAgent20` and `totalPartAgent` are derived automatically
+// from `montantTotal`, `partCem100` and `depassement` (see utils/invoiceAmounts).
 export const personnelFactureGlobaleEditableColumns = [
-    "refSocial", "dateReception", "numFacture", "dateFacture", "nomEtablissement", "majT5", "montantTotal", "partCem100", "depassement", "partCem80", "partAgent20", "totalPartAgent", "localite", "moisPrestation", "refAgence", "remarques1", "retourPrestataire", "recuApresModification",
+    "refSocial", "dateReception", "numFacture", "dateFacture", "nomEtablissement", "majT5", "montantTotal", "partCem100", "depassement", "localite", "moisPrestation", "refAgence", "remarques1", "retourPrestataire", "recuApresModification",
 ] as const satisfies readonly FactureGlobaleColumnKey[];
 export const t5ParAnColumns: T5ParAnColumn[] = [
 	{ key: "refSocial", label: "Réf. social", width: "w-32 min-w-32 max-w-32" },

@@ -9,6 +9,11 @@ import type {
 	FactureGlobaleRow,
 } from "../types/invoiceTable";
 import type { Prestataire } from "../types/prestataire";
+import {
+	AMOUNT_SOURCE_KEYS,
+	COMPUTED_AMOUNT_KEYS,
+	computeFactureGlobaleAmounts,
+} from "../utils/invoiceAmounts";
 
 
 const numericKeys = new Set<FactureGlobaleColumnKey>([
@@ -49,6 +54,24 @@ function receptionTimestamp(value: string) {
 	return new Date(year || 0, (month || 1) - 1, day || 1).getTime();
 }
 
+function applyCellChange(
+	row: FactureGlobaleRow,
+	key: FactureGlobaleEditKey,
+	value: string | number | Date | null,
+): FactureGlobaleRow {
+	const updated = { ...row, [key]: value } as FactureGlobaleRow;
+	if (!AMOUNT_SOURCE_KEYS.has(key)) return updated;
+
+	return {
+		...updated,
+		...computeFactureGlobaleAmounts(
+			updated.montantTotal,
+			updated.partCem100,
+			updated.depassement,
+		),
+	};
+}
+
 export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 	const factureRowsQuery = useGetFactureGlobaleRows();
 	const reloadRows = factureRowsQuery.reload;
@@ -78,33 +101,19 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 			return;
 		}
 
+		// These columns are derived from the total, the CEM share and the overrun.
+		if (COMPUTED_AMOUNT_KEYS.has(key)) return;
+
 		const nextValue: string | number | Date | null = key === "moisPrestation"
 			? value instanceof Date ? value : null
 			: key === "prestataireId" ? (typeof value === "number" ? value : null)
 			: numericKeys.has(key) ? (value === "" ? 0 : Number(value)) : typeof value === "string" ? value : "";
 		if (rowId === addRow.id) {
-			setStoredAddRow((current) => {
-				const row = current ?? addRow;
-				return {
-					...row,
-					[key]: nextValue,
-					...((key === "depassement" || key === "partAgent20") && {
-						totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
-							+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
-					}),
-				} as FactureGlobaleRow;
-			});
+			setStoredAddRow((current) => applyCellChange(current ?? addRow, key, nextValue));
 			return;
 		}
 		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
-			.map((row) => row.id === rowId ? {
-				...row,
-				[key]: nextValue,
-				...((key === "depassement" || key === "partAgent20") && {
-					totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
-						+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
-				}),
-			} as FactureGlobaleRow : row)
+			.map((row) => row.id === rowId ? applyCellChange(row, key, nextValue) : row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
 	}, [addRow, factureRowsQuery.data]);
 

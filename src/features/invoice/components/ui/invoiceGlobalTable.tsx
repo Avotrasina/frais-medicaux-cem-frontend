@@ -16,6 +16,7 @@ import { personnelFactureGlobaleEditableColumns } from "../../data/tableColumn";
 import { useAuth } from "../../../auth";
 import PrestataireDropdownCell from "./prestataireDropdownCell";
 import InvoiceAttachmentsCell from "./invoiceAttachmentsCell";
+import { COMPUTED_AMOUNT_KEYS } from "../../utils/invoiceAmounts";
 
 import {
     dateFilterKeys,
@@ -40,6 +41,7 @@ const DropDownMock: dropdownOptionProps[] = [
 
 const editableUpdateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
 const updateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
+const amountFormatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
 
 function filterableFiltersActive(
     filters: FactureGlobaleFilters["text"],
@@ -400,7 +402,9 @@ export default function FactureGlobaleTable({
                                                     year: "2-digit",
                                                     timeZone: "UTC",
                                                 })
-                                                : String(value ?? "")}
+                                                : typeof value === "number"
+                                                    ? amountFormatter.format(value)
+                                                    : String(value ?? "")}
                                         </td>
                                     );
                                 })
@@ -481,6 +485,9 @@ export default function FactureGlobaleTable({
                                             <td
                                                 key={column.key}
                                                 className={`${cellClass} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
+                                                title={COMPUTED_AMOUNT_KEYS.has(column.key)
+                                                    ? "Calculé automatiquement à partir du montant total, du 100 % CEM et du dépassement."
+                                                    : undefined}
                                             >
                                                 {value instanceof Date
                                                     ? value.toLocaleDateString("fr-FR", {
@@ -488,7 +495,9 @@ export default function FactureGlobaleTable({
                                                         year: "2-digit",
                                                         timeZone: "UTC",
                                                     })
-                                                    : String(value ?? "")}
+                                                    : typeof value === "number"
+                                                        ? amountFormatter.format(value)
+                                                        : String(value ?? "")}
                                             </td>
                                         );
                                     }
@@ -612,6 +621,9 @@ export default function FactureGlobaleTable({
                                             <td
                                                 key={column.key}
                                                 className={`${cellClass} ${isAddRowLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
+                                                title={COMPUTED_AMOUNT_KEYS.has(column.key)
+                                                    ? "Calculé automatiquement à partir du montant total, du 100 % CEM et du dépassement."
+                                                    : undefined}
                                             >
                                                 {value instanceof Date
                                                     ? value.toLocaleDateString("fr-FR", {
@@ -619,7 +631,9 @@ export default function FactureGlobaleTable({
                                                         year: "2-digit",
                                                         timeZone: "UTC",
                                                     })
-                                                    : value}
+                                                    : typeof value === "number"
+                                                        ? amountFormatter.format(value)
+                                                        : value}
                                             </td>
                                         );
                                     }

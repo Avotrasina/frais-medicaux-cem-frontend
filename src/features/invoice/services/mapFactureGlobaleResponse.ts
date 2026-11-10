@@ -2,6 +2,7 @@ import type { FactureGlobaleListeeResponseDto } from "../../../api/domains/factu
 import { formatDate } from "../../../utils/format";
 import { getFactureAttachmentsMock } from "./factureAttachmentMock";
 import type { FactureGlobaleRow } from "../types/invoiceTable";
+import { computeFactureGlobaleAmounts } from "../utils/invoiceAmounts";
 
 function toAmount(value: string | null, field: string, factureId: number): number {
 	if (value === null) return 0;
@@ -32,6 +33,10 @@ function toDisplayDate(value: string | null, field: string, factureId: number): 
 export function mapFactureGlobaleResponse(
 	facture: FactureGlobaleListeeResponseDto,
 ): FactureGlobaleRow {
+	const montantTotal = toAmount(facture.montantTotal, "montant total", facture.id);
+	const partCem100 = toAmount(facture.total100Cem, "total 100 % CEM", facture.id);
+	const depassement = toAmount(facture.totalDepassement, "total dépassement", facture.id);
+
 	return {
 		id: facture.id,
 		prestataireId: facture.prestataireId,
@@ -41,12 +46,10 @@ export function mapFactureGlobaleResponse(
 		numFacture: facture.numFacture,
 		dateFacture: toDisplayDate(facture.dateFacture, "date de facture", facture.id),
 		nomEtablissement: facture.prestataire.nom,
-		montantTotal: toAmount(facture.montantTotal, "montant total", facture.id),
-		partCem100: toAmount(facture.total100Cem, "total 100 % CEM", facture.id),
-		depassement: toAmount(facture.totalDepassement, "total dépassement", facture.id),
-		partCem80: 0,
-		partAgent20: 0,
-		totalPartAgent: 0,
+		montantTotal,
+		partCem100,
+		depassement,
+		...computeFactureGlobaleAmounts(montantTotal, partCem100, depassement),
 		localite: "",
 		moisPrestation: facture.moisPrestation ? toMonth(facture.moisPrestation, facture.id) : null,
 		refAgence: facture.refAgence ?? "",
