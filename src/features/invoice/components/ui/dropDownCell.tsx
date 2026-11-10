@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
-import {TypeContrainte} from "../../types/dropDown";
+import { ROUTES } from "../../../../constants/routes";
+import { fillPath } from "../../../../services/api-contract";
+import {
+    TypeContrainte,
+    type DropdownOption,
+} from "../../types/dropDown";
 
-export type dropdownOptionProps = {
-    id: number,
-    label:string,
-    typeContrainte: TypeContrainte,
-}
+const ROUTE_BY_CONSTRAINT: Record<TypeContrainte, string> = {
+    [TypeContrainte.PAR_AN]: ROUTES.T5ParAn,
+    [TypeContrainte.PAR_AN_PAR_ACTE]: ROUTES.T5ParAnParActe,
+    [TypeContrainte.PAR_SEANCE]: ROUTES.T5Parseance,
+};
 
 export default function DropDownCell({
   options,
@@ -15,7 +20,7 @@ export default function DropDownCell({
   className = "",
   isLocked = false,
 }: {
-  options: dropdownOptionProps[];
+  options: DropdownOption[];
   refSocial: string;
   className?: string;
   isLocked?: boolean;
@@ -33,14 +38,37 @@ export default function DropDownCell({
       </div>
 
       {open && !isLocked && (
-        <ul className="absolute left-0 top-full z-10 w-max min-w-full bg-white shadow-md">
-          {options.map((option) => (
-            <li key={option.label} className="h-10 px-3 flex items-center justify-center cursor-pointer hover:bg-slate-50">
-               {option.typeContrainte == TypeContrainte.PAR_AN && <Link to={`/ParAn/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
-               {option.typeContrainte == TypeContrainte.PAR_AN_PAR_ACTE && <Link to={`/ParAnParActe/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
-               {option.typeContrainte == TypeContrainte.PAR_SEANCE && <Link to={`/ParSeance/${option.id}/${encodeURIComponent(option.label)}/${encodeURIComponent(refSocial)}`}>{option.label}</Link>}
-            </li>
-          ))}
+        <ul className="absolute left-0 top-full z-10 max-h-72 w-max min-w-full overflow-y-auto bg-white shadow-md">
+          {options.map((option) => {
+            const route = ROUTE_BY_CONSTRAINT[option.typeContrainte];
+            const path = fillPath(route, {
+              id: option.id,
+              label: option.label,
+              refSocial,
+            });
+            return (
+              <li
+                key={`${option.type}-${option.id}`}
+                className="flex h-10 items-center gap-2 px-3 hover:bg-slate-50"
+              >
+                <Link
+                  className="flex min-w-0 flex-1 items-center gap-2"
+                  to={{ pathname: path, search: `?type=${option.type}` }}
+                >
+                  <span className="truncate">{option.label}</span>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                      option.type === "acte"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {option.type === "acte" ? "Acte" : "Catégorie"}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </td>

@@ -1,6 +1,7 @@
 import type { RefObject } from "react";
 import type { CreerFactureGlobaleDto } from "../../../api/domains/facture";
 import type { Prestataire } from "./prestataire";
+import type { DropdownOption } from "./dropDown";
 
 export const ContrainteType = {
 	PAR_AN : "PAR_AN",
@@ -86,6 +87,7 @@ export type FactureGlobaleCellValue = string | number | Date | FactureGlobaleAtt
 export type FactureGlobaleTableProps = {
 	rows: FactureGlobaleRow[];
 	prestataires: Prestataire[];
+	majT5Options: DropdownOption[];
 	addRowId: number;
 	activeRowId: number | null;
 	selectedRowId: number | null;

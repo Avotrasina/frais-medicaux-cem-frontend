@@ -48,5 +48,6 @@ export type {
 	T5ParSeanceRow,
 	T5ParSeanceTableProps,
 } from "./types/t5ParSeance";
-export type { dropdownOptionProps } from "./components/ui/dropDownCell";
+export { TypeContrainte } from "./types/dropDown";
+export type { CibleType, DropdownOption } from "./types/dropDown";
 export type { Prestataire } from "./types/prestataire";

@@ -6,6 +6,7 @@ import { AddRowButton, CancelRowButton, ConfirmDialog, ErrorBlock, LoadingState,
 import InvoiceFloatingCalculator from "../features/invoice/components/ui/InvoiceFloatingCalculator";
 import useFactureGlobaleRows from "../features/invoice/hooks/useFactureGlobaleRows";
 import usePrestataires from "../features/invoice/hooks/usePrestataires";
+import useSuiviCibles from "../features/invoice/hooks/useSuiviCibles";
 import useFactureGlobaleRowActions from "../features/invoice/hooks/useFactureGlobaleRowActions";
 import useInvoiceRowEditing from "../features/invoice/hooks/useInvoiceRowEditing";
 import useScrollToAddInvoiceRow from "../features/invoice/hooks/useScrollToAddInvoiceRow";
@@ -51,6 +52,7 @@ export default function FactureGlobalePage() {
 	const { role } = useAuth();
 	const canEditRows = role !== "Y";
 	const { prestataires, error: prestatairesError, reload: reloadPrestataires } = usePrestataires();
+	const { options: majT5Options, error: majT5Error, reload: reloadMajT5Options } = useSuiviCibles();
 	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, saveAttachments, refreshRows, restoreRow } = useFactureGlobaleRows(prestataires);
 	const rowActions = useFactureGlobaleRowActions(rows, updateCell);
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
@@ -172,6 +174,14 @@ export default function FactureGlobalePage() {
 							/>
 						</div>
 					)}
+					{majT5Error && (
+						<div className="p-3 pb-0">
+							<ErrorBlock
+								message={majT5Error}
+								onRetry={() => void reloadMajT5Options()}
+							/>
+						</div>
+					)}
 					{loadError ? (
 						<ErrorBlock
 							message={loadError}
@@ -183,6 +193,7 @@ export default function FactureGlobalePage() {
 						<FactureGlobaleTable
 							rows={rows}
 							prestataires={prestataires}
+							majT5Options={majT5Options}
 							addRowId={addRowId}
 							activeRowId={rowEditing.activeRowId}
 							selectedRowId={selectedRowId}

@@ -1,11 +1,10 @@
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { factureGlobaleColumns } from "../../data/tableColumn";
-import DropDownCell, { type dropdownOptionProps } from "./dropDownCell";
+import DropDownCell from "./dropDownCell";
 import EditableDateCell from "./editableDateCell";
 import EditableMonthCell from "./editableMonthCell";
 import { EditableNumberCell, EditableStringCell } from "../../../../components/ui";
-import { TypeContrainte } from "../../types/dropDown";
 import {
     FACTURE_GLOBALE_UPDATE_KEYS,
     numberColumn,
@@ -32,12 +31,6 @@ import type {
     FactureGlobaleTableProps,
 } from "../../types/invoiceTable";
 
-
-const DropDownMock: dropdownOptionProps[] = [
-    { id: 1, label: "analyse", typeContrainte: TypeContrainte.PAR_AN },
-    { id: 2, label: "chirurgie", typeContrainte: TypeContrainte.PAR_AN_PAR_ACTE },
-    { id: 3, label: "séance", typeContrainte: TypeContrainte.PAR_SEANCE }
-];
 
 const editableUpdateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
 const updateKeys = new Set<string>(FACTURE_GLOBALE_UPDATE_KEYS);
@@ -75,6 +68,7 @@ function hasInvoiceData(row: FactureGlobaleRow): boolean {
 export default function FactureGlobaleTable({
     rows,
     prestataires,
+    majT5Options,
     addRowId,
     activeRowId,
     selectedRowId,
@@ -380,10 +374,10 @@ export default function FactureGlobaleTable({
                                         );
                                     }
                                     if (column.key === "majT5") {
-                                        return hasInvoiceData(row) && row.refSocial.trim() ? (
+                                        return hasInvoiceData(row) && row.refSocial.trim() && majT5Options.length > 0 ? (
                                             <DropDownCell
                                                 key={column.key}
-                                                options={DropDownMock}
+                                                options={majT5Options}
                                                 refSocial={row.refSocial}
                                                 className={`${cellClass} bg-yellow-100 text-red-800`}
                                                 isLocked={activeRowId !== null}
@@ -429,10 +423,10 @@ export default function FactureGlobaleTable({
                                     }
 
                                     if (column.key === "majT5") {
-                                        return activeRowId === null && hasInvoiceData(row) && row.refSocial.trim() ? (
+                                        return activeRowId === null && hasInvoiceData(row) && row.refSocial.trim() && majT5Options.length > 0 ? (
                                             <DropDownCell
                                                 key={column.key}
-                                                options={DropDownMock}
+                                                options={majT5Options}
                                                 refSocial={row.refSocial}
                                                 className={`${cellClass} bg-yellow-100 text-red-800`}
                                             />
