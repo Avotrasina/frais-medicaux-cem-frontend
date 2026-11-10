@@ -53,7 +53,7 @@ export default function FactureGlobalePage() {
 	const canEditRows = role !== "Y";
 	const { prestataires, error: prestatairesError, reload: reloadPrestataires } = usePrestataires();
 	const { options: majT5Options, error: majT5Error, reload: reloadMajT5Options } = useSuiviCibles();
-	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, saveAttachments, refreshRows, restoreRow } = useFactureGlobaleRows(prestataires);
+	const { rows, addRowId, selectedRowId, selectRow, isLoaded, loadError, reload, updateCell, addAttachment, removeAttachment, downloadAttachment, refreshRows, restoreRow } = useFactureGlobaleRows(prestataires);
 	const rowActions = useFactureGlobaleRowActions(rows, updateCell);
 	const rowEditing = useInvoiceRowEditing(rows, addRowId, updateCell, restoreRow, refreshRows, canEditRows);
 	const { containerRef, addRowRef, focusAddRow } = useScrollToAddInvoiceRow(isLoaded);
@@ -204,7 +204,9 @@ export default function FactureGlobalePage() {
 								selectRow(rowId);
 							}}
 							onCellChange={rowEditing.onCellChange}
-							onSaveAttachments={saveAttachments}
+							onAddAttachment={addAttachment}
+							onRemoveAttachment={removeAttachment}
+							onDownloadAttachment={downloadAttachment}
 						/>
 					) : (
 						<LoadingState message="Chargement des données…" />

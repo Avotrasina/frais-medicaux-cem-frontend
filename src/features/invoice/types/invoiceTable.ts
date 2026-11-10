@@ -47,7 +47,9 @@ export type FactureGlobaleRow = {
 
 export type FactureGlobaleAttachment = {
 	id: string;
-	file: File;
+	nom: string;
+	taille: number;
+	type: string;
 };
 
 
@@ -99,7 +101,9 @@ export type FactureGlobaleTableProps = {
 		key: FactureGlobaleEditKey,
 		value: FactureGlobaleCellValue,
 	) => void;
-	onSaveAttachments: (rowId: number, attachments: FactureGlobaleAttachment[]) => Promise<void>;
+	onAddAttachment: (rowId: number, file: File) => Promise<void>;
+	onRemoveAttachment: (rowId: number, attachmentId: string) => Promise<void>;
+	onDownloadAttachment: (rowId: number, attachmentId: string) => Promise<Blob>;
 }
 
 export type FactureGlobaleColumnKey = Exclude<keyof FactureGlobaleRow, "id" | "piecesJointes">|"majT5";

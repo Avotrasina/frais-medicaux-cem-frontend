@@ -1,6 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 import useGetFactureGlobaleRows from "./useGetFactureGlobaleRows";
-import { saveFactureAttachmentsMock } from "../services/factureAttachmentMock";
+import {
+	deleteFactureAttachment,
+	downloadFactureAttachment,
+	uploadFactureAttachment,
+} from "../services/serviceAPI";
+import { mapFactureAttachment } from "../services/mapFactureAttachment";
 import type {
 	FactureGlobaleCellValue,
 	FactureGlobaleAttachment,
@@ -31,11 +36,7 @@ function createEmptyInvoice(id: number): FactureGlobaleRow {
 	};
 }
 
-/**
- * The invoice API only exposes `prestataireId`. The locality comes from the
- * provider list (provider → `lieuID` → location name), so resolve it lazily:
- * this also covers the case where providers finish loading after the invoices.
- */
+
 function resolveLocalite(
 	row: FactureGlobaleRow,
 	prestataires: Prestataire[],
@@ -101,7 +102,6 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 			return;
 		}
 
-		// These columns are derived from the total, the CEM share and the overrun.
 		if (COMPUTED_AMOUNT_KEYS.has(key)) return;
 
 		const nextValue: string | number | Date | null = key === "moisPrestation"
@@ -129,19 +129,44 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
 	}, [addRow, factureRowsQuery.data]);
 
-	const saveAttachments = useCallback(async (rowId: number, attachments: FactureGlobaleAttachment[]) => {
+	const assertEditableAttachmentRow = useCallback((rowId: number) => {
 		if (rowId === addRow.id) {
-			throw new Error("Créez d’abord la facture avant d’enregistrer ses pièces jointes.");
+			throw new Error("Créez d’abord la facture avant de gérer ses pièces jointes.");
 		}
-		const rowExists = dataRows.some((row) => row.id === rowId);
-		if (!rowExists) {
+		if (!dataRows.some((row) => row.id === rowId)) {
 			throw new Error("La facture associée aux pièces jointes est introuvable.");
 		}
+	}, [addRow.id, dataRows]);
 
-		await saveFactureAttachmentsMock(rowId, attachments);
+	const updateRowAttachments = useCallback((
+		rowId: number,
+		update: (attachments: FactureGlobaleAttachment[]) => FactureGlobaleAttachment[],
+	) => {
 		setStoredDataRows((current) => (current ?? factureRowsQuery.data ?? [])
-			.map((row) => row.id === rowId ? { ...row, piecesJointes: [...attachments] } : row));
-	}, [addRow.id, dataRows, factureRowsQuery.data]);
+			.map((row) => row.id === rowId
+				? { ...row, piecesJointes: update(row.piecesJointes) }
+				: row));
+	}, [factureRowsQuery.data]);
+
+	const addAttachment = useCallback(async (rowId: number, file: File) => {
+		assertEditableAttachmentRow(rowId);
+		const piece = await uploadFactureAttachment(rowId, file);
+		const attachment = mapFactureAttachment(piece);
+		updateRowAttachments(rowId, (attachments) => [...attachments, attachment]);
+	}, [assertEditableAttachmentRow, updateRowAttachments]);
+
+	const removeAttachment = useCallback(async (rowId: number, attachmentId: string) => {
+		assertEditableAttachmentRow(rowId);
+		await deleteFactureAttachment(rowId, Number(attachmentId));
+		updateRowAttachments(rowId, (attachments) =>
+			attachments.filter((attachment) => attachment.id !== attachmentId));
+	}, [assertEditableAttachmentRow, updateRowAttachments]);
+
+	const downloadAttachment = useCallback(
+		(rowId: number, attachmentId: string) =>
+			downloadFactureAttachment(rowId, Number(attachmentId)),
+		[],
+	);
 
 	const refreshRows = useCallback(async (created = false) => {
 		if (created) setStoredAddRow(null);
@@ -173,7 +198,9 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 		loadError: factureRowsQuery.error,
 		reload,
 		updateCell,
-		saveAttachments,
+		addAttachment,
+		removeAttachment,
+		downloadAttachment,
 		refreshRows,
 		restoreRow,
 	};

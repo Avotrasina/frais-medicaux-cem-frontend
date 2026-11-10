@@ -1,6 +1,6 @@
 import type { FactureGlobaleListeeResponseDto } from "../../../api/domains/facture";
 import { formatDate } from "../../../utils/format";
-import { getFactureAttachmentsMock } from "./factureAttachmentMock";
+import { mapFactureAttachment } from "./mapFactureAttachment";
 import type { FactureGlobaleRow } from "../types/invoiceTable";
 
 function toAmount(value: string | null, field: string, factureId: number): number {
@@ -39,7 +39,7 @@ export function mapFactureGlobaleResponse(
 	return {
 		id: facture.id,
 		prestataireId: facture.prestataireId,
-		piecesJointes: getFactureAttachmentsMock(facture.id),
+		piecesJointes: (facture.piecesJointes ?? []).map(mapFactureAttachment),
 		refSocial: facture.refSociale,
 		dateReception: toDisplayDate(facture.dateReception, "date de réception", facture.id),
 		numFacture: facture.numFacture,

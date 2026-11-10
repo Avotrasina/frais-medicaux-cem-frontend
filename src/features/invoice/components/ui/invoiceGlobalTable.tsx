@@ -76,7 +76,9 @@ export default function FactureGlobaleTable({
     addRowRef,
     onRowSelect,
     onCellChange,
-    onSaveAttachments,
+    onAddAttachment,
+    onRemoveAttachment,
+    onDownloadAttachment,
 }: FactureGlobaleTableProps) {
     const { role } = useAuth();
     const isRoleY = role === "Y";
@@ -369,7 +371,9 @@ export default function FactureGlobaleTable({
                                                 key={column.key}
                                                 attachments={row.piecesJointes}
                                                 readOnly
-                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                                onAdd={(file) => onAddAttachment(row.id, file)}
+                                                onRemove={(attachmentId) => onRemoveAttachment(row.id, attachmentId)}
+                                                onDownload={(attachmentId) => onDownloadAttachment(row.id, attachmentId)}
                                             />
                                         );
                                     }
@@ -417,7 +421,9 @@ export default function FactureGlobaleTable({
                                                 key={column.key}
                                                 attachments={row.piecesJointes}
                                                 readOnly={activeRowId !== null && activeRowId !== row.id}
-                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                                onAdd={(file) => onAddAttachment(row.id, file)}
+                                                onRemove={(attachmentId) => onRemoveAttachment(row.id, attachmentId)}
+                                                onDownload={(attachmentId) => onDownloadAttachment(row.id, attachmentId)}
                                             />
                                         );
                                     }
@@ -565,7 +571,9 @@ export default function FactureGlobaleTable({
                                                 disabledMessage={isAddRowLocked
                                                     ? "Une autre ligne est en cours de modification."
                                                     : "Enregistrez d’abord la facture pour gérer ses pièces jointes."}
-                                                onSave={(attachments) => onSaveAttachments(row.id, attachments)}
+                                                onAdd={(file) => onAddAttachment(row.id, file)}
+                                                onRemove={(attachmentId) => onRemoveAttachment(row.id, attachmentId)}
+                                                onDownload={(attachmentId) => onDownloadAttachment(row.id, attachmentId)}
                                             />
                                         );
                                     }
