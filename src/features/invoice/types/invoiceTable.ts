@@ -55,7 +55,6 @@ export type FactureGlobaleChanges = Partial<{
 	[K in Exclude<keyof FactureGlobaleRow, "id">]: FactureGlobaleRow[K] | undefined;
 }>;
 
-/** Body of `POST /factures`. */
 export type FactureGlobaleCreateInput = CreerFactureGlobaleDto;
 
 export const FACTURE_GLOBALE_UPDATE_KEYS = [
@@ -63,6 +62,7 @@ export const FACTURE_GLOBALE_UPDATE_KEYS = [
 	"numFacture",
 	"dateFacture",
 	"nomEtablissement",
+	"prestataireId",
 	"montantTotal",
 	"partCem100",
 	"depassement",

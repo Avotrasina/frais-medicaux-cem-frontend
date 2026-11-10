@@ -147,7 +147,7 @@ export default function useInvoiceRowEditing(
 
 				const changes = getChangedValues(originalRow, currentRow);
 				if (Object.keys(changes).length > 0) {
-					await modifyInvoice(originalRow.refSocial, changes);
+					await modifyInvoice(originalRow.id, changes);
 				}
 			}
 		} catch (error) {
