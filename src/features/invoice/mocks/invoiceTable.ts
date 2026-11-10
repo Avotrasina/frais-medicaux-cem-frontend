@@ -1,5 +1,4 @@
 import type {
-	FactureGlobaleCreateInput,
 	FactureGlobaleRow,
 	FactureGlobaleUpdateChanges,
 } from "../types/invoiceTable";
@@ -115,47 +114,6 @@ function cloneFactureGlobaleRow(row: FactureGlobaleRow): FactureGlobaleRow {
 		piecesJointes: [...row.piecesJointes],
 		moisPrestation: row.moisPrestation ? new Date(row.moisPrestation) : null,
 	};
-}
-
-export async function createFactureGlobaleMock(
-	input: FactureGlobaleCreateInput,
-): Promise<FactureGlobaleRow> {
-	await Promise.resolve();
-	const rows = getFactureGlobaleRows();
-	const id = Math.max(0, ...rows.map((row) => row.id)) + 1;
-	const createdRow: FactureGlobaleRow = {
-		id,
-		piecesJointes: [],
-		refSocial: `26/${String(id).padStart(3, "0")}`,
-		dateReception: input.dateReception,
-		numFacture: input.numFacture,
-		dateFacture: input.dateFacture,
-		nomEtablissement: input.nomEtablissement,
-		localite: input.localite,
-		montantTotal: input.montantTotal,
-		partCem100: 0,
-		depassement: 0,
-		partCem80: 0,
-		partAgent20: 0,
-		totalPartAgent: 0,
-		moisPrestation: null,
-		refAgence: "",
-		remarques1: "",
-		retourPrestataire: "",
-		recuApresModification: "",
-		dateEnregistrement: "",
-		parQuiEnregistrement: "",
-		dateEnvoiValidation: "",
-		pourQuiValidation: "",
-		remarques2: "",
-		retourCorrection: "",
-		dateValidation: "",
-		parQuiValidationFinale: "",
-		dateSortie: "",
-		serviceSortie: "",
-	};
-	factureGlobaleRows = [...rows, createdRow];
-	return cloneFactureGlobaleRow(createdRow);
 }
 
 export async function modifyFactureGlobaleMock(

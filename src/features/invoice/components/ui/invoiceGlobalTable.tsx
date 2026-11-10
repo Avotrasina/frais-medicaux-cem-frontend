@@ -449,6 +449,7 @@ export default function FactureGlobaleTable({
                                                 className={cellClass}
                                                 isLocked={activeRowId !== null && activeRowId !== row.id}
                                                 onSelect={(prestataire) => {
+                                                    onCellChange(row.id, "prestataireId", prestataire.id);
                                                     onCellChange(row.id, "nomEtablissement", prestataire.nomEtablissement);
                                                     onCellChange(row.id, "localite", prestataire.localite);
                                                 }}
@@ -584,6 +585,7 @@ export default function FactureGlobaleTable({
                                                 className={cellClass}
                                                 isLocked={isAddRowLocked}
                                                 onSelect={(prestataire) => {
+                                                    onCellChange(row.id, "prestataireId", prestataire.id);
                                                     onCellChange(row.id, "nomEtablissement", prestataire.nomEtablissement);
                                                     onCellChange(row.id, "localite", prestataire.localite);
                                                 }}

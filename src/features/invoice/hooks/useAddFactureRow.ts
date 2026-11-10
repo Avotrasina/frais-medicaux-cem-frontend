@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { createFactureGlobaleMock } from "../mocks/invoiceTable";
+import { createFacture } from "../services/serviceAPI";
 import type { FactureGlobaleCreateInput } from "../types/invoiceTable";
 
 export default function useAddFactureRow() {
@@ -8,7 +8,7 @@ export default function useAddFactureRow() {
 	const save = useCallback(async (input: FactureGlobaleCreateInput) => {
 		setIsLoading(true);
 		try {
-			return await createFactureGlobaleMock(input);
+			return await createFacture(input);
 		} finally {
 			setIsLoading(false);
 		}

@@ -42,15 +42,6 @@ function resolveLocalite(
 	return localite ? { ...row, localite } : row;
 }
 
-function findPrestataireId(
-	nomEtablissement: string,
-	prestataires: Prestataire[],
-): number | null {
-	return prestataires.find(
-		(prestataire) => prestataire.nomEtablissement === nomEtablissement,
-	)?.id ?? null;
-}
-
 function receptionTimestamp(value: string) {
 	if (!value) return Number.POSITIVE_INFINITY;
 	const [day, month, year] = value.split("/").map(Number);
@@ -89,17 +80,14 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 
 		const nextValue: string | number | Date | null = key === "moisPrestation"
 			? value instanceof Date ? value : null
+			: key === "prestataireId" ? (typeof value === "number" ? value : null)
 			: numericKeys.has(key) ? (value === "" ? 0 : Number(value)) : typeof value === "string" ? value : "";
-		const nextPrestataireId = key === "nomEtablissement" && typeof nextValue === "string"
-			? findPrestataireId(nextValue, prestataires)
-			: undefined;
 		if (rowId === addRow.id) {
 			setStoredAddRow((current) => {
 				const row = current ?? addRow;
 				return {
 					...row,
 					[key]: nextValue,
-					...(nextPrestataireId !== undefined && { prestataireId: nextPrestataireId }),
 					...((key === "depassement" || key === "partAgent20") && {
 						totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
 							+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
@@ -112,14 +100,13 @@ export default function useFactureGlobaleRows(prestataires: Prestataire[]) {
 			.map((row) => row.id === rowId ? {
 				...row,
 				[key]: nextValue,
-				...(nextPrestataireId !== undefined && { prestataireId: nextPrestataireId }),
 				...((key === "depassement" || key === "partAgent20") && {
 					totalPartAgent: (key === "depassement" ? Number(nextValue) : row.depassement)
 						+ (key === "partAgent20" ? Number(nextValue) : row.partAgent20),
 				}),
 			} as FactureGlobaleRow : row)
 			.sort((a, b) => receptionTimestamp(a.dateReception) - receptionTimestamp(b.dateReception)));
-	}, [addRow, factureRowsQuery.data, prestataires]);
+	}, [addRow, factureRowsQuery.data]);
 
 	const restoreRow = useCallback((rowId: number, originalRow: FactureGlobaleRow, wasAddRow: boolean) => {
 		if (wasAddRow) {

@@ -1,4 +1,5 @@
 import type { RefObject } from "react";
+import type { CreerFactureGlobaleDto } from "../../../api/domains/facture";
 import type { Prestataire } from "./prestataire";
 
 export const ContrainteType = {
@@ -53,10 +54,8 @@ export type FactureGlobaleChanges = Partial<{
 	[K in Exclude<keyof FactureGlobaleRow, "id">]: FactureGlobaleRow[K] | undefined;
 }>;
 
-export type FactureGlobaleCreateInput = Pick<
-	FactureGlobaleRow,
-	"dateReception" | "numFacture" | "dateFacture" | "nomEtablissement" | "localite" | "montantTotal"
->;
+/** Body of `POST /factures`. */
+export type FactureGlobaleCreateInput = CreerFactureGlobaleDto;
 
 export const FACTURE_GLOBALE_UPDATE_KEYS = [
 	"dateReception",

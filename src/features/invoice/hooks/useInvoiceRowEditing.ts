@@ -15,8 +15,8 @@ import {
 
 type EditingMode = "create" | "update";
 
-const createKeys = new Set<string>([...SaveColumnKey, "localite"]);
-const updateKeys = new Set<string>(personnelFactureGlobaleEditableColumns);
+const createKeys = new Set<string>([...SaveColumnKey, "localite", "prestataireId"]);
+const updateKeys = new Set<string>([...personnelFactureGlobaleEditableColumns, "prestataireId"]);
 
 function getChangedValues(
 	original: FactureGlobaleRow,
@@ -38,25 +38,32 @@ function getChangedValues(
 	return changes;
 }
 
+/** Table dates are stored as `dd/mm/yyyy`; the API expects `yyyy-mm-dd`. */
+function toApiDate(value: string): string | null {
+	const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());
+	if (!match) return null;
+	return `${match[3]}-${match[2]}-${match[1]}`;
+}
+
 function getCreateInput(row: FactureGlobaleRow): FactureGlobaleCreateInput | null {
-	if (
-		!row.dateReception.trim()
-		|| !row.numFacture.trim()
-		|| !row.dateFacture.trim()
-		|| !row.nomEtablissement.trim()
-		|| !row.localite.trim()
-		|| !Number.isFinite(row.montantTotal)
-	) {
+	const dateReception = toApiDate(row.dateReception);
+	const dateFacture = toApiDate(row.dateFacture);
+	const numFacture = row.numFacture.trim();
+	const prestataireId = row.prestataireId;
+
+	if (!dateReception || !dateFacture || !numFacture || typeof prestataireId !== "number") {
 		return null;
 	}
 
 	return {
-		dateReception: row.dateReception,
-		numFacture: row.numFacture.trim(),
-		dateFacture: row.dateFacture,
-		nomEtablissement: row.nomEtablissement.trim(),
-		localite: row.localite,
-		montantTotal: row.montantTotal,
+		prestataireId,
+		numFacture,
+		dateFacture,
+		dateReception,
+		...(row.moisPrestation && {
+			moisPrestation: row.moisPrestation.toISOString().slice(0, 10),
+		}),
+		...(row.refAgence.trim() && { refAgence: row.refAgence.trim() }),
 	};
 }
 
@@ -128,7 +135,7 @@ export default function useInvoiceRowEditing(
 
 				const input = getCreateInput(currentRow);
 				if (!input) {
-					setSaveError("Complétez la date de réception, le numéro, la date de facture, l’établissement, sa localité et le montant total.");
+					setSaveError("Complétez la date de réception, le numéro, la date de facture et sélectionnez un prestataire.");
 					return false;
 				}
 				await saveNewInvoice(input);
