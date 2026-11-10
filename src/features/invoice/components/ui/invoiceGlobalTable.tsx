@@ -480,7 +480,7 @@ export default function FactureGlobaleTable({
                                                 key={column.key}
                                                 className={`${cellClass} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
                                                 title={COMPUTED_AMOUNT_KEYS.has(column.key)
-                                                    ? "Calculé automatiquement à partir du montant total, du 100 % CEM et du dépassement."
+                                                    ? "Recalculé automatiquement lors de la modification du montant total, du 100 % CEM ou du dépassement."
                                                     : undefined}
                                             >
                                                 {value instanceof Date
@@ -616,7 +616,7 @@ export default function FactureGlobaleTable({
                                                 key={column.key}
                                                 className={`${cellClass} ${isAddRowLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-default"}`}
                                                 title={COMPUTED_AMOUNT_KEYS.has(column.key)
-                                                    ? "Calculé automatiquement à partir du montant total, du 100 % CEM et du dépassement."
+                                                    ? "Recalculé automatiquement lors de la modification du montant total, du 100 % CEM ou du dépassement."
                                                     : undefined}
                                             >
                                                 {value instanceof Date

@@ -1350,8 +1350,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Modifier les informations d’une facture
-         * @description Modifie les informations générales et replace la facture au statut ENREGISTREE.
+         * Modifier une facture
+         * @description Modifie les informations générales et les montants, puis replace la facture au statut ENREGISTREE.
          */
         patch: operations["FactureWorkflowController_modifierInformations"];
         trace?: never;
@@ -1482,26 +1482,6 @@ export interface paths {
          * @description Applique une action métier autorisée et retourne la facture ainsi que le mouvement créé.
          */
         patch: operations["FactureWorkflowController_modifierStatut"];
-        trace?: never;
-    };
-    "/factures/{id}/montants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Modifier les montants d’une facture
-         * @description Met à jour les montants globaux et replace la facture au statut ENREGISTREE.
-         */
-        patch: operations["FactureWorkflowController_modifierMontants"];
         trace?: never;
     };
     "/paies/{mois}/cloture": {
@@ -2386,6 +2366,9 @@ export interface components {
             total100Cem: string;
             totalDepassement: string;
             tauxCem: string;
+            montant80Cem: string | null;
+            montant20Agent: string | null;
+            totalChargeAgent: string | null;
             /** @enum {string} */
             statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
             /** @enum {string|null} */
@@ -2423,6 +2406,9 @@ export interface components {
             total100Cem: string;
             totalDepassement: string;
             tauxCem: string;
+            montant80Cem: string | null;
+            montant20Agent: string | null;
+            totalChargeAgent: string | null;
             /** @enum {string} */
             statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
             /** @enum {string|null} */
@@ -2460,6 +2446,9 @@ export interface components {
             total100Cem: string;
             totalDepassement: string;
             tauxCem: string;
+            montant80Cem: string | null;
+            montant20Agent: string | null;
+            totalChargeAgent: string | null;
             /** @enum {string} */
             statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
             /** @enum {string|null} */
@@ -2662,6 +2651,9 @@ export interface components {
             total100Cem: string;
             totalDepassement: string;
             tauxCem: string;
+            montant80Cem: string | null;
+            montant20Agent: string | null;
+            totalChargeAgent: string | null;
             /** @enum {string} */
             statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
             /** @enum {string|null} */
@@ -2699,6 +2691,9 @@ export interface components {
             total100Cem: string;
             totalDepassement: string;
             tauxCem: string;
+            montant80Cem: string | null;
+            montant20Agent: string | null;
+            totalChargeAgent: string | null;
             /** @enum {string} */
             statut: "ENREGISTREE" | "EN_VALIDATION" | "RETOURNEE" | "VALIDEE" | "SORTIE" | "A_CORRIGER" | "SUPPRESSION_DEMANDEE" | "SUPPRIMEE";
             /** @enum {string|null} */
@@ -2730,6 +2725,18 @@ export interface components {
             date?: string;
         };
         ModifierFactureGlobaleDto: {
+            /** @description Montant total de la facture. */
+            montantTotal?: number;
+            /** @description Montant pris en charge à 100 % CEM. */
+            total100Cem?: number;
+            /** @description Montant du dépassement. */
+            totalDepassement?: number;
+            /** @description Part CEM calculée et vérifiée par le serveur. */
+            montant80Cem?: number;
+            /** @description Part agent calculée et vérifiée par le serveur. */
+            montant20Agent?: number;
+            /** @description Charge totale agent calculée et vérifiée par le serveur. */
+            totalChargeAgent?: number;
             prestataireId?: number;
             numFacture?: string;
             dateFacture?: string;
@@ -2737,12 +2744,6 @@ export interface components {
             moisPrestation?: string;
             refAgence?: string | null;
             remarque?: string | null;
-            motif?: string;
-        };
-        ModifierMontantsFactureDto: {
-            montantTotal?: number;
-            total100Cem?: number;
-            totalDepassement?: number;
             motif?: string;
         };
         RefusClotureDetailResponseDto: {
@@ -5851,31 +5852,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FactureWorkflowResponseDto"];
-                };
-            };
-        };
-    };
-    FactureWorkflowController_modifierMontants: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ModifierMontantsFactureDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FactureGlobaleModificationResponseDto"];
                 };
             };
         };

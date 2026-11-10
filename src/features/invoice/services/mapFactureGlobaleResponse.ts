@@ -2,7 +2,6 @@ import type { FactureGlobaleListeeResponseDto } from "../../../api/domains/factu
 import { formatDate } from "../../../utils/format";
 import { getFactureAttachmentsMock } from "./factureAttachmentMock";
 import type { FactureGlobaleRow } from "../types/invoiceTable";
-import { computeFactureGlobaleAmounts } from "../utils/invoiceAmounts";
 
 function toAmount(value: string | null, field: string, factureId: number): number {
 	if (value === null) return 0;
@@ -49,7 +48,9 @@ export function mapFactureGlobaleResponse(
 		montantTotal,
 		partCem100,
 		depassement,
-		...computeFactureGlobaleAmounts(montantTotal, partCem100, depassement),
+		partCem80: toAmount(facture.montant80Cem, "montant 80 % CEM", facture.id),
+		partAgent20: toAmount(facture.montant20Agent, "montant 20 % agent", facture.id),
+		totalPartAgent: toAmount(facture.totalChargeAgent, "charge totale agent", facture.id),
 		localite: "",
 		moisPrestation: facture.moisPrestation ? toMonth(facture.moisPrestation, facture.id) : null,
 		refAgence: facture.refAgence ?? "",
