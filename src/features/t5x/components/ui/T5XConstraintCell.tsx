@@ -4,10 +4,11 @@ type Props = {
 	value: T5XConstraintType | "";
 	className?: string;
 	isLocked?: boolean;
+	options?: readonly T5XConstraintType[];
 	onSave: (value: T5XConstraintType | "") => void;
 };
 
-export default function T5XConstraintCell({ value, className = "", isLocked = false, onSave }: Props) {
+export default function T5XConstraintCell({ value, className = "", isLocked = false, options = T5X_CONSTRAINT_TYPES, onSave }: Props) {
 	return (
 		<td className={`px-2 py-2 ${className}`}>
 			<select
@@ -17,7 +18,7 @@ export default function T5XConstraintCell({ value, className = "", isLocked = fa
 				value={value}
 				onChange={(event) => onSave(event.target.value as T5XConstraintType | "")}
 			>
-				{T5X_CONSTRAINT_TYPES.map((constraint) => (
+				{options.map((constraint) => (
 					<option key={constraint} value={constraint}>{constraint}</option>
 				))}
 			</select>

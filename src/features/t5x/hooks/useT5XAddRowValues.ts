@@ -4,7 +4,7 @@ export default function useT5XAddRowValues(row: Record<string, unknown> | undefi
 	const filledCells = useMemo(() => {
 		const result: Record<string, boolean> = {};
 		for (const [key, value] of Object.entries(row ?? {})) {
-			if (key === "id") continue;
+			if (key === "id" || key === "regime") continue;
 			result[key] = typeof value === "string"
 				? value.trim().length > 0
 				: typeof value === "number" && value !== 0;

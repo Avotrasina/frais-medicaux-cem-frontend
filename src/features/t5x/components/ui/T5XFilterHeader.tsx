@@ -1,11 +1,12 @@
 import { X } from "lucide-react";
-import { T5X_CONSTRAINT_TYPES, type T5XCategoryOption } from "../../types/t5xType";
+import { T5X_CONSTRAINT_TYPES, type T5XCategoryOption, type T5XConstraintType } from "../../types/t5xType";
 
 type Props = {
 	label: string;
 	width: string;
 	filterMode?: "text" | "constraint" | "category";
 	categories?: T5XCategoryOption[];
+	constraintTypes?: readonly T5XConstraintType[];
 	filterValue?: string;
 	isOpen?: boolean;
 	onMouseEnter?: () => void;
@@ -19,6 +20,7 @@ export default function T5XFilterHeader({
 	width,
 	filterMode,
 	categories = [],
+	constraintTypes = T5X_CONSTRAINT_TYPES,
 	filterValue = "",
 	isOpen = false,
 	onMouseEnter,
@@ -44,7 +46,7 @@ export default function T5XFilterHeader({
 							onChange={(event) => onFilterChange?.(event.target.value)}
 						>
 							<option value="">Tous les types</option>
-							{T5X_CONSTRAINT_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+							{constraintTypes.map((type) => <option key={type} value={type}>{type}</option>)}
 						</select>
 					) : filterMode === "category" ? (
 						<select

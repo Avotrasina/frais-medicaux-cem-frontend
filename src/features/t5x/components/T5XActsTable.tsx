@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { EditableNumberCell, EditableStringCell } from "../../../components/ui";
 import { t5xConstraintColumns } from "../data/tableColumns";
+import { T5X_ACT_CONSTRAINT_TYPES } from "../types/t5xType";
 import type { T5XConstraintEditableKey, T5XConstraintTableProps } from "../types/t5xType";
 import T5XCategoryCell from "./ui/T5XCategoryCell";
 import T5XConstraintCell from "./ui/T5XConstraintCell";
@@ -12,7 +13,7 @@ const numberFormatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 
 type FilterKey = "nom" | "nomCategorie" | "typeContrainte";
 
 function canEditNumber(type: string, key: "plafondActe" | "plafondAn" | "nombreSeances") {
-	if (type === "SANS_CONTRAINTE") return false;
+	if (type === "SANS_CONTRAINTE" || type === "EXCLU" || type === "SUR_DECISION_DG") return false;
 	if (key === "plafondActe") return type === "PAR_ACTE" || type === "PAR_AN_PAR_ACTE";
 	if (key === "plafondAn") return type === "PAR_AN" || type === "PAR_AN_PAR_ACTE";
 	return type === "PAR_SEANCE";
@@ -55,8 +56,9 @@ export default function T5XActsTable({ rows, categories, addRowId, activeRowId =
 									key={column.key}
 									label={column.label}
 									width={column.width}
-								filterMode={column.filterMode}
+									filterMode={column.filterMode}
 									categories={filterKey === "nomCategorie" ? categories : undefined}
+									constraintTypes={T5X_ACT_CONSTRAINT_TYPES}
 									filterValue={filterKey ? filters[filterKey] ?? "" : ""}
 									isOpen={Boolean(filterKey && openFilter === filterKey)}
 									onMouseEnter={() => filterKey && setOpenFilter(filterKey)}
@@ -86,7 +88,7 @@ export default function T5XActsTable({ rows, categories, addRowId, activeRowId =
 									if (row.id === addRowId && !addRowHasValues) {
 										return <td key={column.key} className={`${className} text-center align-middle ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>—</td>;
 										}
-										return <T5XConstraintCell key={column.key} value={row.typeContrainte || "SANS_CONTRAINTE"} className={className} isLocked={isLocked} onSave={(value) => onCellChange(row.id, "typeContrainte", value)} />;
+										return <T5XConstraintCell key={column.key} value={row.typeContrainte || "SANS_CONTRAINTE"} className={className} isLocked={isLocked} options={T5X_ACT_CONSTRAINT_TYPES} onSave={(value) => onCellChange(row.id, "typeContrainte", value)} />;
 								}
 								if (column.key === "nomCategorie") {
 									if (row.id === addRowId && !addRowHasValues) {
@@ -105,7 +107,7 @@ export default function T5XActsTable({ rows, categories, addRowId, activeRowId =
 									const isEmpty = value === null || !Number.isFinite(value);
 									return <td key={column.key} className={`${className} ${isEmpty ? "text-center align-middle" : "text-left"} ${isLocked ? "cursor-not-allowed bg-slate-100 text-slate-400" : ""}`}>{isEmpty ? "—" : numberFormatter.format(value)}</td>;
 								}
-								const key = column.key as "code" | "nom" | "libelle";
+								const key = column.key as "code" | "nom" | "listeLibelle";
 									return <EditableStringCell key={key} value={row[key]} emptyValue="—" className={className} isLocked={isLocked} onSave={(value) => onCellChange(row.id, key as T5XConstraintEditableKey, value)} />;
 							})}
 						</tr>

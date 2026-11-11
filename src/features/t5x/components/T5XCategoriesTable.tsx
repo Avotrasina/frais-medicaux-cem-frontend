@@ -11,7 +11,7 @@ const numberFormatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 
 type FilterKey = "nom" | "typeContrainte";
 
 function canEditNumber(type: string, key: "plafondActe" | "plafondAn" | "nombreSeances") {
-	if (type === "SANS_CONTRAINTE") return false;
+	if (type === "SANS_CONTRAINTE" || type === "EXCLU" || type === "SUR_DECISION_DG") return false;
 	if (key === "plafondActe") return type === "PAR_ACTE" || type === "PAR_AN_PAR_ACTE";
 	if (key === "plafondAn") return type === "PAR_AN" || type === "PAR_AN_PAR_ACTE";
 	return type === "PAR_SEANCE";

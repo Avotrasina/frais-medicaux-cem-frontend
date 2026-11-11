@@ -1,11 +1,15 @@
 import { useCallback, useState } from "react";
 import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
 import {
-	createT5XCategoryMock,
-	fetchT5XTable1Mock,
-	updateT5XCategoryMock,
-} from "../mocks/t5xTypes";
+	createCategorie,
+	listCategories,
+} from "../../../services/categorie-acte-api";
 import type { T5XConstraintType, T5XTypeEditableKey, T5XTypeRow } from "../types/t5xType";
+import {
+	mapCategorieListItem,
+	mapCreatedCategorie,
+	toCreateCategorieInput,
+} from "../utils/t5xApiMapper";
 import { applyT5XConstraintType, createEmptyCategoryRow, hasT5XRowData } from "../utils/t5xRowUtils";
 import useSaveT5XRow from "./useSaveT5XRow";
 import useT5XRowEditing from "./useT5XRowEditing";
@@ -17,8 +21,9 @@ export default function useT5XCategories() {
 
 	const load = useCallback(async (isStale: () => boolean) => {
 		try {
-			const loadedRows = await fetchT5XTable1Mock();
+			const loaded = await listCategories({ avecPlafonds: true, inclureActes: false });
 			if (isStale()) return;
+			const loadedRows = loaded.map(mapCategorieListItem);
 			setRows([
 				...loadedRows,
 				createEmptyCategoryRow(Math.max(0, ...loadedRows.map((row) => row.id)) + 1),
@@ -58,8 +63,13 @@ export default function useT5XCategories() {
 		}));
 	}, []);
 
-	const createRow = useCallback((row: T5XTypeRow) => createT5XCategoryMock(row), []);
-	const updateRow = useCallback((row: T5XTypeRow) => updateT5XCategoryMock(row), []);
+	const createRow = useCallback(async (row: T5XTypeRow) => {
+		const created = await createCategorie(toCreateCategorieInput(row));
+		return mapCreatedCategorie(created, row);
+	}, []);
+	const updateRow = useCallback(async (): Promise<T5XTypeRow> => {
+		throw new Error("La modification des catégories n'est pas encore disponible.");
+	}, []);
 	const saveRow = useSaveT5XRow(createRow, updateRow);
 
 	const persistRow = useCallback(async (row: T5XTypeRow, isNew: boolean) => {

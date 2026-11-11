@@ -8,13 +8,15 @@ export const initialT5XTable1Mock: T5XTypeRow[] = [
 	{ id: 5, nom: "Soins sans contrainte", typeContrainte: "SANS_CONTRAINTE", plafondActe: null, plafondAn: null, nombreSeances: null },
 ];
 
+const act = (row: Omit<T5XConstraintRow, "regime">): T5XConstraintRow => ({ ...row, regime: "NORMAL" });
+
 export const initialT5XTable2Mock: T5XConstraintRow[] = [
-	{ id: 1, code: "AN-001", nom: "Analyse sanguine", libelle: "Bilan sanguin complet", categorieId: 1, nomCategorie: "Laboratoire", typeContrainte: "PAR_AN", plafondActe: null, plafondAn: 2_000_000, nombreSeances: null },
-	{ id: 2, code: "AN-002", nom: "Analyse urinaire", libelle: "Examen cytobactériologique", categorieId: 1, nomCategorie: "Laboratoire", typeContrainte: "PAR_AN", plafondActe: null, plafondAn: 750_000, nombreSeances: null },
-	{ id: 3, code: "CH-001", nom: "Chirurgie générale", libelle: "Intervention chirurgicale", categorieId: 2, nomCategorie: "Chirurgie", typeContrainte: "PAR_AN_PAR_ACTE", plafondActe: 4_000_000, plafondAn: 8_000_000, nombreSeances: null },
-	{ id: 4, code: "CO-001", nom: "Consultation spécialiste", libelle: "Consultation médicale spécialisée", categorieId: 3, nomCategorie: "Consultation", typeContrainte: "PAR_ACTE", plafondActe: 120_000, plafondAn: null, nombreSeances: null },
-	{ id: 5, code: "KI-001", nom: "Séance de kinésithérapie", libelle: "Rééducation fonctionnelle", categorieId: 4, nomCategorie: "Kinésithérapie", typeContrainte: "PAR_SEANCE", plafondActe: null, plafondAn: null, nombreSeances: 12 },
-	{ id: 6, code: "SO-001", nom: "Soins infirmiers", libelle: "Soins à domicile", categorieId: 5, nomCategorie: "Soins", typeContrainte: "SANS_CONTRAINTE", plafondActe: null, plafondAn: null, nombreSeances: null },
+	act({ id: 1, code: "AN-001", nom: "Analyse sanguine", listeLibelle: "Bilan sanguin complet", categorieId: 1, nomCategorie: "Laboratoire", typeContrainte: "PAR_AN", plafondActe: null, plafondAn: 2_000_000, nombreSeances: null }),
+	act({ id: 2, code: "AN-002", nom: "Analyse urinaire", listeLibelle: "Examen cytobactériologique", categorieId: 1, nomCategorie: "Laboratoire", typeContrainte: "PAR_AN", plafondActe: null, plafondAn: 750_000, nombreSeances: null }),
+	act({ id: 3, code: "CH-001", nom: "Chirurgie générale", listeLibelle: "Intervention chirurgicale", categorieId: 2, nomCategorie: "Chirurgie", typeContrainte: "PAR_AN_PAR_ACTE", plafondActe: 4_000_000, plafondAn: 8_000_000, nombreSeances: null }),
+	act({ id: 4, code: "CO-001", nom: "Consultation spécialiste", listeLibelle: "Consultation médicale spécialisée", categorieId: 3, nomCategorie: "Consultation", typeContrainte: "PAR_ACTE", plafondActe: 120_000, plafondAn: null, nombreSeances: null }),
+	act({ id: 5, code: "KI-001", nom: "Séance de kinésithérapie", listeLibelle: "Rééducation fonctionnelle", categorieId: 4, nomCategorie: "Kinésithérapie", typeContrainte: "PAR_SEANCE", plafondActe: null, plafondAn: null, nombreSeances: 12 }),
+	act({ id: 6, code: "SO-001", nom: "Soins infirmiers", listeLibelle: "Soins à domicile", categorieId: 5, nomCategorie: "Soins", typeContrainte: "SANS_CONTRAINTE", plafondActe: null, plafondAn: null, nombreSeances: null }),
 ];
 
 const mockDelay = () => new Promise((resolve) => setTimeout(resolve, 1200));

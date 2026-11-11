@@ -1,12 +1,9 @@
 import { useCallback, useState } from "react";
 import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
-import {
-	createT5XActMock,
-	fetchT5XTable2Mock,
-	updateT5XActMock,
-} from "../mocks/t5xTypes";
+import { createActe, listActes } from "../../../services/acte-api";
 import type { T5XCategoryOption, T5XConstraintEditableKey, T5XConstraintRow, T5XConstraintType } from "../types/t5xType";
-import { applyT5XConstraintType, createEmptyActRow, hasT5XRowData } from "../utils/t5xRowUtils";
+import { mapActeListItem, mapCreatedActe, toCreateActeInput } from "../utils/t5xApiMapper";
+import { applyT5XActConstraintType, createEmptyActRow, hasT5XRowData } from "../utils/t5xRowUtils";
 import useSaveT5XRow from "./useSaveT5XRow";
 import useT5XRowEditing from "./useT5XRowEditing";
 
@@ -17,8 +14,14 @@ export default function useT5XActs(categories: T5XCategoryOption[]) {
 
 	const load = useCallback(async (isStale: () => boolean) => {
 		try {
-			const loadedRows = await fetchT5XTable2Mock();
+			const loaded = await listActes({ avecPlafonds: true });
 			if (isStale()) return;
+			const loadedRows = loaded.map((acte) =>
+				mapActeListItem(
+					acte,
+					categories.find((item) => item.id === acte.categorieActeId)?.nom ?? "",
+				),
+			);
 			setRows([
 				...loadedRows,
 				createEmptyActRow(Math.max(0, ...loadedRows.map((row) => row.id)) + 1),
@@ -35,7 +38,7 @@ export default function useT5XActs(categories: T5XCategoryOption[]) {
 		} finally {
 			if (!isStale()) setIsLoading(false);
 		}
-	}, []);
+	}, [categories]);
 
 	useAsyncLoader(load);
 
@@ -50,7 +53,7 @@ export default function useT5XActs(categories: T5XCategoryOption[]) {
 			if (current.id !== rowId) return current;
 			let updated: T5XConstraintRow;
 			if (key === "typeContrainte") {
-				updated = applyT5XConstraintType(current, value as T5XConstraintType | "");
+				updated = applyT5XActConstraintType(current, value as T5XConstraintType | "");
 			} else if (key === "categorieId") {
 				const category = categories.find((item) => item.id === Number(value));
 				updated = category
@@ -71,8 +74,13 @@ export default function useT5XActs(categories: T5XCategoryOption[]) {
 		}));
 	}, [categories]);
 
-	const createRow = useCallback((row: T5XConstraintRow) => createT5XActMock(row), []);
-	const updateRow = useCallback((row: T5XConstraintRow) => updateT5XActMock(row), []);
+	const createRow = useCallback(async (row: T5XConstraintRow) => {
+		const created = await createActe(toCreateActeInput(row));
+		return mapCreatedActe(created, row);
+	}, []);
+	const updateRow = useCallback(async (): Promise<T5XConstraintRow> => {
+		throw new Error("La modification des actes n'est pas encore disponible.");
+	}, []);
 	const saveRow = useSaveT5XRow(createRow, updateRow);
 
 	const persistRow = useCallback(async (row: T5XConstraintRow, isNew: boolean) => {

@@ -8,7 +8,16 @@ export const T5X_CONSTRAINT_TYPES = [
 	"SANS_CONTRAINTE",
 ] as const;
 
-export type T5XConstraintType = (typeof T5X_CONSTRAINT_TYPES)[number];
+export const T5X_REGIME_TYPES = ["EXCLU", "SUR_DECISION_DG"] as const;
+
+export const T5X_ACT_CONSTRAINT_TYPES = [
+	...T5X_CONSTRAINT_TYPES,
+	...T5X_REGIME_TYPES,
+] as const;
+
+export type T5XConstraintType = (typeof T5X_ACT_CONSTRAINT_TYPES)[number];
+
+export type T5XRegime = "NORMAL" | (typeof T5X_REGIME_TYPES)[number];
 
 export type T5XTypeRow = {
 	id: number;
@@ -23,10 +32,11 @@ export type T5XConstraintRow = {
 	id: number;
 	code: string;
 	nom: string;
-	libelle: string;
+	listeLibelle: string;
 	categorieId: number;
 	nomCategorie: string;
 	typeContrainte: T5XConstraintType | "";
+	regime: T5XRegime;
 	plafondActe: number | null;
 	plafondAn: number | null;
 	nombreSeances: number | null;
