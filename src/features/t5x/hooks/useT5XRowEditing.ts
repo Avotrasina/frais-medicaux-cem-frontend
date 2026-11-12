@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 type IdentifiedRow = { id: number };
-type EditableKey<T> = Exclude<keyof T, "id">;
+type EditableKey<T> = Exclude<keyof T, "id" | "contraintePropre">;
 type CellValue<T> = T[EditableKey<T>];
 type UpdateCell<T> = (rowId: number, key: EditableKey<T>, value: CellValue<T>) => void;
 
@@ -10,7 +10,7 @@ type Options<T extends IdentifiedRow> = {
 	addRowId: number;
 	onCellChange: UpdateCell<T>;
 	onRowRestore: (rowId: number, originalRow: T) => void;
-	onRowSave: (row: T, isNew: boolean) => Promise<T>;
+	onRowSave: (row: T, originalRow: T, isNew: boolean) => Promise<T>;
 	isValidNewRow: (row: T) => boolean;
 };
 
@@ -23,11 +23,28 @@ export default function useT5XRowEditing<T extends IdentifiedRow>({
 	isValidNewRow,
 }: Options<T>) {
 	const [activeRowId, setActiveRowId] = useState<number | null>(null);
+	const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
 	const [originalRow, setOriginalRow] = useState<T | null>(null);
 	const [activeIsNew, setActiveIsNew] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState<string | null>(null);
 	const activeRow = rows.find((row) => row.id === activeRowId) ?? null;
+
+	/**
+	 * Selects a row on a simple click. Clicking the selected row keeps it
+	 * selected (no toggle), and the selection cannot move while another row is
+	 * being edited — same behaviour as the invoice page.
+	 */
+	const selectRow = useCallback((rowId: number | null) => {
+		if (rowId === null) {
+			setSelectedRowId(null);
+			return;
+		}
+		if (activeRowId !== null && activeRowId !== rowId) return;
+		setSelectedRowId(rowId);
+	}, [activeRowId]);
+
+	const resetSelection = useCallback(() => setSelectedRowId(null), []);
 
 	const updateCell = useCallback((rowId: number, key: EditableKey<T>, value: CellValue<T>) => {
 		if (activeRowId !== null && activeRowId !== rowId) return;
@@ -38,6 +55,7 @@ export default function useT5XRowEditing<T extends IdentifiedRow>({
 			setOriginalRow(row);
 			setActiveIsNew(rowId === addRowId);
 		}
+		setSelectedRowId(rowId);
 		setSaveError(null);
 		onCellChange(rowId, key, value);
 	}, [activeRowId, addRowId, onCellChange, rows]);
@@ -63,7 +81,7 @@ export default function useT5XRowEditing<T extends IdentifiedRow>({
 		setIsSaving(true);
 		setSaveError(null);
 		try {
-			await onRowSave(activeRow, activeIsNew);
+			await onRowSave(activeRow, originalRow, activeIsNew);
 			clearActiveRow();
 			return true;
 		} catch (error) {
@@ -83,6 +101,9 @@ export default function useT5XRowEditing<T extends IdentifiedRow>({
 
 	return {
 		activeRowId,
+		selectedRowId,
+		selectRow,
+		resetSelection,
 		canSave,
 		isSaving,
 		saveError,

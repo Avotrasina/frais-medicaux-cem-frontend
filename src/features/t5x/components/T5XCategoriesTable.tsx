@@ -17,7 +17,7 @@ function canEditNumber(type: string, key: "plafondActe" | "plafondAn" | "nombreS
 	return type === "PAR_SEANCE";
 }
 
-export default function T5XTypesTable({ rows, addRowId, activeRowId = null, containerRef, addRowRef, onCellChange }: T5XTypeTableProps) {
+export default function T5XTypesTable({ rows, addRowId, activeRowId = null, selectedRowId = null, onRowSelect, containerRef, addRowRef, onCellChange }: T5XTypeTableProps) {
 	const [openFilter, setOpenFilter] = useState<FilterKey | null>(null);
 	const [filters, setFilters] = useState<Partial<Record<FilterKey, string>>>({});
 	const dataRows = rows.filter((row) => row.id !== addRowId);
@@ -73,7 +73,8 @@ export default function T5XTypesTable({ rows, addRowId, activeRowId = null, cont
 							key={row.id}
 							ref={row.id === addRowId ? addRowRef : undefined}
 							tabIndex={row.id === addRowId ? -1 : undefined}
-							className={`h-12 bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId && activeRowId === null ? "focus:relative focus:z-[1] focus:bg-blue-50 focus:[&>td]:border-y-2 focus:[&>td]:border-blue-600 focus:[&>td:first-child]:border-l-2 focus:[&>td:last-child]:border-r-2 focus:[&>td:first-child]:border-l-blue-600 focus:[&>td:last-child]:border-r-blue-600" : ""} ${row.id === activeRowId ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2" : ""}`}
+							onClick={() => onRowSelect?.(row.id)}
+							className={`h-12 cursor-pointer bg-white text-slate-900 hover:bg-slate-50 ${row.id === addRowId && activeRowId === null ? "focus:relative focus:z-[1] focus:bg-blue-50 focus:[&>td]:border-y-2 focus:[&>td]:border-blue-600 focus:[&>td:first-child]:border-l-2 focus:[&>td:last-child]:border-r-2 focus:[&>td:first-child]:border-l-blue-600 focus:[&>td:last-child]:border-r-blue-600" : ""} ${(activeRowId ?? selectedRowId) === row.id ? "relative z-[1] bg-blue-50 [&>td]:border-y-2 [&>td]:border-blue-600 [&>td:first-child]:border-l-2 [&>td:last-child]:border-r-2 [&>td:first-child]:border-l-blue-600 [&>td:last-child]:border-r-blue-600" : ""}`}
 						>
 							{t5xTypeColumns.map((column) => {
 								const className = `${cellClass} ${column.width}`;

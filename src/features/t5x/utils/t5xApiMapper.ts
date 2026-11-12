@@ -1,9 +1,14 @@
 import type { CategorieActeAvecPlafondsResponseDto } from "../../../api/domains/categorie-acte";
 import type { ActeAvecPlafondsResponseDto } from "../../../api/domains/shared/components";
-import type { ActeListResponse, CreateActeInput } from "../../../services/acte-api";
+import type {
+	ActeListResponse,
+	CreateActeInput,
+	UpdateActeInput,
+} from "../../../services/acte-api";
 import type {
 	CategorieListResponse,
 	CreateCategorieBody,
+	UpdateCategorieInput,
 } from "../../../services/categorie-acte-api";
 import type {
 	T5XConstraintRow,
@@ -72,6 +77,7 @@ export function isCategorieWithPlafonds(
 export function mapActeToRow(
 	acte: ActeAvecPlafondsResponseDto,
 	nomCategorie: string,
+	contraintePropre = false,
 ): T5XConstraintRow {
 	return {
 		id: acte.id,
@@ -82,6 +88,7 @@ export function mapActeToRow(
 		nomCategorie,
 		regime: acte.regime,
 		...mapPlafonds(acte.plafonds, acte.regime),
+		contraintePropre,
 	};
 }
 
@@ -98,8 +105,9 @@ export function mapCategorieToRow(
 export function mapActeListItem(
 	acte: ActeListResponse[number],
 	nomCategorie: string,
+	contraintePropre = false,
 ): T5XConstraintRow {
-	if (isActeWithPlafonds(acte)) return mapActeToRow(acte, nomCategorie);
+	if (isActeWithPlafonds(acte)) return mapActeToRow(acte, nomCategorie, contraintePropre);
 	return {
 		id: acte.id,
 		code: acte.code,
@@ -112,6 +120,7 @@ export function mapActeListItem(
 		plafondActe: null,
 		plafondAn: null,
 		nombreSeances: null,
+		contraintePropre,
 	};
 }
 
@@ -134,7 +143,7 @@ export function mapCreatedActe(
 	row: T5XConstraintRow,
 ): T5XConstraintRow {
 	if (isActeWithPlafonds(created)) {
-		return mapActeToRow(created, row.nomCategorie);
+		return mapActeToRow(created, row.nomCategorie, row.contraintePropre);
 	}
 	return {
 		...row,
@@ -207,7 +216,23 @@ export function toPlafondsCreation(
 	}
 }
 
-export function toCreateActeInput(row: T5XConstraintRow): CreateActeInput {
+/** Vrai lorsque la contrainte de la ligne diffère de celle de la ligne d'origine. */
+export function constraintChanged(
+	row: ConstraintFields,
+	originalRow: ConstraintFields,
+): boolean {
+	return (
+		row.typeContrainte !== originalRow.typeContrainte
+		|| row.plafondActe !== originalRow.plafondActe
+		|| row.plafondAn !== originalRow.plafondAn
+		|| row.nombreSeances !== originalRow.nombreSeances
+	);
+}
+
+export function toCreateActeInput(
+	row: T5XConstraintRow,
+	options: { contrainteVerrouillee?: boolean } = {},
+): CreateActeInput {
 	const code = row.code.trim();
 	const nomActe = row.nom.trim();
 	const listeLibelle = row.listeLibelle.trim();
@@ -217,7 +242,10 @@ export function toCreateActeInput(row: T5XConstraintRow): CreateActeInput {
 	if (!row.categorieId) {
 		throw new Error("La catégorie est requise.");
 	}
-	const plafonds = toPlafondsCreation(row);
+	// Rule 1: the category carries a constraint, the act cannot create one.
+	const plafonds = options.contrainteVerrouillee
+		? undefined
+		: toPlafondsCreation(row);
 	return {
 		type: "ACTE",
 		code,
@@ -229,6 +257,30 @@ export function toCreateActeInput(row: T5XConstraintRow): CreateActeInput {
 	};
 }
 
+export function toUpdateActeInput(
+	row: T5XConstraintRow,
+	originalRow: T5XConstraintRow,
+	options: { contrainteVerrouillee?: boolean } = {},
+): UpdateActeInput {
+	const payload: UpdateActeInput = {
+		code: row.code.trim(),
+		nomActe: row.nom.trim(),
+		listeLibelle: row.listeLibelle.trim(),
+		regime: row.regime,
+		categorieActeId: row.categorieId,
+	};
+	const modifiee = constraintChanged(row, originalRow);
+	if (options.contrainteVerrouillee) {
+		// Rule 1: the act inherits the category constraint, its own one is purged.
+		if (modifiee || row.contraintePropre) payload.plafonds = null;
+		return payload;
+	}
+	if (modifiee) {
+		payload.plafonds = toPlafondsCreation(row) ?? null;
+	}
+	return payload;
+}
+
 export function toCreateCategorieInput(row: T5XTypeRow): CreateCategorieBody {
 	const nomCategorie = row.nom.trim();
 	if (!nomCategorie) {
@@ -236,4 +288,15 @@ export function toCreateCategorieInput(row: T5XTypeRow): CreateCategorieBody {
 	}
 	const plafonds = toPlafondsCreation(row);
 	return { nomCategorie, ...(plafonds ? { plafonds } : {}) };
+}
+
+export function toUpdateCategorieInput(
+	row: T5XTypeRow,
+	originalRow: T5XTypeRow,
+): UpdateCategorieInput {
+	const payload: UpdateCategorieInput = { nomCategorie: row.nom.trim() };
+	if (constraintChanged(row, originalRow)) {
+		payload.plafonds = toPlafondsCreation(row) ?? null;
+	}
+	return payload;
 }

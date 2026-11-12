@@ -9,7 +9,7 @@ export const t5xTypeColumns: T5XColumn<"nom" | "typeContrainte" | "plafondActe" 
 ];
 
 export const t5xConstraintColumns: T5XColumn<"code" | "nom" | "listeLibelle" | "nomCategorie" | "typeContrainte" | "plafondActe" | "plafondAn" | "nombreSeances">[] = [
-	{ key: "code", label: "Code", width: "w-32 min-w-32 max-w-32" },
+	{ key: "code", label: "Code", width: "w-32 min-w-32 max-w-32", filterMode: "text" },
 	{ key: "nom", label: "Nom", width: "w-56 min-w-56 max-w-56", filterMode: "text" },
 	{ key: "listeLibelle", label: "Liste libellé", width: "w-72 min-w-72 max-w-72" },
 	{ key: "nomCategorie", label: "Nom catégorie", width: "w-56 min-w-56 max-w-56", filterMode: "category" },

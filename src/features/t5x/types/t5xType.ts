@@ -19,6 +19,8 @@ export type T5XConstraintType = (typeof T5X_ACT_CONSTRAINT_TYPES)[number];
 
 export type T5XRegime = "NORMAL" | (typeof T5X_REGIME_TYPES)[number];
 
+export type T5XConstraintSource = "ACTE" | "CATEGORIE";
+
 export type T5XTypeRow = {
 	id: number;
 	nom: string;
@@ -40,21 +42,29 @@ export type T5XConstraintRow = {
 	plafondActe: number | null;
 	plafondAn: number | null;
 	nombreSeances: number | null;
+
+	contraintePropre: boolean;
 };
 
 export type T5XTypeEditableKey = "nom" | "typeContrainte" | "plafondActe" | "plafondAn" | "nombreSeances";
 
-export type T5XConstraintEditableKey = Exclude<keyof T5XConstraintRow, "id">;
+export type T5XConstraintEditableKey = Exclude<keyof T5XConstraintRow, "id" | "contraintePropre">;
 
 export type T5XCategoryOption = {
 	id: number;
 	nom: string;
+	typeContrainte: T5XConstraintType | "";
+	plafondActe: number | null;
+	plafondAn: number | null;
+	nombreSeances: number | null;
 };
 
 export type T5XTypeTableProps = {
 	rows: T5XTypeRow[];
 	addRowId: number;
 	activeRowId?: number | null;
+	selectedRowId?: number | null;
+	onRowSelect?: (rowId: number | null) => void;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (rowId: number, key: T5XTypeEditableKey, value: string | number | null) => void;
@@ -65,6 +75,8 @@ export type T5XConstraintTableProps = {
 	categories: T5XCategoryOption[];
 	addRowId: number;
 	activeRowId?: number | null;
+	selectedRowId?: number | null;
+	onRowSelect?: (rowId: number | null) => void;
 	containerRef: RefObject<HTMLDivElement | null>;
 	addRowRef: RefObject<HTMLTableRowElement | null>;
 	onCellChange: (rowId: number, key: T5XConstraintEditableKey, value: string | number | null) => void;

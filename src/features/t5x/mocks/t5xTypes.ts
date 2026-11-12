@@ -8,7 +8,7 @@ export const initialT5XTable1Mock: T5XTypeRow[] = [
 	{ id: 5, nom: "Soins sans contrainte", typeContrainte: "SANS_CONTRAINTE", plafondActe: null, plafondAn: null, nombreSeances: null },
 ];
 
-const act = (row: Omit<T5XConstraintRow, "regime">): T5XConstraintRow => ({ ...row, regime: "NORMAL" });
+const act = (row: Omit<T5XConstraintRow, "regime" | "contraintePropre">): T5XConstraintRow => ({ ...row, regime: "NORMAL", contraintePropre: false });
 
 export const initialT5XTable2Mock: T5XConstraintRow[] = [
 	act({ id: 1, code: "AN-001", nom: "Analyse sanguine", listeLibelle: "Bilan sanguin complet", categorieId: 1, nomCategorie: "Laboratoire", typeContrainte: "PAR_AN", plafondActe: null, plafondAn: 2_000_000, nombreSeances: null }),

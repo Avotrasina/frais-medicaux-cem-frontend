@@ -2,13 +2,16 @@ import { useCallback, useState } from "react";
 import { useAsyncLoader } from "../../../hooks/useAsyncLoader";
 import {
 	createCategorie,
+	deleteCategorie,
 	listCategories,
+	updateCategorie,
 } from "../../../services/categorie-acte-api";
 import type { T5XConstraintType, T5XTypeEditableKey, T5XTypeRow } from "../types/t5xType";
 import {
 	mapCategorieListItem,
 	mapCreatedCategorie,
 	toCreateCategorieInput,
+	toUpdateCategorieInput,
 } from "../utils/t5xApiMapper";
 import { applyT5XConstraintType, createEmptyCategoryRow, hasT5XRowData } from "../utils/t5xRowUtils";
 import useSaveT5XRow from "./useSaveT5XRow";
@@ -44,8 +47,8 @@ export default function useT5XCategories() {
 
 	useAsyncLoader(load);
 
-	const reload = useCallback(async () => {
-		setIsLoading(true);
+	const reload = useCallback(async (silent = false) => {
+		if (!silent) setIsLoading(true);
 		setLoadError(null);
 		await load(() => false);
 	}, [load]);
@@ -67,13 +70,21 @@ export default function useT5XCategories() {
 		const created = await createCategorie(toCreateCategorieInput(row));
 		return mapCreatedCategorie(created, row);
 	}, []);
-	const updateRow = useCallback(async (): Promise<T5XTypeRow> => {
-		throw new Error("La modification des catégories n'est pas encore disponible.");
+
+	const updateRow = useCallback(async (row: T5XTypeRow, originalRow: T5XTypeRow | null) => {
+		const payload = toUpdateCategorieInput(row, originalRow ?? row);
+		const updated = await updateCategorie(row.id, payload);
+		return { ...row, id: updated.id, nom: updated.nomCategorie };
 	}, []);
+
+	const deleteRow = useCallback(async (rowId: number) => {
+		await deleteCategorie(rowId);
+	}, []);
+
 	const saveRow = useSaveT5XRow(createRow, updateRow);
 
-	const persistRow = useCallback(async (row: T5XTypeRow, isNew: boolean) => {
-		const savedRow = await saveRow(row, isNew);
+	const persistRow = useCallback(async (row: T5XTypeRow, originalRow: T5XTypeRow, isNew: boolean) => {
+		const savedRow = await saveRow(row, originalRow, isNew);
 		setRows((currentRows) => {
 			if (!isNew) return currentRows.map((item) => item.id === row.id ? savedRow : item);
 			const persistedRows = [...currentRows.filter((item) => item.id !== row.id), savedRow];
@@ -103,11 +114,15 @@ export default function useT5XCategories() {
 		loadError,
 		reload,
 		activeRowId: editing.activeRowId,
+		selectedRowId: editing.selectedRowId,
+		selectRow: editing.selectRow,
+		resetSelection: editing.resetSelection,
 		canSaveRow: editing.canSave,
 		isSaving: editing.isSaving,
 		saveError: editing.saveError,
 		updateCell: editing.updateCell,
 		saveActiveRow: editing.saveActiveRow,
 		cancelActiveRow: editing.cancelActiveRow,
+		deleteRow,
 	};
 }

@@ -14,6 +14,7 @@ export function createEmptyActRow(id: number): T5XConstraintRow {
 	return {
 		id, code: "", nom: "", listeLibelle: "", categorieId: 0, nomCategorie: "",
 		typeContrainte: "", regime: "NORMAL", plafondActe: null, plafondAn: null, nombreSeances: null,
+		contraintePropre: false,
 	};
 }
 
